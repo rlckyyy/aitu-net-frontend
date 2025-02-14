@@ -1,25 +1,25 @@
-"use client";
+'use client';
 
-import {useState} from "react";
-import {useRouter} from "next/navigation";
-import {api} from "@/lib/api";
+import { api } from '@/lib/api';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function LoginForm() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
     const router = useRouter();
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError("");
+        setError('');
 
         try {
-            await api.login(email, password);
-            router.push("/users/profile");
+            await api.login({ email, password });
+            router.push('/users/profile');
         } catch (err) {
             console.error(err);
-            setError("Неверные учетные данные");
+            setError('Неверные учетные данные');
         }
     };
 
@@ -40,7 +40,10 @@ export default function LoginForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 className="border p-2 rounded text-black"
             />
-            <button type="submit" className="bg-blue-500 text-white p-2 rounded">
+            <button
+                type="submit"
+                className="bg-blue-500 text-white p-2 rounded"
+            >
                 Войти
             </button>
         </form>

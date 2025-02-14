@@ -1,50 +1,53 @@
+import axios from 'axios';
+
 const API_URL = 'http://localhost:8080/api';
 
-async function request(endpoint: string, options: RequestInit = {}) {
-    const token = localStorage.getItem("token");
+const apiClient = axios.create({
+    baseURL: API_URL,
+    withCredentials: true,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+});
 
-    const headers = {
-        "Content-Type": "application/json",
-        ...(token ? {Authorization: `Bearer ${token}`} : {}),
-    };
-
-    const res = await fetch(`${API_URL}${endpoint}`, {
-        ...options,
-        headers,
-    });
-
-    if (!res.ok) {
-        throw new Error("Ошибка API");
+async function request(endpoint: string, options: any = {}) {
+    try {
+        const response = await apiClient.request({
+            url: endpoint,
+            ...options,
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Ошибка API', error);
+        throw error;
     }
-
-    return res.json();
 }
 
 export const api = {
-    register: (username: string, email: string, password: string) =>
-        request("/v1/auth/register", {
-            method: "POST",
-            body: JSON.stringify({username, email, password}),
+    register: (userData: {
+        username: string;
+        email: string;
+        password: string;
+    }) =>
+        request('/v1/auth/register', {
+            method: 'POST',
+            data: userData,
         }),
 
-    login: async (email: string, password: string) => {
-        const data = await request("/v1/auth/login", {
-            method: "POST",
-            body: JSON.stringify({email, password}),
+    login: async (userData: { email: string; password: string }) => {
+        return request('/v1/auth/login', {
+            method: 'POST',
+            data: userData,
         });
-
-        if (data.token) {
-            localStorage.setItem("token", data.token);
-        }
-
-        return data;
     },
 
-    getUser: () => request("/v1/users/me", {
-        method: "GET"
-    }),
+    getUser: () =>
+        request('/v1/auth/me', {
+            method: 'GET',
+        }),
 
-    logout: () => {
-        localStorage.removeItem("token");
-    },
+    logout: async () =>
+        await request('/v1/auth/logout', {
+            method: 'POST',
+        }),
 };
