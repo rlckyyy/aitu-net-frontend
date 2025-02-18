@@ -11,7 +11,7 @@ import {
 } from 'react';
 
 interface AuthContextType {
-    currentUser: User | null;
+    user: User | null;
     loginUser: (userData: { email: string; password: string }) => Promise<void>;
     logout: () => void;
     register: (userData: {
@@ -78,19 +78,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const getUser = async () => {
         try {
             const response = await api.getUser();
-            console.log('Response of ME', response);
             if (response.status === 200) {
                 setUser(response.data);
+            } else {
+                setUser(null);
             }
-        } catch (error) {
-            console.error('Failed to fetch user:', error);
+        } catch (err) {
+            console.error('Failed to fetch user:', err);
+            setUser(null); // <-- Explicitly set null if request fails
         }
     };
 
     return (
-        <AuthContext.Provider
-            value={{ currentUser: user, loginUser, logout, register }}
-        >
+        <AuthContext.Provider value={{ user, loginUser, logout, register }}>
             {children}
         </AuthContext.Provider>
     );

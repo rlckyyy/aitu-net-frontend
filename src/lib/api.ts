@@ -16,7 +16,7 @@ async function request(endpoint: string, options: any = {}) {
             url: endpoint,
             ...options,
         });
-        return response.data;
+        return response;
     } catch (error) {
         console.error('Ошибка API', error);
         throw error;
