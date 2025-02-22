@@ -130,15 +130,6 @@ export default function ChatPage() {
         selectChat(currentChatId, currentCompanion)
     }
 
-    function sendMessageOnEnter() {
-        return (event) => {
-            if (event.key === 'Enter') {
-                event.preventDefault()
-                sendMessage()
-            }
-        }
-    }
-
     return (
         <div className="h-screen bg-black text-gray-300 flex overflow-hidden">
             {/* Sidebar (Fixed height, scrollable list inside) */}
@@ -194,7 +185,7 @@ export default function ChatPage() {
                                 placeholder={`Enter message for ${currentCompanion}`}
                                 onChange={handleInputMessage}
                                 value={inputMessage}
-                                onKeyDown={sendMessageOnEnter()}
+                                onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), sendMessage())}
                             />
                             <button
                                 className="ml-2 bg-blue-600 hover:bg-blue-500 px-4 py-2 text-white rounded transition"

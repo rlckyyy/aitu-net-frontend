@@ -60,10 +60,26 @@ export const api = {
         })
     },
 
-    getUser: async (): Promise<AxiosResponse<User>> =>
-        await request<User>('/auth/me', {
+    uploadProfilePhoto: async (file: File) => {
+        const formData = new FormData();
+        formData.append('file', file);
+        return request('/users/profile/photo', {
+            method: 'PATCH',
+            data: formData,
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            }
+        })
+    },
+
+    getProfilePhoto: async (id: string) => {
+        return request(`/users/profile/photo/${id}`, {
             method: 'GET',
-        }),
+        });
+    },
+
+    getUser: async (): Promise<AxiosResponse<User>> =>
+        await request<User>('/auth/me'),
 
     logout: async () =>
         await request('/auth/logout', {
@@ -71,28 +87,18 @@ export const api = {
         }),
 
     fetchChatRooms: async (email: string): Promise<ChatRoom[]> => {
-        const response = await request<ChatRoom[]>(`/chats/rooms/${email}`, {
-            method: 'GET'
-        });
-        return response.data
+        return (await request<ChatRoom[]>(`/chats/rooms/${email}`)).data;
     },
 
     fetchOnlineUsers: async (): Promise<User[]> => {
-        const response = await request<User[]>('/chats/users/online', {
-            method: 'GET'
-        });
-        return response.data
+        return (await request<User[]>('/chats/users/online')).data;
     },
 
     fetchChatRoomMessages: async (sender: string, recipient: string) => {
-        const response = await request<ChatMessage[]>(`/chats/messages/${sender}/${recipient}`, {
-            method: 'GET'
-        })
-        return response.data
+        return (await request<ChatMessage[]>(`/chats/messages/${sender}/${recipient}`)).data
     },
 
     searchUsers: async (query: string) => {
-        const response = await request<User[]>(`/chats/users/search?query=${query}`)
-        return response.data
+        return (await request<User[]>(`/chats/users/search?query=${query}`)).data
     }
 };

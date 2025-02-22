@@ -1,17 +1,17 @@
 'use client';
 
-import { LogoutButton } from '@/app/Logout';
-import { useAuth } from '@/context/AuthProvider';
+import {LogoutButton} from '@/app/Logout';
+import {useAuth} from '@/context/AuthProvider';
 import Link from 'next/link';
 import React from "react";
 import SearchBar from "@/components/SearchBar";
 
 export default function ClientLayout({
-    children,
-}: {
+                                         children,
+                                     }: {
     children: React.ReactNode;
 }) {
-    const { user } = useAuth();
+    const {user} = useAuth();
 
     return (
         <>
@@ -21,8 +21,8 @@ export default function ClientLayout({
                 {!user && <Link href="/auth/register" className="hover:text-blue-400 transition">📝 Registration</Link>}
                 <Link href="/users/profile" className="hover:text-blue-400 transition">📌 Profile</Link>
                 {user && <Link href="/chat" className="hover:text-blue-400 transition">💬 Chat</Link>}
-                <SearchBar />
-                <LogoutButton />
+                <SearchBar/>
+                <LogoutButton/>
             </nav>
             <main className="p-6">{children}</main>
         </>
