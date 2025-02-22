@@ -19,7 +19,7 @@ export default function ChatPage() {
 
     const searchParams = useSearchParams()
 
-    // Current chat id for user
+    // Current chat id for users
     const [currentChatId, setCurrentChatId] = useState<string>('')
     const [currentCompanion, setCurrentCompanion] = useState<string>('')
 

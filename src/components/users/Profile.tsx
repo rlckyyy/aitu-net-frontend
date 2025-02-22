@@ -1,7 +1,8 @@
 'use client';
 
 import {useAuth} from '@/context/AuthProvider';
-import {useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
+import Link from "next/link";
 
 export default function Profile() {
     const {user, loadUser} = useAuth();
@@ -41,6 +42,10 @@ export default function Profile() {
                 <p>
                     <span className="font-semibold text-gray-400">Roles:</span> {user?.roles?.join(", ")}
                 </p>
+                <p>
+                    <span className="font-semibold text-gray-400">Bio:</span> {user?.description ? user?.description : "Empty"}
+                </p>
+                <Link href="/users/profile" className="hover:text-blue-400 transition"> Edit</Link>
             </div>
         </div>
     )

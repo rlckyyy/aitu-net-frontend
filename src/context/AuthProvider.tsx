@@ -86,7 +86,7 @@ export function AuthProvider({children}: AuthProviderProps) {
                 setUser(null)
             }
         } catch (err) {
-            console.error('Failed to fetch user:', err);
+            console.error('Failed to fetch users:', err);
             setUser(null);
         }
     }
