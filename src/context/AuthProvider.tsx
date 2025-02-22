@@ -1,7 +1,7 @@
 'use client';
 
-import { api } from '@/lib/api';
-import { User } from '@/models/user';
+import {api} from '@/lib/api';
+import {User} from '@/models/user';
 import {
     createContext,
     ReactNode,
@@ -12,6 +12,7 @@ import {
 
 interface AuthContextType {
     user: User | null;
+    loadUser: () => void;
     loginUser: (userData: { email: string; password: string }) => Promise<void>;
     logout: () => void;
     register: (userData: {
@@ -24,22 +25,23 @@ interface AuthContextType {
 interface AuthProviderProps {
     children: ReactNode;
 }
+
 export const AuthContext = createContext<AuthContextType | undefined>(
     undefined
 );
 
-export function AuthProvider({ children }: AuthProviderProps) {
+export function AuthProvider({children}: AuthProviderProps) {
     const [user, setUser] = useState<User | null>(null);
 
     useEffect(() => {
-        getUser();
+        loadUser();
     }, []);
 
     const loginUser = async (userData: { email: string; password: string }) => {
         try {
             const response = await api.login(userData);
             if (response.status === 200) {
-                await getUser();
+                console.log('Successfully logged in')
             }
         } catch (error) {
             console.error('Login failed:', error);
@@ -75,10 +77,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
         }
     };
 
-    const getUser = async () => {
+    const loadUser = async () => {
         try {
             const response = await api.getUser();
-            console.log('getUser response', response)
             if (response.status === 200) {
                 setUser(response.data);
             } else {
@@ -88,10 +89,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
             console.error('Failed to fetch user:', err);
             setUser(null);
         }
-    };
+    }
 
     return (
-        <AuthContext.Provider value={{ user, loginUser, logout, register }}>
+        <AuthContext.Provider value={{user, loginUser, logout, register, loadUser}}>
             {children}
         </AuthContext.Provider>
     );

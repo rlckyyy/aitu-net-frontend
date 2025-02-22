@@ -1,8 +1,6 @@
 import axios, {AxiosError, AxiosResponse} from 'axios';
 import {User} from "@/models/user";
-import Interceptors from "undici-types/interceptors";
-import retry = Interceptors.retry;
-import {log} from "node:util";
+import {ChatMessage} from "@/models/chatMessage";
 
 const API_URL = 'http://localhost:8080/api/v1';
 
