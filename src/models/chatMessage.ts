@@ -1,5 +1,5 @@
 type ChatMessage = {
-    id: string;
+    id?: string;
     chatId: string;
     sender: string;
     recipient: string;

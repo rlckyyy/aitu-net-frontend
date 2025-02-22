@@ -1,6 +1,7 @@
 'use client';
 
 import { api } from '@/lib/api';
+import { AxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -21,7 +22,10 @@ export default function AuthForm({ type }: { type: 'register' | 'login' }) {
             }
             router.push('/auth/login');
         } catch (err) {
-            setError('Ошибка: ' + err);
+            const errorMessage =
+                (err as AxiosError<ProblemDetail>)?.response?.data?.detail ||
+                'An unexpected error occurred';
+            setError(errorMessage);
         }
     };
 

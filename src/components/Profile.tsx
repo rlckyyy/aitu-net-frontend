@@ -17,23 +17,26 @@ export default function Profile() {
     if (!user) return null;
 
     return (
-        <div className="max-w-md mx-auto p-6 bg-black rounded-lg shadow-md">
-            <h1 className="text-2xl font-semibold">Профиль</h1>
-            <p>
-                <strong>ID:</strong> {user?.id}
-            </p>
-            <p>
-                <strong>Username:</strong> {user?.username}
-            </p>
-            <p>
-                <strong>Email:</strong> {user?.email}
-            </p>
-            <p>
-                <strong>FriendList:</strong> {user?.friendList}
-            </p>
-            <p>
-                <strong>Roles:</strong> {user?.roles}
-            </p>
+        <div className="max-w-md mx-auto p-6 bg-gray-900 text-white rounded-lg shadow-lg">
+            <h1 className="text-2xl font-semibold mb-4 text-blue-400">Профиль</h1>
+
+            <div className="space-y-2">
+                <p>
+                    <span className="font-semibold text-gray-400">ID:</span> {user?.id}
+                </p>
+                <p>
+                    <span className="font-semibold text-gray-400">Username:</span> {user?.username}
+                </p>
+                <p>
+                    <span className="font-semibold text-gray-400">Email:</span> {user?.email}
+                </p>
+                <p>
+                    <span className="font-semibold text-gray-400">Friend List:</span> {user?.friendList?.join(", ") || "No friends"}
+                </p>
+                <p>
+                    <span className="font-semibold text-gray-400">Roles:</span> {user?.roles?.join(", ")}
+                </p>
+            </div>
         </div>
-    );
+    )
 }

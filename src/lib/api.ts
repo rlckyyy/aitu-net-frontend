@@ -1,6 +1,10 @@
-import axios from 'axios';
+import axios, {AxiosError, AxiosResponse} from 'axios';
+import {User} from "@/models/user";
+import Interceptors from "undici-types/interceptors";
+import retry = Interceptors.retry;
+import {log} from "node:util";
 
-const API_URL = 'http://localhost:8080/api';
+const API_URL = 'http://localhost:8080/api/v1';
 
 const apiClient = axios.create({
     baseURL: API_URL,
@@ -10,17 +14,26 @@ const apiClient = axios.create({
     },
 });
 
-async function request(endpoint: string, options: any = {}) {
-    try {
-        const response = await apiClient.request({
-            url: endpoint,
-            ...options,
-        });
-        return response;
-    } catch (error) {
-        console.error('Ошибка API', error);
-        throw error;
+apiClient.interceptors.response.use(
+    (response) => response,
+    (error: AxiosError) => {
+        if (
+            error.response?.status &&
+            error.response?.status >= 400 &&
+            error.response?.status < 500
+        ) {
+            return Promise.reject(error);
+        }
+        console.error('Unexpected API error:', error);
+        return Promise.reject(error);
     }
+);
+
+async function request<T>(endpoint: string, options: any = {}) : Promise<AxiosResponse<T>> {
+    return await apiClient.request({
+        url: endpoint,
+        ...options,
+    });
 }
 
 export const api = {
@@ -29,25 +42,51 @@ export const api = {
         email: string;
         password: string;
     }) =>
-        request('/v1/auth/register', {
+        request('/auth/register', {
             method: 'POST',
             data: userData,
         }),
 
     login: async (userData: { email: string; password: string }) => {
-        return request('/v1/auth/login', {
+        return request('/auth/login', {
             method: 'POST',
             data: userData,
         });
     },
 
-    getUser: () =>
-        request('/v1/auth/me', {
+    getUser: async () : Promise<AxiosResponse<User>> =>
+        await request<User>('/auth/me', {
             method: 'GET',
         }),
 
     logout: async () =>
-        await request('/v1/auth/logout', {
+        await request('/auth/logout', {
             method: 'POST',
         }),
+
+    fetchChatRooms: async (email: string) : Promise<ChatRoom[]> => {
+        const response = await request<ChatRoom[]>(`/chats/rooms/${email}`, {
+            method: 'GET'
+        });
+        return response.data
+    },
+
+    fetchOnlineUsers: async () : Promise<User[]> => {
+        const response = await request<User[]>('/chats/users/online', {
+            method: 'GET'
+        });
+        return response.data
+    },
+
+    fetchChatRoomMessages: async (sender: string, recipient: string) => {
+        const response = await request<ChatMessage[]>(`/chats/messages/${sender}/${recipient}`, {
+            method: 'GET'
+        })
+        return response.data
+    },
+
+    searchUsers: async (query: string) => {
+        const response = await request<User[]>(`/chats/users/search?query=${query}`)
+        return response.data
+    }
 };

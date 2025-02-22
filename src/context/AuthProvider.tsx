@@ -78,14 +78,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const getUser = async () => {
         try {
             const response = await api.getUser();
+            console.log('getUser response', response)
             if (response.status === 200) {
                 setUser(response.data);
             } else {
-                setUser(null);
+                setUser(null)
             }
         } catch (err) {
             console.error('Failed to fetch user:', err);
-            setUser(null); // <-- Explicitly set null if request fails
+            setUser(null);
         }
     };
 

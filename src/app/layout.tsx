@@ -1,8 +1,7 @@
-import { LogoutButton } from '@/app/Logout';
+import ClientLayout from '@/components/ClientLayout';
 import { AuthProvider } from '@/context/AuthProvider';
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
-import Link from 'next/link';
 import './globals.css';
 
 const geistSans = Geist({
@@ -31,14 +30,7 @@ export default function RootLayout({
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >
                 <AuthProvider>
-                    <nav className="p-4 bg-gray-800 text-white flex space-x-4">
-                        <Link href="/">🏠 Main</Link>
-                        <Link href="/auth/login">🔐 Logi </Link>
-                        <Link href="/auth/register">📝 Registration</Link>
-                        <Link href="/users/profile">📌 Profile</Link>
-                        <LogoutButton />
-                    </nav>
-                    <main className="p-4">{children}</main>
+                    <ClientLayout>{children}</ClientLayout>
                 </AuthProvider>
             </body>
         </html>
