@@ -1,11 +1,17 @@
 'use client';
 
-import { useAuth } from '@/context/AuthProvider';
-import { useEffect, useState } from 'react';
+import {useAuth} from '@/context/AuthProvider';
+import {useEffect, useState} from 'react';
 
 export default function Profile() {
-    const { user } = useAuth();
+    const {user, loadUser} = useAuth();
     const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        console.log('Profile component opened')
+        console.log('User: ', user)
+        loadUser()
+    }, []);
 
     useEffect(() => {
         if (user) {
@@ -31,7 +37,8 @@ export default function Profile() {
                     <span className="font-semibold text-gray-400">Email:</span> {user?.email}
                 </p>
                 <p>
-                    <span className="font-semibold text-gray-400">Friend List:</span> {user?.friendList?.join(", ") || "No friends"}
+                    <span
+                        className="font-semibold text-gray-400">Friend List:</span> {user?.friendList?.join(", ") || "No friends"}
                 </p>
                 <p>
                     <span className="font-semibold text-gray-400">Roles:</span> {user?.roles?.join(", ")}

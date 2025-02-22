@@ -1,10 +1,11 @@
 import {useAuth} from '@/context/AuthProvider';
-import {Client, Message, Stomp} from '@stomp/stompjs';
+import {Client, Message} from '@stomp/stompjs';
 import SockJS from 'sockjs-client'
 import React, {useEffect, useRef, useState} from "react";
 import {api} from "@/lib/api";
 import {User} from "@/models/user";
 import {useSearchParams} from "next/navigation";
+import {ChatMessage, ChatMessageStatus} from "@/models/chatMessage";
 
 export default function ChatPage() {
     const stompClientRef = useRef<Client | null>(null)
@@ -90,8 +91,8 @@ export default function ChatPage() {
         setCurrentChatId(chatId)
         setCurrentCompanion(companionEmail)
 
-        const messages = await api.fetchChatRoomMessages(user.email, companionEmail)
-        const chatIdChatRoomMessages = Map.groupBy(messages.values(), item => item.chatId)
+        const messages: ChatMessage[] = await api.fetchChatRoomMessages(user.email, companionEmail)
+        const chatIdChatRoomMessages: Map<string, ChatMessage[]> = Map.groupBy(messages.values(), item => item.chatId)
         setChatRoomMessages(chatIdChatRoomMessages)
     }
 
@@ -119,7 +120,7 @@ export default function ChatPage() {
             content: inputMessage,
             recipient: currentCompanion,
             sender: user.email,
-            status: 'DELIVERED',
+            status: ChatMessageStatus.DELIVERED,
             timestamp: new Date()
         }
         stompClient.publish({

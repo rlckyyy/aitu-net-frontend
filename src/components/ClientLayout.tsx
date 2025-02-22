@@ -20,7 +20,7 @@ export default function ClientLayout({
                 {!user && <Link href="/auth/login" className="hover:text-blue-400 transition">🔐 Login</Link>}
                 {!user && <Link href="/auth/register" className="hover:text-blue-400 transition">📝 Registration</Link>}
                 <Link href="/users/profile" className="hover:text-blue-400 transition">📌 Profile</Link>
-                <Link href="/chat" className="hover:text-blue-400 transition">💬 Chat</Link>
+                {user && <Link href="/chat" className="hover:text-blue-400 transition">💬 Chat</Link>}
                 <SearchBar />
                 <LogoutButton />
             </nav>
