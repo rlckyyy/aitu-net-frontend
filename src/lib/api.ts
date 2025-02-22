@@ -1,6 +1,7 @@
 import axios, {AxiosError, AxiosResponse} from 'axios';
 import {User} from "@/models/user";
 import {ChatMessage} from "@/models/chatMessage";
+import {ProfileUpdate} from "@/models/ProfileUpdate";
 
 const API_URL = 'http://localhost:8080/api/v1';
 
@@ -27,7 +28,7 @@ apiClient.interceptors.response.use(
     }
 );
 
-async function request<T>(endpoint: string, options: any = {}) : Promise<AxiosResponse<T>> {
+async function request<T>(endpoint: string, options: any = {}): Promise<AxiosResponse<T>> {
     return await apiClient.request({
         url: endpoint,
         ...options,
@@ -52,7 +53,14 @@ export const api = {
         });
     },
 
-    getUser: async () : Promise<AxiosResponse<User>> =>
+    updateUser: async (profileUpdate: ProfileUpdate) => {
+        return request('/users', {
+            method: 'PATCH',
+            data: profileUpdate,
+        })
+    },
+
+    getUser: async (): Promise<AxiosResponse<User>> =>
         await request<User>('/auth/me', {
             method: 'GET',
         }),
@@ -62,14 +70,14 @@ export const api = {
             method: 'POST',
         }),
 
-    fetchChatRooms: async (email: string) : Promise<ChatRoom[]> => {
+    fetchChatRooms: async (email: string): Promise<ChatRoom[]> => {
         const response = await request<ChatRoom[]>(`/chats/rooms/${email}`, {
             method: 'GET'
         });
         return response.data
     },
 
-    fetchOnlineUsers: async () : Promise<User[]> => {
+    fetchOnlineUsers: async (): Promise<User[]> => {
         const response = await request<User[]>('/chats/users/online', {
             method: 'GET'
         });

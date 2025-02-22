@@ -45,7 +45,7 @@ export default function Profile() {
                 <p>
                     <span className="font-semibold text-gray-400">Bio:</span> {user?.description ? user?.description : "Empty"}
                 </p>
-                <Link href="/users/profile" className="hover:text-blue-400 transition"> Edit</Link>
+                <Link href="/users/edit" className="hover:text-blue-400 transition"> Edit</Link>
             </div>
         </div>
     )
