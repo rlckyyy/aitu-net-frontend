@@ -2,9 +2,9 @@
 
 import {useAuth} from "@/context/AuthProvider";
 import React, {FormEvent, useState} from "react";
-import {api} from "@/lib/api";
 import {ProfileUpdate} from "@/models/ProfileUpdate";
 import {useRouter} from "next/navigation";
+import {api} from "@/lib";
 
 export default function () {
     const {user} = useAuth()
@@ -17,7 +17,7 @@ export default function () {
             username: username??user?.username,
             description: description??user?.description,
         }
-        api.updateUser(req)
+        api.user.updateUser(req)
         router.push(`/users/profile`)
     }
 

@@ -2,10 +2,10 @@ import {useAuth} from '@/context/AuthProvider';
 import {Client, Message} from '@stomp/stompjs';
 import SockJS from 'sockjs-client'
 import React, {useEffect, useRef, useState} from "react";
-import {api} from "@/lib/api";
 import {User} from "@/models/user";
 import {useSearchParams} from "next/navigation";
 import {ChatMessage, ChatMessageStatus} from "@/models/chatMessage";
+import {api} from "@/lib";
 
 export default function ChatPage() {
     const stompClientRef = useRef<Client | null>(null)
@@ -62,7 +62,7 @@ export default function ChatPage() {
 
     const fetchChatRooms = async () => {
         if (user) {
-            const rooms: ChatRoom[] = await api.fetchChatRooms(user.email)
+            const rooms: ChatRoom[] = await api.chat.fetchChatRooms(user.email)
             setChatRooms(
                 new Map(rooms.map((chatRoom) => [chatRoom.chatId, chatRoom]))
             )
@@ -71,7 +71,7 @@ export default function ChatPage() {
 
     const fetchOnlineUsers = async () => {
         if (user) {
-            const onlineUsers: User[] = await api.fetchOnlineUsers()
+            const onlineUsers: User[] = await api.chat.fetchOnlineUsers()
             console.log('Online users', onlineUsers)
         }
     }
@@ -89,7 +89,7 @@ export default function ChatPage() {
         setCurrentChatId(chatId)
         setCurrentCompanion(companionEmail)
 
-        const messages: ChatMessage[] = await api.fetchChatRoomMessages(user.email, companionEmail)
+        const messages: ChatMessage[] = await api.chat.fetchChatRoomMessages(user.email, companionEmail)
         const chatIdChatRoomMessages: Map<string, ChatMessage[]> = Map.groupBy(messages.values(), item => item.chatId)
         setChatRoomMessages(chatIdChatRoomMessages)
     }

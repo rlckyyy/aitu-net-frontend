@@ -1,16 +1,17 @@
 'use client';
 
-import { api } from '@/lib/api';
-import { AxiosError } from 'axios';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import {AxiosError} from 'axios';
+import {useRouter} from 'next/navigation';
+import {useState} from 'react';
+import {useAuth} from "@/context/AuthProvider";
 
-export default function AuthForm({ type }: { type: 'register' | 'login' }) {
+export default function AuthForm({type}: { type: 'register' | 'login' }) {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const router = useRouter();
+    const {register} = useAuth();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -18,7 +19,7 @@ export default function AuthForm({ type }: { type: 'register' | 'login' }) {
 
         try {
             if (type === 'register') {
-                await api.register({ username, email, password });
+                await register({username: username, email: email, password: password});
             }
             router.push('/auth/login');
         } catch (err) {

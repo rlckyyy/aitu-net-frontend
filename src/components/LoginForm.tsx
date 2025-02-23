@@ -1,21 +1,22 @@
 'use client';
 
-import { api } from '@/lib/api';
-import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import {useRouter} from 'next/navigation';
+import React, {useState} from 'react';
+import {useAuth} from "@/context/AuthProvider";
 
 export default function LoginForm() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const router = useRouter();
+    const {loginUser} = useAuth();
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
 
         try {
-            await api.login({ email, password });
+            await loginUser({email, password});
             router.push('/users/profile');
         } catch (err) {
             console.error(err);

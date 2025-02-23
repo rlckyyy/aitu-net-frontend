@@ -3,7 +3,7 @@
 import {useAuth} from '@/context/AuthProvider';
 import React, {useEffect, useRef, useState} from 'react';
 import Link from "next/link";
-import {api} from "@/lib/api";
+import {api} from "@/lib";
 
 export default function Profile() {
     const {user, loadUser} = useAuth();
@@ -52,7 +52,7 @@ export default function Profile() {
     const handleUpload = async () => {
         if (!selectedFile || !user) return;
         try {
-            await api.uploadProfilePhoto(selectedFile);
+            await api.user.uploadProfilePhoto(selectedFile);
             alert("Successfully uploaded photo");
             loadUser();
         } catch (error) {
@@ -68,7 +68,7 @@ export default function Profile() {
         setMenuOpen(!menuOpen);
     }
     const handleDelete = () => {
-        api.deleteProfilePhoto();
+        api.user.deleteProfilePhoto();
         console.log("Photo deleted");
         setMenuOpen(false);
         window.location.reload();

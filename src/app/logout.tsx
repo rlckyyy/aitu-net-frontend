@@ -1,15 +1,15 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import { api } from '@/lib/api';
+import {useRouter} from 'next/navigation';
+import {useAuth} from "@/context/AuthProvider";
 
 export const LogoutButton = () => {
     const router = useRouter();
+    const {logout} = useAuth()
 
     const handleLogout = async (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
-        await api.logout();
-
+        await logout();
         router.refresh();
         router.replace('/auth/login');
     };

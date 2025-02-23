@@ -1,14 +1,8 @@
 'use client';
 
-import {api} from '@/lib/api';
 import {User} from '@/models/user';
-import {
-    createContext,
-    ReactNode,
-    useContext,
-    useEffect,
-    useState,
-} from 'react';
+import {createContext, ReactNode, useContext, useEffect, useState,} from 'react';
+import {api} from "@/lib";
 
 interface AuthContextType {
     user: User | null;
@@ -39,7 +33,7 @@ export function AuthProvider({children}: AuthProviderProps) {
 
     const loginUser = async (userData: { email: string; password: string }) => {
         try {
-            const response = await api.login(userData);
+            const response = await api.auth.login(userData);
             if (response.status === 200) {
                 console.log('Successfully logged in')
             }
@@ -50,8 +44,9 @@ export function AuthProvider({children}: AuthProviderProps) {
 
     const logout = async () => {
         try {
-            await api.logout();
+            await api.auth.logout();
             setUser(null);
+            await loadUser();
             console.log('Logout successful');
         } catch (error: any) {
             console.error(
@@ -67,7 +62,7 @@ export function AuthProvider({children}: AuthProviderProps) {
         password: string;
     }) => {
         try {
-            const response = await api.register(userData);
+            const response = await api.auth.register(userData);
             console.log('Registration successful:', response.data);
         } catch (error: any) {
             console.error(
@@ -79,7 +74,7 @@ export function AuthProvider({children}: AuthProviderProps) {
 
     const loadUser = async () => {
         try {
-            const response = await api.getUser();
+            const response = await api.auth.getUser();
             if (response.status === 200) {
                 setUser(response.data);
             } else {
