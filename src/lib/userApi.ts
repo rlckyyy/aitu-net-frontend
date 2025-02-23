@@ -1,5 +1,6 @@
 import {request} from "@/lib/apiClient";
 import {ProfileUpdate} from "@/models/ProfileUpdate";
+import {User} from "@/models/user";
 
 export const userApi = {
     updateUser: (profileUpdate: ProfileUpdate) =>
@@ -16,6 +17,10 @@ export const userApi = {
             data: formData,
             headers: { 'Content-Type': 'multipart/form-data' },
         });
+    },
+
+    getUserById: (id: string) => {
+        return request<User>(`/users/${id}`, { method: 'GET' });
     },
 
     getProfilePhoto: (id: string) =>

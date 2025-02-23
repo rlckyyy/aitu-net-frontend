@@ -23,7 +23,7 @@ export default function FriendLayout() {
                         <Link href="/friends/list" className="hover:text-blue-400 transition">👥 Friend List</Link>
                         <Link href="/friends/send-requests" className="hover:text-blue-400 transition">📨 Send
                             Requests</Link>
-                        <Link href="/friends/respond-requests" className="hover:text-blue-400 transition">✅ Respond
+                        <Link href="/friends/respond-requests" className="hover:text-blue-400 transition">✅ Received
                             Requests</Link>
                     </nav>
                 </div>

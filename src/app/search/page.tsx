@@ -3,7 +3,7 @@
 import {useRouter, useSearchParams} from "next/navigation";
 import {useEffect, useState} from "react";
 import {User} from "@/models/user";
-import {api} from "@/lib/api";
+import {api} from "@/lib";
 
 export default function SearchPage() {
     const searchParams = useSearchParams()
@@ -16,11 +16,13 @@ export default function SearchPage() {
         if (!query) {
             return
         }
-
-        api.searchUsers(query)
+        api.chat.searchUsers(query)
             .then(setUsers)
             .then(() => setLoading(false))
     }, [query])
+    const handleFriendRequest = async (userId: string) => {
+        api.friends.sendFriendRequest(userId);
+    }
 
     return (
         <div className="p-6 bg-gray-900 min-h-screen text-white">
@@ -41,6 +43,13 @@ export default function SearchPage() {
                                 <p className="text-lg font-semibold">{user.username}</p>
                                 <p className="text-gray-400">Email: {user.email}</p>
                             </div>
+                            <button
+                                type="button"
+                                className="bg-blue-600 hover:bg-blue-500 px-4 py-2 text-white rounded transition"
+                                onClick={() => handleFriendRequest(user.id)}
+                            >
+                                Send Friend Request
+                            </button>
                             <button
                                 type="button"
                                 className="bg-blue-600 hover:bg-blue-500 px-4 py-2 text-white rounded transition"

@@ -1,7 +1,7 @@
-import RespondRequests from "@/components/friends/respond-requests/RespondRequests";
+import ReceivedRequests from "@/components/friends/respond-requests/ReceivedRequests";
 
-export default function RespondRequestsPage() {
+export default function ReceivedRequestsPage() {
     return (
-        <RespondRequests/>
+        <ReceivedRequests/>
     )
 }
