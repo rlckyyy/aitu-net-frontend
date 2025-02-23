@@ -1,7 +1,7 @@
 'use client';
 
 import {useAuth} from '@/context/AuthProvider';
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import Link from "next/link";
 import {api} from "@/lib/api";
 
@@ -9,7 +9,8 @@ export default function Profile() {
     const {user, loadUser} = useAuth();
     const [loading, setLoading] = useState(true);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [preview, setPreview] = useState<string | null>(null);
+    const [menuOpen, setMenuOpen] = useState(false);
+    const menuRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         loadUser()
@@ -22,15 +23,25 @@ export default function Profile() {
     }, [user]);
 
     useEffect(() => {
-        if (!selectedFile) {
-            setPreview(null);
-            return;
-        }
-        const objectUrl = URL.createObjectURL(selectedFile);
-        setPreview(objectUrl);
-
-        return () => URL.revokeObjectURL(objectUrl);
+        handleUpload();
+        setMenuOpen(false);
     }, [selectedFile]);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (menuRef.current && !(menuRef.current as HTMLElement).contains(event.target as Node)) {
+                setMenuOpen(false);
+            }
+        };
+
+        if (menuOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [menuOpen]);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files?.length) {
@@ -42,48 +53,83 @@ export default function Profile() {
         if (!selectedFile || !user) return;
         try {
             await api.uploadProfilePhoto(selectedFile);
-            alert("Фото успешно обновлено!");
+            alert("Successfully uploaded photo");
             loadUser();
         } catch (error) {
-            console.error("Ошибка загрузки фото", error);
-            alert("Ошибка загрузки фото");
+            console.error("Error with upload", error);
+            alert("Error with upload");
         }
     };
 
     if (loading) return <p>Загрузка...</p>;
     if (!user) return null;
-    const avatarUrl = "http://" + user?.avatar?.location;
-    console.log(avatarUrl);
+
+    const toggleMenu = () => {
+        setMenuOpen(!menuOpen);
+    }
+    const handleDelete = () => {
+        api.deleteProfilePhoto();
+        console.log("Photo deleted");
+        setMenuOpen(false);
+        window.location.reload();
+    };
+
     return (
         <div className="flex justify-center items-center">
             {/* Image Block */}
-            <div className="flex flex-col items-center" style={{
-                width: preview ? "12%" : "12%",
-            }}>
-                <img src={avatarUrl} alt={"GANDON NETU FOTKI"}/>
-                <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    className="mt-2 text-sm text-gray-400"
+            <div className="flex flex-col items-center mr-20 relative">
+                {/* Фото профиля */}
+                <img
+                    src={user?.avatar?.location || "/def_pfp.svg"}
+                    alt="Profile"
+                    className="w-32 h-38 rounded-full cursor-pointer"
+                    onClick={toggleMenu}
                 />
 
-                <button
-                    onClick={handleUpload}
-                    className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition disabled:opacity-50"
-                    disabled={!selectedFile}
-                >
-                    Обновить фото
-                </button>
+                {/* Выпадающее меню */}
+                {menuOpen && (
+                    <div
+                        ref={menuRef}
+                        className="absolute top-[calc(100%+8px)] left-1/2 -translate-x-1/2 w-40 bg-white shadow-md rounded-lg border border-gray-200"
+                    >
+                        {/* Кнопка загрузки */}
+                        <label
+                            htmlFor="fileInput"
+                            className="block px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
+                        >
+                            Обновить фото
+                        </label>
+                        <input
+                            id="fileInput"
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => {
+                                handleFileChange(e)
+                                setMenuOpen(false)
+                            }}
+                        />
+
+                        {/* Кнопка удаления */}
+                        <button
+                            onClick={() => {
+                                console.log("Фото удалено");
+                                handleDelete();
+                                setMenuOpen(false);
+                            }}
+                            className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
+                        >
+                            Удалить фото
+                        </button>
+                    </div>
+                )}
             </div>
 
+
             <div className="max-w-md p-6 bg-gray-900 text-white rounded-lg shadow-lg">
-                <h1 className="text-2xl font-semibold mb-4 text-blue-400">Профиль</h1>
+                <h1 className="text-2xl font-semibold mb-4 text-blue-400">Profile</h1>
 
                 <div className="space-y-2">
-                    <p>
-                        <span className="font-semibold text-gray-400">ID:</span> {user?.id}
-                    </p>
                     <p>
                         <span className="font-semibold text-gray-400">Username:</span> {user?.username}
                     </p>
@@ -97,11 +143,18 @@ export default function Profile() {
                     <p>
                         <span className="font-semibold text-gray-400">Roles:</span> {user?.roles?.join(", ")}
                     </p>
-                    <p>
-                        <span
-                            className="font-semibold text-gray-400">Bio:</span> {user?.description ? user?.description : "Empty"}
-                    </p>
-                    <Link href="/users/edit" className="hover:text-blue-400 transition">Edit</Link>
+                    {user?.description && (
+                        <p>
+                            <span className="font-semibold text-gray-400">Bio:</span> {user.description}
+                        </p>
+                    )}
+                    <Link
+                        href="/users/edit"
+                        className="mt-4 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow-md transition duration-300 block"
+                    >
+                        Edit Profile
+                    </Link>
+
                 </div>
             </div>
         </div>

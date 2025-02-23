@@ -59,6 +59,11 @@ export const api = {
             data: profileUpdate,
         })
     },
+    deleteProfilePhoto: async () => {
+        return request('/users/profile/photo', {
+            method: 'DELETE',
+        })
+    },
 
     uploadProfilePhoto: async (file: File) => {
         const formData = new FormData();
