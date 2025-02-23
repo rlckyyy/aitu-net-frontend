@@ -75,7 +75,7 @@ export default function Profile() {
     };
 
     return (
-        <div className="flex justify-center items-center">
+        <div className="flex pl-10 justify-betweenш items-center">
             {/* Image Block */}
             <div className="flex flex-col items-center mr-20 relative">
                 {/* Фото профиля */}

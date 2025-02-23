@@ -14,8 +14,9 @@ export default function ClientLayout({
     const {user} = useAuth();
 
     return (
-        <>
-            <nav className="p-4 bg-gray-800 text-white flex items-center space-x-4 shadow-lg">
+        <div className="flex">
+            {/* Sidebar */}
+            <aside className="w-64 h-screen bg-gray-800 text-white p-4 shadow-lg fixed flex flex-col space-y-4">
                 <Link href="/" className="hover:text-blue-400 transition">🏠 Main</Link>
                 {!user && <Link href="/auth/login" className="hover:text-blue-400 transition">🔐 Login</Link>}
                 {!user && <Link href="/auth/register" className="hover:text-blue-400 transition">📝 Registration</Link>}
@@ -23,8 +24,10 @@ export default function ClientLayout({
                 {user && <Link href="/chat" className="hover:text-blue-400 transition">💬 Chat</Link>}
                 <SearchBar/>
                 <LogoutButton/>
-            </nav>
-            <main className="p-6">{children}</main>
-        </>
-    )
+            </aside>
+
+            {/* Main Content */}
+            <main className="flex-1 p-6 ml-64">{children}</main>
+        </div>
+    );
 }
