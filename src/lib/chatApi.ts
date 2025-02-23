@@ -14,4 +14,8 @@ export const chatApi = {
 
     searchUsers: async (query: string): Promise<User[]> =>
         (await request<User[]>(`/chats/users/search?query=${query}`)).data,
+
+    getOrCreateChatId: async (sender: string, recipient: string): Promise<{chatId: string}> => {
+        return (await request<{chatId: string}>(`/chats/id/${sender}/${recipient}`)).data
+    }
 };

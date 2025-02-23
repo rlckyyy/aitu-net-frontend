@@ -2,7 +2,6 @@ import {useAuth} from '@/context/AuthProvider';
 import {Client, Message} from '@stomp/stompjs';
 import SockJS from 'sockjs-client'
 import React, {useEffect, useRef, useState} from "react";
-import {User} from "@/models/user";
 import {useSearchParams} from "next/navigation";
 import {ChatMessage, ChatMessageStatus} from "@/models/chatMessage";
 import {api} from "@/lib";
@@ -24,15 +23,10 @@ export default function ChatPage() {
     const [currentCompanion, setCurrentCompanion] = useState<string>('')
 
     useEffect(() => {
-        if (!user) {
-            return
-        }
-        const sockJS = new SockJS('http://localhost:8080/ws')
+        if (!user) return
         const stompClient = new Client({
-            webSocketFactory: () => sockJS,
-            debug: (msg) => {
-                console.log(msg)
-            },
+            webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
+            debug: console.log,
             onConnect: onConnected,
             onStompError: (frame) => {
                 console.error('Broker reported error: ' + frame.headers['message'])
@@ -43,55 +37,66 @@ export default function ChatPage() {
 
         stompClientRef.current = stompClient
 
-        return () => {
-            stompClient.deactivate()
-        }
+        return () => stompClient.deactivate()
     }, [user])
 
-    const onConnected = () => {
+    const onConnected = async () => {
+        if (!user) return
         console.log('Successfully connected to STOMP client.')
         stompClientRef.current?.subscribe(`/user/${user?.email}/queue/messages`, onPrivateMessageReceived)
 
-        const companionEmailFromParam = searchParams.get('companionEmail')
-        if (companionEmailFromParam) {
-            selectChat(`${user?.email}_${companionEmailFromParam}`, companionEmailFromParam)
+        const companionEmail = searchParams.get('companionEmail')
+        if (companionEmail) {
+            const {chatId} = await api.chat.getOrCreateChatId(user.email, companionEmail)
+            selectChat(chatId, user.email, companionEmail)
         }
-        fetchChatRooms()
-        fetchOnlineUsers()
+
+        fetchAndSetChatRooms()
     }
 
-    const fetchChatRooms = async () => {
-        if (user) {
-            const rooms: ChatRoom[] = await api.chat.fetchChatRooms(user.email)
-            setChatRooms(
-                new Map(rooms.map((chatRoom) => [chatRoom.chatId, chatRoom]))
-            )
-        }
+    const fetchAndSetChatRooms = async (email: string = user?.email) => {
+        if (!email) return
+
+        const rooms: ChatRoom[] = await api.chat.fetchChatRooms(email)
+        setChatRooms(
+            new Map(rooms.map((chatRoom) => [chatRoom.chatId, chatRoom]))
+        )
     }
 
-    const fetchOnlineUsers = async () => {
-        if (user) {
-            const onlineUsers: User[] = await api.chat.fetchOnlineUsers()
-            console.log('Online users', onlineUsers)
-        }
+    const fetchAndSetChatRoomMessages = async (sender: string = user?.email, recipient: string = currentCompanion, chatId: string = currentChatId) => {
+        if (!sender || !currentCompanion || !chatId) return
+
+        const messages: ChatMessage[] = await api.chat.fetchChatRoomMessages(sender, recipient)
+        const newChatRoomMessages = new Map(chatRoomMessages)
+        newChatRoomMessages.set(currentChatId, messages)
+
+        setChatRoomMessages(newChatRoomMessages)
     }
 
     const onPrivateMessageReceived = (message: Message) => {
         const chatMessage = JSON.parse(message.body) as ChatMessage;
-        selectChat(chatMessage.chatId, chatMessage.sender)
+
+        if (!chatRooms.has(chatMessage.chatId)) {
+            fetchAndSetChatRooms()
+        }
+
+        setChatRoomMessages(prevChatRoomMessages => {
+            const newChatRoomMessages = new Map(prevChatRoomMessages)
+            const messages = newChatRoomMessages.get(chatMessage.chatId) || []
+            newChatRoomMessages.set(chatMessage.chatId, [...messages, chatMessage])
+            return newChatRoomMessages
+        })
     }
 
-    const selectChat = async (chatId: string, companionEmail: string) => {
-        if (!user) {
+    const selectChat = async (chatId: string, sender: string | undefined = user?.email, companionEmail: string) => {
+        if (!sender) {
             return
         }
 
         setCurrentChatId(chatId)
         setCurrentCompanion(companionEmail)
 
-        const messages: ChatMessage[] = await api.chat.fetchChatRoomMessages(user.email, companionEmail)
-        const chatIdChatRoomMessages: Map<string, ChatMessage[]> = Map.groupBy(messages.values(), item => item.chatId)
-        setChatRoomMessages(chatIdChatRoomMessages)
+        await fetchAndSetChatRoomMessages(sender, companionEmail, chatId)
     }
 
     if (!user) {
@@ -104,16 +109,13 @@ export default function ChatPage() {
     }
 
     const sendMessage = () => {
+        const stompClient = stompClientRef.current
+        if (!user || !stompClient || inputMessage.trim() === '') return
+
         console.log(`sending message: ${inputMessage} to ${currentCompanion} from ${user.email}`)
-        const stompClient = stompClientRef.current;
-        if (!stompClient) {
-            return;
-        }
-        if (inputMessage === '') {
-            return
-        }
+
         const message: ChatMessage = {
-            chatId: '',
+            chatId: currentChatId,
             type: 'MESSAGE',
             content: inputMessage,
             recipient: currentCompanion,
@@ -121,26 +123,52 @@ export default function ChatPage() {
             status: ChatMessageStatus.DELIVERED,
             timestamp: new Date()
         }
+
         stompClient.publish({
             destination: '/app/chat',
             body: JSON.stringify(message)
         })
+
+
         setInputMessage('')
 
-        selectChat(currentChatId, currentCompanion)
+        setChatRoomMessages(prevChatRoomMessages => {
+            const newChatRoomMessages = new Map(prevChatRoomMessages)
+            const messages = newChatRoomMessages.get(currentChatId) || []
+            message.id = crypto.randomUUID()
+            newChatRoomMessages.set(currentChatId, [...messages, message])
+            return newChatRoomMessages
+        })
+
+        if (!chatRooms.has(currentChatId)) {
+            setChatRooms(prevChatRooms => {
+                const newChatRooms = new Map(prevChatRooms)
+                newChatRooms.set(currentChatId, {
+                    id: crypto.randomUUID(),
+                    chatId: currentChatId,
+                    sender: user.email,
+                    recipient: currentCompanion
+                })
+                return newChatRooms
+            })
+        }
+    }
+
+    if (!user) {
+        return <div>Loading...</div>
     }
 
     return (
         <div className="h-screen bg-black text-gray-300 flex overflow-hidden">
             {/* Sidebar (Fixed height, scrollable list inside) */}
             <aside className="w-1/4 bg-gray-900 p-4 h-screen shadow-lg flex flex-col overflow-hidden">
-                <h3 className="text-lg font-semibold text-white mb-4">Your Chats</h3>
+                <h3 className="text-lg font-semibold text-white mb-4">Chats</h3>
                 <ul className="space-y-2 overflow-y-auto flex-1">
-                    {[...chatRooms.values()].map((chatRoom) => (
+                    {[...chatRooms.values()].map((chatRoom: ChatRoom) => (
                         <li key={chatRoom.id}>
                             <button
                                 className="w-full bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded transition text-left"
-                                onClick={() => selectChat(chatRoom.chatId, chatRoom.recipient)}
+                                onClick={() => selectChat(chatRoom.chatId, user?.email, chatRoom.recipient)}
                             >
                                 {chatRoom.recipient}
                             </button>
@@ -156,17 +184,17 @@ export default function ChatPage() {
                 <div className="w-full bg-gray-900 p-4 rounded-lg shadow-lg mt-4 flex flex-col flex-1 overflow-hidden">
                     {/* Scrollable Messages Section */}
                     <div className="flex-1 overflow-y-auto p-2 space-y-2">
-                        {currentChatId ? (
-                            (chatRoomMessages.get(currentChatId) || []).map((message) => (
+                        {currentCompanion ? (
+                            (chatRoomMessages.get(currentChatId) || []).map((chatMessage: ChatMessage) => (
                                 <div
-                                    key={message.id}
+                                    key={chatMessage.id}
                                     className={`p-3 rounded max-w-[75%] ${
-                                        message.sender === user.email
+                                        chatMessage.sender === user.email
                                             ? "bg-blue-600 text-white ml-auto"
                                             : "bg-gray-800 text-gray-300"
                                     }`}
                                 >
-                                    {message.content}
+                                    {chatMessage.content}
                                 </div>
                             ))
                         ) : (
