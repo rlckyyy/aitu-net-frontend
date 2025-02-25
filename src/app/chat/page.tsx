@@ -1,6 +1,8 @@
 'use client'
-import ChatPage from '@/components/ChatPage';
+import MessagingComponent from '@/components/chats/MessagingComponent';
 
 export default function LoginPage() {
-    return <ChatPage />;
+    return (
+        <MessagingComponent/>
+    );
 }
