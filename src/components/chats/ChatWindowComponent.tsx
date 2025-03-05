@@ -1,4 +1,4 @@
-import {ChatMessage} from "@/models/chatMessage";
+import {ChatMessage} from "@/models/chat/chatMessage";
 import React from "react";
 import {InputMessageBarComponent} from "@/components/chats/InputMessageBarComponent";
 
@@ -34,6 +34,12 @@ export const ChatWindowComponent = ({
                                 }`}
                             >
                                 {chatMessage.content}
+                                <div className={'text-xs text-gray-400 flex justify-end self-end mt-1'}>
+                                    {new Date(chatMessage.timestamp).toLocaleTimeString([], {
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    })}
+                                </div>
                             </div>
                         ))
                     ) : (

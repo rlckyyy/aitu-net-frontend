@@ -6,6 +6,7 @@ export interface User {
     roles: string[];
     friendList: string[];
     avatar: Avatar;
+    publicKey: string;
 }
 
 interface Avatar {

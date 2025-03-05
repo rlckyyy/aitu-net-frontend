@@ -3,17 +3,15 @@
 import {User} from '@/models/user';
 import {createContext, ReactNode, useContext, useEffect, useState,} from 'react';
 import {api} from "@/lib";
+import {generateKeyPair, savePrivateKey} from "@/app/services/keysService";
+import {UserRegisterData} from "@/models/userRegisterData";
 
 interface AuthContextType {
     user: User | null
     loadUser: () => void
-    loginUser: (userData: { email: string; password: string }) => Promise<void>
+    loginUser: (userData: { email: string; password: string }) => void
     logout: () => void
-    register: (userData: {
-        email: string
-        username: string
-        password: string
-    }) => void
+    register: (userRegData: UserRegisterData) => void
 }
 
 interface AuthProviderProps {
@@ -31,15 +29,12 @@ export function AuthProvider({children}: AuthProviderProps) {
         loadUser()
     }, [])
 
-    const loginUser = async (userData: { email: string; password: string }) => {
-        try {
-            const response = await api.auth.login(userData);
-            if (response.status === 200) {
-                console.log('Successfully logged in')
-            }
-        } catch (error) {
-            console.error('Login failed:', error)
-        }
+    const loginUser = (userData: { email: string; password: string }) => {
+        api.auth.login(userData)
+            .then(res => {
+                res.status === 200 && console.log('Successfully logged in')
+            })
+            .catch(err => console.error('Login failed:', err));
     }
 
     const logout = async () => {
@@ -56,13 +51,12 @@ export function AuthProvider({children}: AuthProviderProps) {
         }
     }
 
-    const register = async (userData: {
-        email: string
-        username: string
-        password: string
-    }) => {
+    const register = async (userRegData: UserRegisterData) => {
         try {
-            const response = await api.auth.register(userData);
+            const {publicKey, privateKey} = await generateKeyPair()
+            userRegData.publicKey = publicKey
+            const response = await api.auth.register(userRegData);
+            await savePrivateKey(privateKey)
             console.log('Registration successful:', response.data);
         } catch (error: any) {
             console.error(

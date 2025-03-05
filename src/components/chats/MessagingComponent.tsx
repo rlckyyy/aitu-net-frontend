@@ -3,7 +3,7 @@ import {ChatRoomsComponent} from "@/components/chats/ChatRoomsComponent";
 import {ChatWindowComponent} from "@/components/chats/ChatWindowComponent";
 import {useAuth} from "@/context/AuthProvider";
 import React, {useState} from "react";
-import {ChatMessage, ChatMessageStatus} from "@/models/chatMessage";
+import {ChatMessage, ChatMessageStatus} from "@/models/chat/chatMessage";
 
 export default function MessagingComponent() {
     const {user} = useAuth();
