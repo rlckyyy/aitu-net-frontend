@@ -56,4 +56,4 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/aitu-net-frontend:latest
             docker stop aitu-net-frontend || true
             docker rm aitu-net-frontend || true
-            docker run -d --name aitu-net-frontend -e NODE_ENV=production --network aitu-net -p 3000:3000 ${{ secrets.DOCKER_USERNAME }}/aitu-net-frontend:latest
+            docker run -d --name aitu-net-frontend --env-file .env.production --network aitu-net -p 3000:3000 ${{ secrets.DOCKER_USERNAME }}/aitu-net-frontend:latest
