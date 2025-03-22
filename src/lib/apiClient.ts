@@ -1,9 +1,6 @@
-import axios, { AxiosError, AxiosResponse } from 'axios';
+import axios, {AxiosError, AxiosResponse} from 'axios';
 
-const API_URL =
-    process.env.NODE_ENV === 'development'
-        ? 'http://localhost:8080/api/v1'
-        : process.env.AITU_BACKEND;
+const API_URL = 'http://localhost:8080/api/v1'
 
 export const apiClient = axios.create({
     baseURL: API_URL,
@@ -25,5 +22,5 @@ apiClient.interceptors.response.use(
 );
 
 export async function request<T>(endpoint: string, options: any = {}): Promise<AxiosResponse<T>> {
-    return await apiClient.request({ url: endpoint, ...options });
+    return await apiClient.request({url: endpoint, ...options});
 }
