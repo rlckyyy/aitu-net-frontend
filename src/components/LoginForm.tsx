@@ -16,11 +16,6 @@ export default function LoginForm() {
         setError('');
 
         try {
-            console.log("Hello")
-            console.log(process.env.NEXT_PUBLIC_API_URL)
-            console.log(process.env.NEXT_PUBLIC_API_URL)
-            console.log(process.env.NEXT_PUBLIC_API_URL)
-            console.log("HElloo")
             await loginUser({email, password});
             router.push('/users/profile');
         } catch (err) {
