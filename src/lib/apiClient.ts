@@ -1,6 +1,5 @@
 import axios, {AxiosError, AxiosResponse} from 'axios';
 
-export const dynamic = "force-dynamic";
 
 const API_URL = "http://aitu-network:8080/api/v1";
 
