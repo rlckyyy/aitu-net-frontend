@@ -1,4 +1,4 @@
-# ---- Stage 1: Build ----
+# Build Stage
 FROM node:22.9.0-alpine AS builder
 
 WORKDIR /app
@@ -7,25 +7,26 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
-# Copy the rest of the app
+# Copy all source code and build the project
 COPY . .
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN npm run build && ls -la .next && ls -la .next/server
 
-# Build the Next.js application
-RUN npm run build
-
-# ---- Stage 2: Production ----
+# Production Stage
 FROM node:22.9.0-alpine
 
 WORKDIR /app
 
-# Copy only necessary files from the builder stage
-COPY --from=builder /app/package*.json ./
+# Copy only necessary files for production
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/package-lock.json ./
 COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next ./.next
 
-# Expose port 3000
+# Set environment variable to production mode
+ENV NODE_ENV=production
+
 EXPOSE 3000
 
-# Start the Next.js app in production mode
 CMD ["npm", "start"]
