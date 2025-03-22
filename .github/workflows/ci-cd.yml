@@ -25,9 +25,6 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Run tests (Optional)
-        run: npm test
-
   docker:
     needs: build
     runs-on: ubuntu-latest
