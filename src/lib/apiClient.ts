@@ -1,5 +1,7 @@
 import axios, {AxiosError, AxiosResponse} from 'axios';
 
+export const dynamic = "force-dynamic";
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const apiClient = axios.create({
