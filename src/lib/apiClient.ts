@@ -1,6 +1,9 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 
-const API_URL = 'http://localhost:8080/api/v1';
+const API_URL =
+    process.env.NODE_ENV === 'development'
+        ? 'http://localhost:8080/api/v1'
+        : process.env.AITU_BACKEND;
 
 export const apiClient = axios.create({
     baseURL: API_URL,
