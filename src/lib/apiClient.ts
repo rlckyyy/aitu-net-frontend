@@ -2,7 +2,7 @@ import axios, {AxiosError, AxiosResponse} from 'axios';
 
 export const dynamic = "force-dynamic";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL = "http://aitu-network:8080/api/v1";
 
 export const apiClient = axios.create({
     baseURL: API_URL,

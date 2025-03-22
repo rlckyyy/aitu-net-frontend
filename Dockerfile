@@ -8,7 +8,6 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
-COPY .env.production ./
 COPY package*.json ./
 RUN npm install
 
@@ -36,7 +35,7 @@ CMD ["npm", "start"]
 
 FROM base AS dev
 ENV NODE_ENV=production
-COPY --from=base /app/.env.production ./
+
 RUN npm install
 COPY . .
 CMD ["npm", "run", "dev"]
