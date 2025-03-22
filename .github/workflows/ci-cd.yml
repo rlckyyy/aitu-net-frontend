@@ -25,14 +25,14 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Save next directory
+      - name: check
+        run: ls -la .next
+
+      - name: Upload .next as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: next-files
+          name: next-build
           path: .next/
-
-      - name: check
-        run: ls -la
 
   docker:
     needs: build
@@ -48,7 +48,7 @@ jobs:
       - name: Restore next directory
         uses: actions/download-artifact@v4
         with:
-          name: next-files
+          name: next-build
           path: .next/
 
       - name: check
