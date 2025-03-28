@@ -1,7 +1,6 @@
 FROM node:22.9.0 AS base
 
 FROM base AS deps
-RUN apt-get update && apt-get install -y libc6
 WORKDIR /app
 
 COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
@@ -25,6 +24,10 @@ RUN \
   else echo "Lockfile not found." && exit 1; \
   fi
 
+# Отладка: проверяем содержимое `.next`
+RUN ls -la /app/.next
+RUN ls -la /app/.next/static || echo "⚠️ .next/static не найден!"
+
 FROM base AS runner
 WORKDIR /app
 
@@ -35,8 +38,8 @@ RUN useradd --system --uid 1001 -g nodejs nextjs
 
 COPY --from=builder /app/public ./public
 
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
+# Если `.next/static` нет, создаем вручную
+RUN mkdir -p /app/.next/static
 
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
