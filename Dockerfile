@@ -17,22 +17,6 @@ FROM base AS builder
 COPY . .
 RUN npm run build
 
-FROM base AS production
-WORKDIR /app
-ENV NODE_ENV=production
-
-RUN npm ci --omit=dev
-
-RUN groupadd -g 1001 nodejs && useradd -m -u 1001 -g nodejs nextjs
-USER nextjs
-
-COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
-COPY --from=builder /app/node_modules ./node_modules
-COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/public ./public
-
-CMD ["npm", "start"]
-
 FROM base AS dev
 ENV NODE_ENV=production
 
