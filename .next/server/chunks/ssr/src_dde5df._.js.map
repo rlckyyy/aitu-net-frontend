@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 7, "column": 0}, "map": {"version":3,"sources":["file:///Users/relucky/Desktop/programming/react/aitu-net-frontend/src/components/friends/layout/FriendLayout.tsx"],"sourcesContent":["'use client'\n\nimport Link from \"next/link\";\n\nexport default function FriendLayout({onSelect}: { onSelect: (section: string) => void }) {\n    return (\n        <div className=\"mt-4 p-2 bg-gray-700 text-white rounded-md shadow\">\n            <nav className=\"flex flex-col space-y-2\">\n                <Link href=\"/friends/list\" className=\"hover:text-blue-400 transition\">👥 Friend List</Link>\n                <Link href=\"/friends/send-requests\" className=\"hover:text-blue-400 transition\">📨 Send Requests</Link>\n                <Link href=\"/friends/respond-requests\" className=\"hover:text-blue-400 transition\">✅ Respond\n                    Requests</Link>\n            </nav>\n        </div>\n    )\n}"],"names":[],"mappings":";;;;AAEA;AAFA;;;AAIe,SAAS,aAAa,EAAC,QAAQ,EAA0C;IACpF,qBACI,8OAAC;QAAI,WAAU;kBACX,cAAA,8OAAC;YAAI,WAAU;;8BACX,8OAAC,4JAAA,CAAA,UAAI;oBAAC,MAAK;oBAAgB,WAAU;8BAAiC;;;;;;8BACtE,8OAAC,4JAAA,CAAA,UAAI;oBAAC,MAAK;oBAAyB,WAAU;8BAAiC;;;;;;8BAC/E,8OAAC,4JAAA,CAAA,UAAI;oBAAC,MAAK;oBAA4B,WAAU;8BAAiC;;;;;;;;;;;;;;;;;AAKlG"}},
+    {"offset": {"line": 60, "column": 0}, "map": {"version":3,"sources":[],"names":[],"mappings":"A"}}]
+}
