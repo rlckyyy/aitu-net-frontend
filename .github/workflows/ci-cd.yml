@@ -26,22 +26,17 @@ jobs:
         run: npm run build
 
       - name: Debug Build Output
-        run: ls -la .next
-
-      - name: Debug Build Output 2
         run: ls -la
 
-      - name: Fix permissions
-        run: chmod -R 755 .next
+      - name: Copy .next to temp folder
+        run: cp -r .next next_build
 
-      - name: Debug working directory
-        run: pwd
-
-      - name: Save build artifacts
+      - name: Upload Next.js build
         uses: actions/upload-artifact@v4
         with:
           name: next-build
-          path: /home/runner/work/aitu-net-frontend/aitu-net-frontend/.next
+          path: next_build
+          if-no-files-found: error
 
   docker:
     needs: build
@@ -58,7 +53,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: next-build
-          path: .next
+          path: next_build
+
+      - name: Move downloaded build to .next
+        run: cp -r next_build .next
 
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
