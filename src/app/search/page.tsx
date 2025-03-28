@@ -27,7 +27,7 @@ export default function SearchPage() {
     return (
         <div className="p-6 bg-gray-900 min-h-screen text-white">
             <h1 className="text-2xl font-bold mb-4 text-blue-400">
-                Search Results for: "{query}"
+                Search Results for: &quot;{query}&quot;
             </h1>
 
             {loading && <p className="text-gray-400">Loading...</p>}
