@@ -25,8 +25,8 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: check
-        run: ls
+      - name: Debug Build Output
+        run: ls -la
 
       - name: Save build artifacts
         uses: actions/upload-artifact@v4
@@ -43,7 +43,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: check
-        run: ls
+        run: ls -la
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
