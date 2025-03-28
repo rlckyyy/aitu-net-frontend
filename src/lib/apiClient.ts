@@ -1,7 +1,7 @@
 import axios, {AxiosError, AxiosResponse} from 'axios';
 
 
-const API_URL = "http://aitu-network:8080/api/v1";
+const API_URL = "http://host.docker.internal:8080/api/v1";
 
 export const apiClient = axios.create({
     baseURL: API_URL,

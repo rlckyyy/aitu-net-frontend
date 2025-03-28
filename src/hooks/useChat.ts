@@ -30,7 +30,7 @@ export function useChat() {
         if (!user) return
 
         const stompClient = new Client({
-            webSocketFactory: () => new SockJS("http://aitu-network:8080/ws"),
+            webSocketFactory: () => new SockJS("http://host.docker.internal:8080/ws"),
             debug: console.log,
             onConnect: onConnected,
             onStompError: (frame) => console.error(`STOMP Error: ${frame.body}`),
