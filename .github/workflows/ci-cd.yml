@@ -28,11 +28,17 @@ jobs:
       - name: Debug Build Output
         run: ls -la .next
 
+      - name: Debug Build Output 2
+        run: ls -la
+
+      - name: Debug working directory
+        run: pwd
+
       - name: Save build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: next-build
-          path: aitu-net-frontend/.next
+          path: .next
 
   docker:
     needs: build
