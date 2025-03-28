@@ -1,7 +1,7 @@
 import axios, {AxiosError, AxiosResponse} from 'axios';
 
 
-const API_URL = "http://85.202.193.50:8080/api/v1";
+const API_URL = "http://85.202.193.50:8080/api/v1"; //
 
 export const apiClient = axios.create({
     baseURL: API_URL,

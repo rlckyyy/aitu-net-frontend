@@ -56,7 +56,7 @@ export function AuthProvider({children}: AuthProviderProps) {
             const {publicKey, privateKey} = await generateKeyPair()
             userRegData.publicKey = publicKey
             const response = await api.auth.register(userRegData);
-            await savePrivateKey(privateKey)
+            // await savePrivateKey(privateKey)
             console.log('Registration successful:', response.data);
         } catch (error: any) {
             console.error(

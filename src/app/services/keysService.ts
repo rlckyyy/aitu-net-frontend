@@ -18,13 +18,12 @@ export async function generateKeyPair() {
         ["encrypt", "decrypt"]
     )
 
-    // Export the public key as a Base64-encoded string
     const exportedPublicKey = await crypto.subtle.exportKey("spki", keyPair.publicKey)
     const publicKeyBase64 = ab2b64(exportedPublicKey)
 
     return {
-        publicKey: publicKeyBase64,  // To be sent to the server
-        privateKey: keyPair.privateKey // Store securely on the client
+        publicKey: publicKeyBase64,
+        privateKey: keyPair.privateKey
     }
 }
 
