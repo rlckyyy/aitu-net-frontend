@@ -25,6 +25,15 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: check
+        run: ls
+
+      - name: Save build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-build
+          path: .next
+
   docker:
     needs: build
     runs-on: ubuntu-latest
@@ -32,6 +41,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: check
+        run: ls
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: next-build
+          path: .next
 
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
