@@ -58,6 +58,9 @@ jobs:
       - name: Move downloaded build to .next
         run: cp -r next_build .next
 
+      - name: check
+        run: ls -la .next
+
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
@@ -78,6 +81,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
+            ls -la
             docker pull ${{ secrets.DOCKER_USERNAME }}/aitu-net-frontend:latest
             docker stop aitu-net-frontend || true
             docker rm aitu-net-frontend || true
