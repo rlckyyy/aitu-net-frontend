@@ -1,7 +1,7 @@
 import axios, {AxiosError, AxiosResponse} from 'axios';
 
 
-const API_URL = "https://aitunet.kz/api/v1";
+const API_URL = "https://aitunet.kz/api/v1"; // https://aitunet.kz/api/v1
 
 export const apiClient = axios.create({
     baseURL: API_URL,
