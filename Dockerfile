@@ -14,7 +14,6 @@ RUN ls -la .next
 FROM node:22.9.0 as runner
 WORKDIR /app
 ENV NODE_ENV production
-RUN ls -la /app/.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/.next ./.next
@@ -25,4 +24,4 @@ RUN ls -la .next || (echo "Build not found! Run 'next build' before starting." &
 
 EXPOSE 3000
 
-CMD ["sh", "-c", "ls -la .next && npm run start"]
+CMD ["sh", "-c", "ls -la .next && npx next start"]
