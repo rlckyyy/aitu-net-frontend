@@ -1,12 +1,8 @@
 name: Build image and push to Docker Hub
 
 on:
-  workflow_run:
-    workflows: ["Build project"]
-    types:
-      - completed
-    branches:
-      - "main"
+  push:
+    branches: [main]
 
 jobs:
   build-docker-image:
