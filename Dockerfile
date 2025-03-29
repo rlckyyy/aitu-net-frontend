@@ -7,7 +7,7 @@ RUN npm install --frozen-lockfile
 FROM node:22.9.0 as builder
 WORKDIR /app
 COPY . .
-COPY --from=dependencies /app/node_modules ./node_modules
+COPY --from=base /app/node_modules ./node_modules
 RUN npm run build
 
 FROM node:22.9.0 as runner
