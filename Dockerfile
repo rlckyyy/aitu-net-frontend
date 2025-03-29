@@ -9,11 +9,12 @@ WORKDIR /app
 COPY . .
 COPY --from=base /app/node_modules ./node_modules
 RUN npm run build
+RUN ls -la .next
 
 FROM node:22.9.0 as runner
 WORKDIR /app
 ENV NODE_ENV production
-
+RUN ls -la /app/.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/.next ./.next
