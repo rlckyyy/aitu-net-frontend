@@ -1,61 +1,44 @@
-name: Docker Build & Deploy
+name: Build image and push to Docker Hub
 
 on:
-  push:
-    branches: [main]
+  workflow_run:
+    workflows: ["Build project"]
+    types:
+      - completed
+    branches:
+      - "main"
 
 jobs:
-  build_push:
-    name: Build and Push Docker Image
+  build-docker-image:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout Repository 🛎️
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Set up Docker Buildx 🚀
-        uses: docker/setup-buildx-action@v3
+      - name: Docker sign-in
+        run: echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Log in to Docker Hub 🚢
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Build Docker image
+        run: docker build -t rlckyyy/aitu-net-frontend .
 
-      - name: Build and Push Docker Image 🏗️
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/aitu-net-frontend:${{ github.sha }}
-            ${{ secrets.DOCKER_USERNAME }}/aitu-net-frontend:latest
+      - name: Push Docker image
+        run: docker push rlckyyy/aitu-net-frontend
 
-  deploy:
-    name: Deploy to Server
-    needs: build_push
+  deploy-to-server:
     runs-on: ubuntu-latest
-
+    needs: build-docker-image
     steps:
-      - name: Deploy to Ubuntu Server 🚀
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Deploy
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            echo "📌 Pulling latest image..."
             docker pull ${{ secrets.DOCKER_USERNAME }}/aitu-net-frontend:latest
-
-            echo "🛑 Stopping and removing old container..."
             docker stop aitu-net-frontend || true
             docker rm aitu-net-frontend || true
-
-            echo "🚀 Starting new container..."
-            docker run -d --name aitu-net-frontend \
-              --network aitu-net \
-              -p 3000:3000 \
-              ${{ secrets.DOCKER_USERNAME }}/aitu-net-frontend:latest
-
-            echo "✅ Deployment successful!"
+            docker run -d --name aitu-net-frontend --network aitu-net -p 3000:3000 ${{ secrets.DOCKER_USERNAME }}/aitu-net-frontend:latest

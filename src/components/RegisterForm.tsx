@@ -19,7 +19,7 @@ export default function AuthForm({type}: { type: 'register' | 'login' }) {
 
         try {
             if (type === 'register') {
-                await register({username: username, email: email, password: password});
+                await register({username: username, email: email, password: password, publicKey: 'fewf'});
             }
             router.push('/auth/login');
         } catch (err) {
