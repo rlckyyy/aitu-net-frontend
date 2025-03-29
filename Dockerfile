@@ -19,6 +19,9 @@ COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 
+
+RUN ls -la .next || (echo "Build not found! Run 'next build' before starting." && exit 1)
+
 EXPOSE 3000
 
-CMD ["npm", "run" , "start"]
+CMD ["sh", "-c", "ls -la .next && npm run start"]
