@@ -1,6 +1,6 @@
 import ProfileEdit from "@/components/users/ProfileEdit";
 
-export default function LoginPage() {
+export default function EditPage() {
     return (
         <ProfileEdit/>
     );

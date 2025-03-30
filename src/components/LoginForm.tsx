@@ -26,7 +26,7 @@ export default function LoginForm() {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen">
-            <h2 className="text-2xl mb-4">Вход</h2>
+            <h2 className="text-2xl mb-4 text-red-500">Sign in</h2>
             <form onSubmit={handleLogin} className="flex flex-col space-y-3">
                 {error && <p className="text-red-500">{error}</p>}
                 <input
