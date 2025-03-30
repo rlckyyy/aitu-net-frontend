@@ -76,9 +76,7 @@ export default function Profile() {
 
     return (
         <div className="flex pl-10 justify-betweenш items-center">
-            {/* Image Block */}
             <div className="flex flex-col items-center mr-20 relative">
-                {/* Фото профиля */}
                 <img
                     src={user?.avatar?.location || "/def_pfp.svg"}
                     alt="Profile"
@@ -86,18 +84,16 @@ export default function Profile() {
                     onClick={toggleMenu}
                 />
 
-                {/* Выпадающее меню */}
                 {menuOpen && (
                     <div
                         ref={menuRef}
                         className="absolute top-[calc(100%+8px)] left-1/2 -translate-x-1/2 w-40 bg-white shadow-md rounded-lg border border-gray-200"
                     >
-                        {/* Кнопка загрузки */}
                         <label
                             htmlFor="fileInput"
                             className="block px-4 py-2 text-gray-700 hover:bg-gray-100 cursor-pointer"
                         >
-                            Обновить фото
+                            Update photo
                         </label>
                         <input
                             id="fileInput"
@@ -110,7 +106,6 @@ export default function Profile() {
                             }}
                         />
 
-                        {/* Кнопка удаления */}
                         <button
                             onClick={() => {
                                 console.log("Фото удалено");
@@ -119,7 +114,7 @@ export default function Profile() {
                             }}
                             className="block w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100"
                         >
-                            Удалить фото
+                            Delete Photo
                         </button>
                     </div>
                 )}

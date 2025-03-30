@@ -7,9 +7,9 @@ export const LogoutButton = () => {
     const router = useRouter();
     const {logout} = useAuth()
 
-    const handleLogout = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    const handleLogout = (event: React.MouseEvent<HTMLButtonElement>) => {
         event.preventDefault();
-        await logout();
+        logout();
         router.refresh();
         router.replace('/auth/login');
     };
@@ -20,7 +20,7 @@ export const LogoutButton = () => {
             onClick={handleLogout}
             className="bg-red-500 text-white px-4 py-2 rounded"
         >
-            Выйти
+            Sign Out
         </button>
     );
 };

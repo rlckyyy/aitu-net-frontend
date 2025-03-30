@@ -13,15 +13,12 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 
     return (
         <div className="flex flex-col min-h-screen w-full">
-            {/* Header */}
             <header className="bg-white shadow-md px-6 py-3 flex justify-between items-center fixed w-full top-0 z-10 h-16">
-                {/* Контейнер для логотипа и поиска */}
                 <div className="flex items-center gap-4">
                     <Link href="/" className="text-xl font-bold text-gray-800">AITU Network</Link>
                     <SearchBar />
                 </div>
 
-                {/* Контейнер для аватара и меню */}
                 <div className="relative">
                     {user && (
                         <div>
@@ -45,7 +42,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                 </div>
             </header>
 
-            {/* Sidebar */}
             <aside className="fixed left-0 top-16 w-64 h-[calc(100vh-64px)] bg-gray-800 text-white p-4 shadow-lg flex flex-col">
                 <Link href="/" className="hover:text-blue-400 transition">🏠 Main</Link>
                 {!user && <Link href="/auth/login" className="hover:text-blue-400 transition">🔐 Login</Link>}
@@ -55,7 +51,6 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
                 {user && <FriendLayout />}
             </aside>
 
-            {/* Main Content */}
             <main className="flex-1 p-6 bg-gray-100 flex flex-col justify-start items-center ml-64 mt-16 min-h-screen">
                 <div className="w-full max-w-5xl">{children}</div>
             </main>

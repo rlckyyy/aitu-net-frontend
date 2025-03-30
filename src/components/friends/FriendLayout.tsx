@@ -8,7 +8,6 @@ export default function FriendLayout() {
 
     return (
         <div className="mt-2">
-            {/* Кнопка Friends */}
             <button
                 onClick={() => setShowFriendsMenu((prev) => !prev)}
                 className="hover:text-blue-400 transition flex items-center"
@@ -16,7 +15,6 @@ export default function FriendLayout() {
                 🤼‍ Friends
             </button>
 
-            {/* Меню друзей */}
             {showFriendsMenu && (
                 <div className="mt-4 p-2 bg-gray-700 text-white rounded-md shadow">
                     <nav className="flex flex-col space-y-2">

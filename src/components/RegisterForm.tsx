@@ -31,42 +31,45 @@ export default function AuthForm({type}: { type: 'register' | 'login' }) {
     };
 
     return (
-        <div className="max-w-md mx-auto p-4 border rounded-lg">
-            <h2 className="text-xl font-bold">
-                {type === 'register' ? 'Регистрация' : 'Вход'}
-            </h2>
-            {error && <p className="text-red-500">{error}</p>}
-            <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-                {type === 'register' && (
+        <div className="flex flex-col items-center justify-center min-h-screen">
+            <h2 className="text-2xl mb-4">📝 Регистрация</h2>
+            <div className="max-w-md w-full p-4 border rounded-lg bg-white">
+                <h2 className="text-xl font-bold text-center mb-2">
+                    {type === 'register' ? 'Регистрация' : 'Вход'}
+                </h2>
+                {error && <p className="text-red-500 text-center mb-2">{error}</p>}
+                <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+                    {type === 'register' && (
+                        <input
+                            type="text"
+                            placeholder="Username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            className="border p-2 rounded text-black w-full"
+                        />
+                    )}
                     <input
-                        type="text"
-                        placeholder="Имя"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        className="border p-2 rounded text-black"
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="border p-2 rounded text-black w-full"
                     />
-                )}
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="border p-2 rounded text-black"
-                />
-                <input
-                    type="password"
-                    placeholder="Пароль"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="border p-2 rounded text-black"
-                />
-                <button
-                    type="submit"
-                    className="bg-blue-500 text-black p-2 rounded"
-                >
-                    {type === 'register' ? 'Зарегистрироваться' : 'Войти'}
-                </button>
-            </form>
+                    <input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="border p-2 rounded text-black w-full"
+                    />
+                    <button
+                        type="submit"
+                        className="bg-blue-500 text-white p-2 rounded w-full hover:bg-blue-600 transition"
+                    >
+                        {type === 'register' ? 'Sign Up' : 'Sign In'}
+                    </button>
+                </form>
+            </div>
         </div>
     );
 }

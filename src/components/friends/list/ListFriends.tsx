@@ -22,7 +22,7 @@ export default function ListFriends() {
 
     return (
         <div className="max-w-2xl mx-auto p-6 bg-gray-800 text-white rounded-lg shadow-lg">
-            <h2 className="text-2xl font-semibold mb-4 text-blue-400">Список друзей</h2>
+            <h2 className="text-2xl font-semibold mb-4 text-blue-400">Friend List</h2>
             <ul className="space-y-4">
                 {friends.length > 0 ? (
                     friends.map(friend => (
@@ -47,7 +47,7 @@ export default function ListFriends() {
                         </li>
                     ))
                 ) : (
-                    <p className="text-gray-400">У вас пока нет друзей.</p>
+                    <p className="text-gray-400">No friends yet</p>
                 )}
             </ul>
         </div>

@@ -23,7 +23,7 @@ export default function () {
 
     return (
         <div className="max-w-md mx-auto p-6 bg-gray-900 text-white rounded-lg shadow-lg">
-            <h1 className="text-2xl font-semibold mb-4 text-blue-400">Обновить профиль</h1>
+            <h1 className="text-2xl font-semibold mb-4 text-blue-400">Update profile</h1>
 
             <form id="updateForm"
                   onSubmit={handleSubmit}>
@@ -44,7 +44,7 @@ export default function () {
                     <button type="submit"
                             className="w-full p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
                     >
-                        Сохранить изменения
+                        Save the changes
                     </button>
                 </div>
             </form>

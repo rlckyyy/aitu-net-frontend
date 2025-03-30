@@ -27,7 +27,7 @@ export default function UserProfile() {
     }, [userId]);
 
     if (loading) return <p>Loading...</p>;
-    if (!user) return <p>Пользователь не найден</p>;
+    if (!user) return <p>User not found</p>;
 
     return (
         <div className=" pl-10 justify-between items-center">
