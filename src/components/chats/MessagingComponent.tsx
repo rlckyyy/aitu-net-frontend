@@ -1,3 +1,5 @@
+'use client'
+
 import {useChat} from "@/hooks/useChat";
 import {ChatRoomsComponent} from "@/components/chats/ChatRoomsComponent";
 import {ChatWindowComponent} from "@/components/chats/ChatWindowComponent";

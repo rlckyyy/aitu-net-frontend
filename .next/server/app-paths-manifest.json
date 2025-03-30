@@ -1,9 +1,16 @@
 {
-  "/search/page": "app/search/page.js",
-  "/users/profile/another/page": "app/users/profile/another/page.js",
-  "/page": "app/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/auth/login/page": "app/auth/login/page.js",
   "/chat/page": "app/chat/page.js",
   "/friends/list/page": "app/friends/list/page.js",
+  "/auth/register/page": "app/auth/register/page.js",
+  "/friends/respond-requests/page": "app/friends/respond-requests/page.js",
+  "/friends/send-requests/page": "app/friends/send-requests/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/page": "app/page.js",
+  "/search/page": "app/search/page.js",
+  "/users/edit/page": "app/users/edit/page.js",
+  "/users/profile/another/page": "app/users/profile/another/page.js",
   "/users/profile/page": "app/users/profile/page.js",
-  "/friends/send-requests/page": "app/friends/send-requests/page.js"
+  "/friends/page": "app/friends/page.js"
 }
