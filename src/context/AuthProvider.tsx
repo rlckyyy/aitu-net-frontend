@@ -29,12 +29,16 @@ export function AuthProvider({children}: AuthProviderProps) {
         loadUser()
     }, [])
 
-    const loginUser = (userData: { email: string; password: string }) => {
-        api.auth.login(userData)
-            .then(res => {
-                res.status === 200 && console.log('Successfully logged in')
-            })
-            .catch(err => console.error('Login failed:', err));
+    const loginUser = async (userData: { email: string; password: string }) => {
+        try {
+            const response = await api.auth.login(userData);
+            if (response.status === 200) {
+                console.log('Successfully logged in');
+                await loadUser();
+            }
+        } catch (err) {
+            console.error('Login failed:', err);
+        }
     }
 
     const logout = async () => {

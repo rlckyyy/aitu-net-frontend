@@ -27,7 +27,6 @@ export default function MessagingComponent() {
 
         sendMessage(chatMessage)
 
-        // Send message to backend and update chatRoomMessages...
         setInputMessage("");
     };
 
