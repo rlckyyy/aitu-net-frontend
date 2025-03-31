@@ -71,6 +71,10 @@ export function AuthProvider({children}: AuthProviderProps) {
     }
 
     const loadUser = async () => {
+        if (!document.cookie.includes('jwt')) {
+            setUser(null);
+            return;
+        }
         try {
             const response = await api.auth.getUser();
             if (response.status === 200) {
