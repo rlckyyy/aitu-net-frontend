@@ -32,9 +32,9 @@ export default function AuthForm({type}: { type: 'register' | 'login' }) {
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen">
-            <h2 className="text-2xl mb-4">📝 Sign up</h2>
+            <h2 className="text-2xl mb-4 text-red-500">📝 Sign up</h2>
             <div className="max-w-md w-full p-4 border rounded-lg bg-white">
-                <h2 className="text-xl font-bold text-center mb-2">
+                <h2 className="text-xl font-bold text-center mb-2 text-red-500">
                     {type === 'register' ? 'Sign Up' : 'Sign in'}
                 </h2>
                 {error && <p className="text-red-500 text-center mb-2">{error}</p>}
