@@ -3,7 +3,6 @@
 import {User} from '@/models/user';
 import {createContext, ReactNode, useContext, useEffect, useState,} from 'react';
 import {api} from "@/lib";
-import {generateKeyPair, savePrivateKey} from "@/app/services/keysService";
 import {UserRegisterData} from "@/models/userRegisterData";
 
 interface AuthContextType {
@@ -57,10 +56,7 @@ export function AuthProvider({children}: AuthProviderProps) {
 
     const register = async (userRegData: UserRegisterData) => {
         try {
-            const {publicKey, privateKey} = await generateKeyPair()
-            userRegData.publicKey = publicKey
             const response = await api.auth.register(userRegData);
-            // await savePrivateKey(privateKey)
             console.log('Registration successful:', response.data);
         } catch (error: any) {
             console.error(
@@ -71,12 +67,6 @@ export function AuthProvider({children}: AuthProviderProps) {
     }
 
     const loadUser = async () => {
-        console.log("check cookie")
-        console.log(document.cookie)
-        if (!document.cookie.includes('jwt')) {
-            setUser(null);
-            return;
-        }
         try {
             const response = await api.auth.getUser();
             if (response.status === 200) {

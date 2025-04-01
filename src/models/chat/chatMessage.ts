@@ -9,12 +9,7 @@ export type ChatMessage = {
     sender: string;
     recipient: string;
     content: string;
-    contentForSelf?: string;
     timestamp: Date;
     status: ChatMessageStatus;
     type: string;
-    encryptedAesKey?: string;
-    iv?: string;
-    encryptedAesKeyForSelf?: string;
-    ivForSelf?: string;
 };

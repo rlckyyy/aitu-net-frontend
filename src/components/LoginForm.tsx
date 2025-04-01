@@ -16,7 +16,7 @@ export default function LoginForm() {
         setError('');
 
         try {
-            await loginUser({email, password});
+            loginUser({email, password});
             router.push('/users/profile');
         } catch (err) {
             console.error(err);

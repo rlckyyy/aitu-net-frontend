@@ -2,7 +2,7 @@
 
 import {AxiosError} from 'axios';
 import {useRouter} from 'next/navigation';
-import {useState} from 'react';
+import React, {useState} from 'react';
 import {useAuth} from "@/context/AuthProvider";
 
 export default function AuthForm({type}: { type: 'register' | 'login' }) {
@@ -19,7 +19,7 @@ export default function AuthForm({type}: { type: 'register' | 'login' }) {
 
         try {
             if (type === 'register') {
-                await register({username: username, email: email, password: password, publicKey: 'fewf'});
+                register({username: username, email: email, password: password});
             }
             router.push('/auth/login');
         } catch (err) {
