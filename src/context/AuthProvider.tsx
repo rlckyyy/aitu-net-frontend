@@ -71,6 +71,8 @@ export function AuthProvider({children}: AuthProviderProps) {
     }
 
     const loadUser = async () => {
+        console.log("check cookie")
+        console.log(document.cookie)
         if (!document.cookie.includes('jwt')) {
             setUser(null);
             return;
