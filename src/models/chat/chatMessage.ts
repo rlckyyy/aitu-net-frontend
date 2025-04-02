@@ -9,7 +9,8 @@ export type ChatMessage = {
     sender: string;
     recipient: string;
     content: string;
-    timestamp: Date;
     status: ChatMessageStatus;
     type: string;
+    createdAt?: Date;
+    updatedAt?: Date;
 };

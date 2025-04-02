@@ -24,7 +24,7 @@ export default function MessagingComponent() {
             recipient: currentCompanion,
             sender: user.email,
             status: ChatMessageStatus.DELIVERED,
-            timestamp: new Date()
+            createdAt: new Date(),
         }
 
         sendMessage(chatMessage)

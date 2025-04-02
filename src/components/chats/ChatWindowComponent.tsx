@@ -35,7 +35,7 @@ export const ChatWindowComponent = ({
                             >
                                 {chatMessage.content}
                                 <div className={'text-xs text-gray-400 flex justify-end self-end mt-1'}>
-                                    {new Date(chatMessage.timestamp).toLocaleTimeString([], {
+                                    {new Date(chatMessage.createdAt!).toLocaleTimeString([], {
                                         hour: '2-digit',
                                         minute: '2-digit'
                                     })}
