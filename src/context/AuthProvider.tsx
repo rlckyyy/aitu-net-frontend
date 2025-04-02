@@ -23,17 +23,31 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 
 export function AuthProvider({children}: AuthProviderProps) {
     const [user, setUser] = useState<User | null>(null)
+    const [authenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
     useEffect(() => {
-        loadUser()
+        checkAuth();
     }, [])
+
+    const checkAuth = async () => {
+        try {
+            const response = await api.auth.checkAuth();
+            const data = response.data as AuthCheckResponse;
+            setIsAuthenticated(data.authenticated);
+            if (data.authenticated) {
+                await loadUser();
+            }
+        } catch (err) {
+            setIsAuthenticated(false);
+        }
+    }
 
     const loginUser = async (userData: { email: string; password: string }) => {
         try {
             const response = await api.auth.login(userData);
             if (response.status === 200) {
                 console.log('Successfully logged in');
-                await loadUser();
+                await checkAuth();
             }
         } catch (err) {
             console.error('Login failed:', err);
@@ -44,7 +58,7 @@ export function AuthProvider({children}: AuthProviderProps) {
         try {
             await api.auth.logout();
             setUser(null);
-            await loadUser();
+            setIsAuthenticated(false);
             console.log('Logout successful');
         } catch (error: any) {
             console.error(

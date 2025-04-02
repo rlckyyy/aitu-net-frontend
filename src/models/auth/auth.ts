@@ -1,0 +1,3 @@
+interface AuthCheckResponse {
+    authenticated: boolean;
+}
