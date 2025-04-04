@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import type { User } from "@/models/user";
 import { api } from "@/lib";
 import { Search, UserPlus, MessageCircle, Mail } from "lucide-react";
+import {useAuth} from "@/context/AuthProvider";
 
 export default function SearchComponent() {
 	const searchParams = useSearchParams();
@@ -13,6 +14,7 @@ export default function SearchComponent() {
 	const query = searchParams.get("query") || "";
 	const [loading, setLoading] = useState(true);
 	const [requestSent, setRequestSent] = useState<Record<string, boolean>>({});
+	const {user} = useAuth();
 
 	useEffect(() => {
 		if (!query) {
@@ -81,49 +83,54 @@ export default function SearchComponent() {
 									</div>
 								</div>
 
-								<div className="flex flex-wrap gap-2 sm:flex-nowrap">
-									<button
-										type="button"
-										className={`flex items-center px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-											requestSent[user.id]
-												? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-												: "bg-indigo-100 text-indigo-800 hover:bg-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-800/40"
-										}`}
-										onClick={() => handleFriendRequest(user.id)}
-										disabled={requestSent[user.id]}
-									>
-										{requestSent[user.id] ? (
-											<>
-												<span className="mr-1">✓</span>
-												Request Sent
-											</>
-										) : (
-											<>
-												<UserPlus size={16} className="mr-1" />
-												Add Friend
-											</>
-										)}
-									</button>
+                                <div className="flex flex-wrap gap-2 sm:flex-nowrap">
+                                    {/* Кнопка "View Profile" всегда отображается */}
+                                    <button
+                                        type="button"
+                                        className="flex items-center px-3 py-1.5 bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 rounded-md text-sm font-medium transition-colors"
+                                        onClick={() => router.push(`/users/profile/another?userId=${user.id}`)}
+                                    >
+                                        <span className="mr-1">👤</span>
+                                        View Profile
+                                    </button>
 
-									<button
-										type="button"
-										className="flex items-center px-3 py-1.5 bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 rounded-md text-sm font-medium transition-colors"
-										onClick={() => router.push(`/chat?companionEmail=${user.email}`)}
-									>
-										<MessageCircle size={16} className="mr-1" />
-										Message
-									</button>
+                                    {user && (
+                                        <>
+                                            <button
+                                                type="button"
+                                                className={`flex items-center px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                                                    requestSent[user.id]
+                                                        ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                                                        : "bg-indigo-100 text-indigo-800 hover:bg-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-800/40"
+                                                }`}
+                                                onClick={() => handleFriendRequest(user.id)}
+                                                disabled={requestSent[user.id]}
+                                            >
+                                                {requestSent[user.id] ? (
+                                                    <>
+                                                        <span className="mr-1">✓</span>
+                                                        Request Sent
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <UserPlus size={16} className="mr-1" />
+                                                        Add Friend
+                                                    </>
+                                                )}
+                                            </button>
 
-									<button
-										type="button"
-										className="flex items-center px-3 py-1.5 bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 rounded-md text-sm font-medium transition-colors"
-										onClick={() => router.push(`/users/profile/another?userId=${user.id}`)}
-									>
-										<span className="mr-1">👤</span>
-										View Profile
-									</button>
-								</div>
-							</div>
+                                            <button
+                                                type="button"
+                                                className="flex items-center px-3 py-1.5 bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 rounded-md text-sm font-medium transition-colors"
+                                                onClick={() => router.push(`/chat?companionEmail=${user.email}`)}
+                                            >
+                                                <MessageCircle size={16} className="mr-1" />
+                                                Message
+                                            </button>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
 						))}
 					</div>
 				) : (
