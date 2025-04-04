@@ -31,6 +31,13 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             docker pull ${{ secrets.DOCKER_USERNAME }}/aitu-net-frontend:latest
+            
             docker stop aitu-net-frontend || true
             docker rm aitu-net-frontend || true
+            OLD_IMAGE_ID=$(docker images "${{ secrets.DOCKER_USERNAME }}/aitu-net-frontend" --format "{{.ID}}" | tail -n +2)
+
+            if [ ! -z "$OLD_IMAGE_ID" ]; then
+              docker rmi -f $OLD_IMAGE_ID || true
+            fi
+            
             docker run -d --name aitu-net-frontend --network aitu-net -p 3000:3000 ${{ secrets.DOCKER_USERNAME }}/aitu-net-frontend:latest
