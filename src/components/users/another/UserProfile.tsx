@@ -84,22 +84,25 @@ export default function UserProfile() {
 
                 {currUser && (
                     <div className="absolute bottom-4 right-4 flex space-x-2">
-                    <button
-                        onClick={handleSendMessage}
-                        className="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 rounded-lg shadow hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700"
-                    >
-                        <MessageCircle size={16} className="mr-2"/>
-                        Message
-                    </button>
+                        <button
+                            onClick={handleSendMessage}
+                            className="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 rounded-lg shadow hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700"
+                        >
+                            <MessageCircle size={16} className="mr-2"/>
+                            Message
+                        </button>
 
-                    <button
-                        onClick={handleSendFriendRequest}
-                        className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition-colors"
-                    >
-                        <UserPlus size={16} className="mr-2"/>
-                        Add Friend
-                    </button>
-                </div>
+                        {!currUser.friendList.includes(user.id) && (
+                            <button
+                                onClick={handleSendFriendRequest}
+                                className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition-colors"
+                            >
+                                <UserPlus size={16} className="mr-2"/>
+                                Add Friend
+                            </button>
+                        )}
+
+                    </div>
                 )}
             </div>
 
