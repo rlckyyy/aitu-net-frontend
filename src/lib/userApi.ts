@@ -21,7 +21,7 @@ export const userApi = {
     },
 
     getUserById: (id: string) => {
-        return request<User>(`/public/users/${id}`, { method: 'GET' });
+        return request<User>(`/users/public/${id}`, { method: 'GET' });
     },
 
     getUserByEmail: (email: string): Promise<AxiosResponse<User>> => {
