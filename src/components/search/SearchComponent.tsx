@@ -57,38 +57,37 @@ export default function SearchComponent() {
 					</div>
 				) : users.length > 0 ? (
 					<div className="space-y-4">
-						{users.map(user => (
+						{users.map(searchedUser => (
 							<div
-								key={user.id}
+								key={searchedUser.id}
 								className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 hover:shadow-md transition-shadow border border-gray-200 dark:border-gray-700"
 							>
 								<div className="flex items-center">
 									<div className="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mr-4">
-										{user.avatar?.location ? (
+										{searchedUser.avatar?.location ? (
 											<img
-												src={user.avatar.location || "/placeholder.svg"}
-												alt={user.username}
+												src={searchedUser.avatar.location || "/placeholder.svg"}
+												alt={searchedUser.username}
 												className="w-12 h-12 rounded-full object-cover"
 											/>
 										) : (
-											<span className="text-xl font-bold">{user.username.charAt(0).toUpperCase()}</span>
+											<span className="text-xl font-bold">{searchedUser.username.charAt(0).toUpperCase()}</span>
 										)}
 									</div>
 									<div>
-										<h3 className="text-lg font-medium text-gray-900 dark:text-white">{user.username}</h3>
+										<h3 className="text-lg font-medium text-gray-900 dark:text-white">{searchedUser.username}</h3>
 										<div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
 											<Mail size={14} className="mr-1" />
-											{user.email}
+											{searchedUser.email}
 										</div>
 									</div>
 								</div>
-
                                 <div className="flex flex-wrap gap-2 sm:flex-nowrap">
                                     {/* Кнопка "View Profile" всегда отображается */}
                                     <button
                                         type="button"
                                         className="flex items-center px-3 py-1.5 bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 rounded-md text-sm font-medium transition-colors"
-                                        onClick={() => router.push(`/users/profile/another?userId=${user.id}`)}
+                                        onClick={() => router.push(`/users/profile/another?userId=${searchedUser.id}`)}
                                     >
                                         <span className="mr-1">👤</span>
                                         View Profile
@@ -99,14 +98,14 @@ export default function SearchComponent() {
                                             <button
                                                 type="button"
                                                 className={`flex items-center px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                                                    requestSent[user.id]
+                                                    requestSent[searchedUser.id]
                                                         ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
                                                         : "bg-indigo-100 text-indigo-800 hover:bg-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-800/40"
                                                 }`}
-                                                onClick={() => handleFriendRequest(user.id)}
-                                                disabled={requestSent[user.id]}
+                                                onClick={() => handleFriendRequest(searchedUser.id)}
+                                                disabled={requestSent[searchedUser.id]}
                                             >
-                                                {requestSent[user.id] ? (
+                                                {requestSent[searchedUser.id] ? (
                                                     <>
                                                         <span className="mr-1">✓</span>
                                                         Request Sent
@@ -122,7 +121,7 @@ export default function SearchComponent() {
                                             <button
                                                 type="button"
                                                 className="flex items-center px-3 py-1.5 bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 rounded-md text-sm font-medium transition-colors"
-                                                onClick={() => router.push(`/chat?companionEmail=${user.email}`)}
+                                                onClick={() => router.push(`/chat?companionEmail=${searchedUser.email}`)}
                                             >
                                                 <MessageCircle size={16} className="mr-1" />
                                                 Message
