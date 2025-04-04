@@ -1,3 +1,6 @@
 {
-  "/users/profile/page": "app/users/profile/page.js"
+  "/auth/login/page": "app/auth/login/page.js",
+  "/users/profile/page": "app/users/profile/page.js",
+  "/favicon.ico/route": "app/favicon.ico/route.js",
+  "/auth/register/page": "app/auth/register/page.js"
 }

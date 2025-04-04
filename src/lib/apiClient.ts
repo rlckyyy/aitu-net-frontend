@@ -1,27 +1,26 @@
-import axios, {AxiosError, AxiosResponse} from 'axios';
-
+import axios, { AxiosError, AxiosResponse } from "axios";
 
 const API_URL = "https://aitunet.kz/api/v1"; // https://aitunet.kz/api/v1
 
 export const apiClient = axios.create({
-    baseURL: API_URL,
-    withCredentials: true,
-    headers: {
-        'Content-Type': 'application/json',
-    },
+	baseURL: API_URL,
+	withCredentials: true,
+	headers: {
+		"Content-Type": "application/json",
+	},
 });
 
 apiClient.interceptors.response.use(
-    (response) => response,
-    (error: AxiosError) => {
-        if (error.response?.status && error.response?.status >= 400 && error.response?.status < 500) {
-            return Promise.reject(error);
-        }
-        console.error('Unexpected API error:', error);
-        return Promise.reject(error);
-    }
+	response => response,
+	(error: AxiosError) => {
+		if (error.response?.status && error.response?.status >= 400 && error.response?.status < 500) {
+			return Promise.reject(error);
+		}
+		console.error("Unexpected API error:", error);
+		return Promise.reject(error);
+	}
 );
 
 export async function request<T>(endpoint: string, options: any = {}): Promise<AxiosResponse<T>> {
-    return await apiClient.request({url: endpoint, ...options});
+	return await apiClient.request({ url: endpoint, ...options });
 }
