@@ -92,7 +92,7 @@ export default function UserProfile() {
                             Message
                         </button>
 
-                        {!currUser.friendList.includes(user.id) && (
+                        {!currUser.friendList.includes(user.email) && (
                             <button
                                 onClick={handleSendFriendRequest}
                                 className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition-colors"

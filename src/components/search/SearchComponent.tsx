@@ -97,7 +97,7 @@ export default function SearchComponent() {
                                         View Profile
                                     </button>
 
-                                    {user && !user.friendList.includes(searchedUser.id) && (
+                                    {user && !user.friendList.includes(searchedUser.email) && (
                                         <>
                                             <button
                                                 type="button"
