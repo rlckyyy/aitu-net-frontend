@@ -11,7 +11,7 @@ export const friendsApi = {
         return await request<FriendRequest[]>(`/friend/received`, {method: 'GET', params: {status}});
     },
     getSentFriendRequests: async (requestStatus: FriendRequestStatus) => {
-        return await request<FriendRequest[]>(`/friend/sent`, {method: 'GET'});
+        return await request<FriendRequest[]>(`/friend/sent`, {method: 'GET', params: {requestStatus}});
     },
     deleteFriendRequest: async (requestId: string) => {
         return await request(`/friend/request/${requestId}`, {method: 'DELETE'});
