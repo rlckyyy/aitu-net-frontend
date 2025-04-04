@@ -9,7 +9,7 @@ export interface User {
     publicKey: string;
 }
 
-interface Avatar {
+export interface Avatar {
     id: string;
     location: string;
 }

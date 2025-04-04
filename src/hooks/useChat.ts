@@ -10,19 +10,21 @@ export function useChat() {
     const {user} = useAuth();
     const searchParams = useSearchParams();
     const stompClientRef = useRef<Client | null>(null);
-
     const [chatRooms, setChatRooms] = useState<Map<string, ChatRoom>>(new Map());
     const [chatRoomMessages, setChatRoomMessages] = useState<Map<string, ChatMessage[]>>(new Map());
     const [currentChatId, setCurrentChatId] = useState<string>("");
     const [currentCompanion, setCurrentCompanion] = useState<string>("");
-
+    const SOCKET_URL: string = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "defaultWebSocketUrl";
+    {
+        console.log("SOCKET_URL", SOCKET_URL);
+    }
     const localId = crypto.randomUUID()
 
     useEffect(() => {
         if (!user) return
 
         const stompClient = new Client({
-            webSocketFactory: () => new SockJS("https://aitunet.kz/api/ws"), //wss://aitunet.kz/api/ws
+            webSocketFactory: () => new SockJS(SOCKET_URL),
             debug: console.log,
             onConnect: onConnected,
             onStompError: (frame) => console.error(`STOMP Error: ${frame.body}`),

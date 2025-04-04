@@ -1,7 +1,9 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 
-const API_URL = "https://aitunet.kz/api/v1"; // https://aitunet.kz/api/v1
-
+const API_URL = process.env.NEXT_PUBLIC_API_URL; // https://aitunet.kz/api/v1
+{
+	console.log("API_URL", API_URL);
+}
 export const apiClient = axios.create({
 	baseURL: API_URL,
 	withCredentials: true,

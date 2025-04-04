@@ -32,7 +32,6 @@ jobs:
           script: |
             docker pull ${{ secrets.DOCKER_USERNAME }}/aitu-net-frontend:latest
             
-            # Сохраняем ID нового pulled образа
             NEW_IMAGE_ID=$(docker images "${{ secrets.DOCKER_USERNAME }}/aitu-net-frontend" --format "{{.ID}}" | head -n 1)
             
             docker stop aitu-net-frontend || true
