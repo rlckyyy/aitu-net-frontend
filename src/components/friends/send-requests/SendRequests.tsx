@@ -55,7 +55,7 @@ export default function SendRequests() {
 											}}
 											className="text-lg font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
 										>
-											{friendReq.receiverId}
+											{friendReq.receiver}
 										</Link>
 										<div className="flex items-center text-sm text-gray-500 dark:text-gray-400 mt-1">
 											<Clock size={14} className="mr-1" />

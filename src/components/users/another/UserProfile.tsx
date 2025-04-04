@@ -46,7 +46,11 @@ export default function UserProfile() {
                 })
                 .catch(error => {
                     console.error("Error sending friend request:", error);
-                    alert("Failed to send friend request");
+                    if (error.response && error.response.status === 409) {
+                        alert("Failed to send friend request: Already pending request");
+                    } else {
+                        alert("Failed to send friend request");
+                    }
                 });
         }
     };
