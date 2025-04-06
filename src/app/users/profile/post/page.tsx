@@ -1,5 +1,7 @@
-export default function UsersPosts() {
+import UserPosts from "@/components/users/UsersPosts";
+
+export default function UsersPostsPage() {
     return (
-        <UsersPosts/>
+        <UserPosts/>
     );
 }

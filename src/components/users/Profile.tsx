@@ -9,7 +9,6 @@ import {Camera, Edit, FileText, Mail, Shield, Trash2, User, Users} from "lucide-
 import UserPosts from "@/components/users/UsersPosts";
 
 
-
 export default function Profile() {
     const {user, loadUser} = useAuth();
     const [loading, setLoading] = useState(true);
@@ -223,7 +222,7 @@ export default function Profile() {
                 </div>
             </div>
             <div className="px-8 pb-8">
-                <UserPosts userId={user.id}/>
+                <UserPosts/>
             </div>
         </div>
     );

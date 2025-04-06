@@ -3,96 +3,24 @@
 import React, {useEffect, useState} from "react";
 import {Post, PostDTO, PostType} from "@/models/post/post";
 import {api} from "@/lib";
-import {FileText, ImageIcon, Plus} from "lucide-react";
+import {FileText, Plus} from "lucide-react";
 import clsx from "clsx";
+import {useAuth} from "@/context/AuthProvider";
+import {MediaFiles} from "@/components/MediaFiles";
 
-interface UserPostsProps {
-    userId: string;
-}
 
-export const MediaFiles = ({mediaFileIds}: { mediaFileIds: string[] }) => {
-    const [fileTypes, setFileTypes] = useState<string[]>([]);
-
-    const getFileType = async (url: string) => {
-        console.log("getFileType", url);
-        const fileExtension = url.split('.').pop()?.toLowerCase();
-        if (fileExtension === "jpg" || fileExtension === "jpeg" || fileExtension === "png" || fileExtension === "gif") {
-            return "image";
-        }
-
-        try {
-            const response = await fetch(url, { method: 'HEAD' });
-            const contentType = response.headers.get('Content-Type') || '';
-            console.log(contentType);
-            if (contentType.includes('image')) {
-                return 'image';
-            }
-            if (contentType.includes('video')) {
-                return 'video';
-            }
-            if (contentType.includes('audio')) {
-                return 'audio';
-            }
-            return 'unknown';
-        } catch (error) {
-            console.error("Error fetching file type:", error);
-            return 'unknown';
-        }
-    };
-
-    useEffect(() => {
-        const fetchFileTypes = async () => {
-            const types = await Promise.all(mediaFileIds.map(url => getFileType(url)));
-            setFileTypes(types);
-        };
-
-        fetchFileTypes();
-    }, [mediaFileIds]);
-
-    return (
-        <div className="flex flex-wrap gap-2 mt-2">
-            {mediaFileIds.map((fileId, idx) => (
-                <div
-                    key={idx}
-                    className="w-24 h-24 bg-gray-100 dark:bg-gray-700 rounded overflow-hidden flex items-center justify-center border border-gray-300 dark:border-gray-600"
-                >
-                    {fileTypes[idx] === 'image' ? (
-                        <img
-                            src={fileId}
-                            alt={`media-${idx}`}
-                            className="w-full h-full object-cover"
-                        />
-                    ) : fileTypes[idx] === 'video' ? (
-                        <video controls className="w-full h-full object-cover">
-                            <source src={fileId} type="video/mp4"/>
-                            Ваш браузер не поддерживает видео.
-                        </video>
-                    ) : fileTypes[idx] === 'audio' ? (
-                        <audio controls className="w-full h-full object-cover">
-                            <source src={fileId} type="audio/mp3"/>
-                            Ваш браузер не поддерживает аудио.
-                        </audio>
-                    ) : (
-                        <div className="text-gray-400">Unsupported file type</div>
-                    )}
-                </div>
-            ))}
-        </div>
-    );
-};
-
-export default function UserPosts({userId}: UserPostsProps) {
+export default function UserPosts() {
     const [posts, setPosts] = useState<Post[] | null>(null);
     const [newPostDescription, setNewPostDescription] = useState("");
     const [newPostFiles, setNewPostFiles] = useState<File[]>([]);
     const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
-    const [files, setFiles] = useState<File[] | null>(null);
+    const {user} = useAuth();
 
     useEffect(() => {
-        api.post.searchPosts(undefined, userId, PostType.USER, undefined)
+        api.post.searchPosts(undefined, user?.id, PostType.USER, undefined)
             .then(r => setPosts(r.data));
 
-    }, [userId]);
+    }, [user?.id]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
@@ -103,7 +31,7 @@ export default function UserPosts({userId}: UserPostsProps) {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const newPost: PostDTO = {
-            ownerId: userId,
+            ownerId: user?.id,
             postType: PostType.USER,
             description: newPostDescription,
         };
@@ -113,7 +41,7 @@ export default function UserPosts({userId}: UserPostsProps) {
             setNewPostDescription("");
             setNewPostFiles([]);
             api.post
-                .searchPosts(undefined, userId, PostType.USER, undefined)
+                .searchPosts(undefined, user?.id, PostType.USER, undefined)
                 .then((r) => setPosts(r.data));
         } catch (error) {
             console.error("Error creating post:", error);
@@ -178,7 +106,7 @@ export default function UserPosts({userId}: UserPostsProps) {
             </div>
 
             {/* Список постов */}
-            <div className="space-y-4 mt-4"> {/* Добавлен отступ сверху */}
+            <div className="space-y-4 mt-4">
                 {posts === null ? (
                     <p className="text-gray-500 dark:text-gray-400 text-center py-4">Loading posts...</p>
                 ) : posts.length === 0 ? (
@@ -202,7 +130,7 @@ export default function UserPosts({userId}: UserPostsProps) {
 
                             {/* Отображение медиафайлов */}
                             {post.mediaFileIds && post.mediaFileIds.length > 0 && (
-                                <MediaFiles mediaFileIds={post.mediaFileIds} />
+                                <MediaFiles mediaFileIds={post.mediaFileIds}/>
                             )}
                         </div>
                     ))
