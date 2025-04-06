@@ -1,34 +1,34 @@
-import {UserRegisterData} from "@/models/userRegisterData";
 import {request} from "@/lib/apiClient";
-import {AxiosResponse} from "axios";
-import {User} from "@/models/user";
+import {Post, PostDTO, PostType} from "@/models/post/post";
 
 export const postApi = {
-    // 1. Получить пост по ID
     getById: async (id: string) => {
         return await request<Post>(`/post/${id}`);
     },
 
-    // 2. Поиск постов по критериям
-    searchPosts: async (criteria: PostDTO) => {
+    searchPosts: async (groupId?: string, ownerId?: string, postType?: PostType, description?: string) => {
+        const params: Record<string, any> = {};
+
+        if (groupId) params.groupId = groupId;
+        if (ownerId) params.ownerId = ownerId;
+        if (postType) params.postType = postType;
+        if (description) params.description = description;
         return await request<Post[]>(`/post`, {
             method: "GET",
-            data: criteria,
+            params: params,
         });
     },
 
-    // 3. Создание поста с файлами
     createPost: async (post: PostDTO, files: File[]) => {
         const formData = new FormData();
-        formData.append("post", new Blob([JSON.stringify(post)], { type: "application/json" }));
-        files.forEach((file) => formData.append("files", file));
+        formData.append("post", new Blob([JSON.stringify(post)], {type: "application/json"}));
+
+        files.forEach(file => formData.append("files", file));
 
         return await request<Post>(`/post`, {
             method: "POST",
-            headers: {
-                "Content-Type": "multipart/form-data",
-            },
             data: formData,
+            headers: {"Content-Type": "multipart/form-data"}
         });
     },
 
