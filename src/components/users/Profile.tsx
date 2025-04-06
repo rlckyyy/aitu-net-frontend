@@ -156,8 +156,6 @@ export default function Profile() {
 					{/* Left column - User info */}
 					<div className="flex-1">
 						<h1 className="text-2xl font-bold text-gray-900 dark:text-white">{user.username}</h1>
-						{user?.description && <p className="mt-2 text-gray-600 dark:text-gray-300">{user.description}</p>}
-
 						<div className="mt-6 space-y-4">
 							<div className="flex items-center">
 								<Mail className="w-5 h-5 text-gray-500 dark:text-gray-400 mr-2" />
