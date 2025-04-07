@@ -7,7 +7,7 @@ import type React from "react";
 import { useState } from "react";
 import SearchBar from "@/components/SearchBar";
 import FriendLayout from "@/components/friends/FriendLayout";
-import { Bell, Home, MessageCircle, Settings, User, Users } from "lucide-react";
+import {Bell, Group, Home, MessageCircle, Settings, User, Users} from "lucide-react";
 
 export default function ClientLayout({ children }: { children: React.ReactNode }) {
 	const { user } = useAuth();
@@ -105,6 +105,10 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
 							<Link href="/chat" className="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
 								<MessageCircle size={18} className="mr-3 text-indigo-500" />
 								<span>Chat</span>
+							</Link>
+							<Link href="/group" className="flex items-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+								<Group size={18} className="mr-3 text-indigo-500" />
+								<span>Community</span>
 							</Link>
 							<div className="pt-2">
 								<FriendLayout />

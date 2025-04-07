@@ -8,13 +8,12 @@ export const postApi = {
 
     searchPosts: async (groupId?: string, ownerId?: string, postType?: PostType, description?: string) => {
         const params: Record<string, any> = {};
-
+        console.log(groupId, ownerId, postType, description);
         if (groupId) params.groupId = groupId;
         if (ownerId) params.ownerId = ownerId;
         if (postType) params.postType = postType;
         if (description) params.description = description;
         return await request<Post[]>(`/post`, {
-            method: "GET",
             params: params,
         });
     },

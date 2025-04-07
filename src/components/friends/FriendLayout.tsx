@@ -8,7 +8,7 @@ export default function FriendLayout() {
 	const [showFriendsMenu, setShowFriendsMenu] = useState(false);
 
 	return (
-		<div className="mt-2">
+		<div>
 			<button
 				onClick={() => setShowFriendsMenu(prev => !prev)}
 				className="flex items-center w-full p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"

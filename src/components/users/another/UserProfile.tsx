@@ -11,8 +11,8 @@ export default function UserProfile() {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const searchParams = useSearchParams();
-    const router = useRouter();
     const userId = searchParams.get("userId");
+    const router = useRouter();
     const {user: currUser} = useAuth();
 
     useEffect(() => {

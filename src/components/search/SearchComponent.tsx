@@ -6,6 +6,7 @@ import type {User} from "@/models/user";
 import {api} from "@/lib";
 import {Mail, MessageCircle, Search, UserPlus} from "lucide-react";
 import {useAuth} from "@/context/AuthProvider";
+import Link from "next/link";
 
 export default function SearchComponent() {
     const searchParams = useSearchParams();
@@ -88,14 +89,13 @@ export default function SearchComponent() {
                                 </div>
                                 <div className="flex flex-wrap gap-2 sm:flex-nowrap">
                                     {/* Кнопка "View Profile" всегда отображается */}
-                                    <button
-                                        type="button"
+                                    <Link
+                                        href={`/users/profile/another?userId=${searchedUser.id}`}
                                         className="flex items-center px-3 py-1.5 bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 rounded-md text-sm font-medium transition-colors"
-                                        onClick={() => router.push(`/users/profile/another?userId=${searchedUser.id}`)}
                                     >
                                         <span className="mr-1">👤</span>
                                         View Profile
-                                    </button>
+                                    </Link>
 
                                     {user && !user.friendList.includes(searchedUser.email) && (
                                         <>

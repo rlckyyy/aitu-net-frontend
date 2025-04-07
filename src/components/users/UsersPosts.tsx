@@ -19,7 +19,6 @@ export default function UserPosts() {
     useEffect(() => {
         api.post.searchPosts(undefined, user?.id, PostType.USER, undefined)
             .then(r => setPosts(r.data));
-
     }, [user?.id]);
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,37 +68,37 @@ export default function UserPosts() {
 
                 {/* Модальное окно */}
                 {isCreatePostModalOpen && (
-                    <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50 z-50">
+                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
                         <div
-                            className="bg-white rounded-lg shadow-lg w-96 p-6 transform transition-transform duration-300 scale-100">
-                            <form onSubmit={handleSubmit}>
-                                <textarea
-                                    value={newPostDescription}
-                                    onChange={(e) => setNewPostDescription(e.target.value)}
-                                    placeholder="Write a new post..."
-                                    className="w-full p-2 mb-4 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                                />
+                            className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md p-6 transition-transform duration-300 scale-100 animate-fade-in">
+                            <button
+                                onClick={() => setIsCreatePostModalOpen(false)}
+                                className="absolute top-3 right-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-xl font-bold"
+                            >
+                                ×
+                            </button>
+                            <form onSubmit={handleSubmit} className="mt-4">
+                            <textarea
+                                value={newPostDescription}
+                                onChange={(e) => setNewPostDescription(e.target.value)}
+                                placeholder="Write something amazing..."
+                                className="w-full h-32 p-3 mb-4 border border-gray-300 dark:border-gray-600 rounded-xl dark:bg-gray-900 dark:text-gray-200 resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            />
                                 <input
                                     type="file"
                                     multiple
                                     onChange={handleFileChange}
-                                    className="mb-4"
+                                    className="mb-4 w-full text-sm text-gray-600 dark:text-gray-300"
                                 />
                                 <div className="flex justify-end">
                                     <button
                                         type="submit"
-                                        className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition-colors"
+                                        className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-md transition-colors duration-200"
                                     >
                                         Add Post
                                     </button>
                                 </div>
                             </form>
-                            <button
-                                onClick={() => setIsCreatePostModalOpen(false)}
-                                className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-                            >
-                                X
-                            </button>
                         </div>
                     </div>
                 )}
@@ -125,7 +124,7 @@ export default function UserPosts() {
                                         : "italic text-gray-500 dark:text-gray-400"
                                 )}
                             >
-                                {post.description || "No description"}
+                                {post.description}
                             </p>
 
                             {/* Отображение медиафайлов */}
