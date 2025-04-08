@@ -1,9 +1,10 @@
 import {Avatar} from "@/models/user";
+import {AccessType} from "@/models/group/accessType";
 
 export interface GroupCreateDto {
     name: string;
     description: string;
-    accessType: AccessType
+    accessType: AccessType;
 }
 
 export interface Group {
