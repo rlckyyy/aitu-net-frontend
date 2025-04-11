@@ -125,7 +125,7 @@ export default function SearchComponent() {
                                             <button
                                                 type="button"
                                                 className="flex items-center px-3 py-1.5 bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 rounded-md text-sm font-medium transition-colors"
-                                                onClick={() => router.push(`/chat?companionEmail=${searchedUser.email}`)}
+                                                onClick={() => router.push(`/chat?companionId=${searchedUser.id}`)}
                                             >
                                                 <MessageCircle size={16} className="mr-1"/>
                                                 Message

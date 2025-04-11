@@ -4,12 +4,12 @@ import { useChat } from "@/hooks/useChat";
 import { ChatRoomsComponent } from "@/components/chats/ChatRoomsComponent";
 import { ChatWindowComponent } from "@/components/chats/ChatWindowComponent";
 import { useAuth } from "@/context/AuthProvider";
-import { useState } from "react";
+import {useState} from "react";
 import { type ChatMessage, ChatMessageStatus } from "@/models/chat/chatMessage";
 
 export default function MessagingComponent() {
 	const { user } = useAuth();
-	const { chatRooms, chatRoomMessages, currentChatId, currentCompanion, selectChat, sendMessage } = useChat();
+	const { chatRooms, chatRoomMessages, currentChatId, selectChat, sendMessage } = useChat();
 	const [inputMessage, setInputMessage] = useState("");
 
 	if (!user)
@@ -26,8 +26,7 @@ export default function MessagingComponent() {
 			chatId: currentChatId,
 			type: "MESSAGE",
 			content: inputMessage,
-			recipient: currentCompanion,
-			sender: user.email,
+			senderId: user.id,
 			status: ChatMessageStatus.DELIVERED,
 			createdAt: new Date(),
 		};
@@ -39,16 +38,15 @@ export default function MessagingComponent() {
 	return (
 		<div className="bg-white dark:bg-gray-900 shadow rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 h-[calc(100vh-180px)]">
 			<div className="flex h-full">
-				<ChatRoomsComponent selectChat={selectChat} chatRooms={chatRooms} />
+				<ChatRoomsComponent chatRooms={chatRooms} selectChat={selectChat} />
 
-				{currentCompanion ? (
+				{currentChatId && chatRooms.has(currentChatId) ? (
 					<ChatWindowComponent
-						messages={chatRoomMessages.get(currentChatId) || []}
-						currentCompanion={currentCompanion}
+						chatMessages={chatRoomMessages.get(currentChatId) || []}
+						chatRoom={chatRooms.get(currentChatId)!}
 						handleSendMessage={handleSendMessage}
 						inputMessage={inputMessage}
 						setInputMessage={setInputMessage}
-						userEmail={user.email}
 					/>
 				) : (
 					<div className="flex-1 flex items-center justify-center text-gray-500 dark:text-gray-400 p-8">

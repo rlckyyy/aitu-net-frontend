@@ -4,13 +4,13 @@ import type React from "react";
 import { Send, Paperclip, Smile } from "lucide-react";
 
 interface InputMessageBarProps {
-	handleSendMessage: () => void;
-	currentCompanion: string;
-	setInputMessage: (inputMessage: string) => void;
+	handleSendMessage(): void;
+	title: string;
+	setInputMessage(inputMessage: string): void;
 	inputMessage: string;
 }
 
-export const InputMessageBarComponent: React.FC<InputMessageBarProps> = ({ handleSendMessage, setInputMessage, inputMessage, currentCompanion }) => {
+export const InputMessageBarComponent: React.FC<InputMessageBarProps> = ({ handleSendMessage, setInputMessage, inputMessage, title }) => {
 	return (
 		<div className="p-4 border-t border-gray-200 dark:border-gray-700">
 			<div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden">
@@ -21,7 +21,7 @@ export const InputMessageBarComponent: React.FC<InputMessageBarProps> = ({ handl
 				<input
 					type="text"
 					className="flex-1 py-2 px-3 bg-transparent border-0 focus:ring-0 text-gray-900 dark:text-white placeholder-gray-500"
-					placeholder={`Message ${currentCompanion}...`}
+					placeholder={`Message ${title}...`}
 					value={inputMessage}
 					onChange={e => setInputMessage(e.target.value)}
 					onKeyDown={e => e.key === "Enter" && (e.preventDefault(), handleSendMessage())}

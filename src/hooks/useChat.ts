@@ -5,6 +5,7 @@ import {useSearchParams} from "next/navigation";
 import {useAuth} from "@/context/AuthProvider";
 import {api} from "@/lib";
 import SockJS from "sockjs-client";
+import {ChatRoom, ChatRoomType} from "@/models/chat/chatRoom";
 
 export function useChat() {
     const {user} = useAuth();
@@ -13,11 +14,11 @@ export function useChat() {
     const [chatRooms, setChatRooms] = useState<Map<string, ChatRoom>>(new Map());
     const [chatRoomMessages, setChatRoomMessages] = useState<Map<string, ChatMessage[]>>(new Map());
     const [currentChatId, setCurrentChatId] = useState<string>("");
-    const [currentCompanion, setCurrentCompanion] = useState<string>("");
     const SOCKET_URL: string = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "defaultWebSocketUrl";
     {
         console.log("SOCKET_URL", SOCKET_URL);
     }
+
     const localId = crypto.randomUUID()
 
     useEffect(() => {
@@ -42,68 +43,92 @@ export function useChat() {
         if (!user) return
         console.log("Connected to STOMP")
 
-        stompClientRef.current?.subscribe(`/user/${user.email}/queue/messages`, onMessageReceived)
+        stompClientRef.current?.subscribe(`/user/${user.id}/queue/messages`, onMessageReceived)
 
         await fetchAndSetChatRooms()
 
-        const companionEmail = searchParams.get("companionEmail")
-        if (!companionEmail) {
-            return
-        }
-        const {chatId} = await api.chat.getOrCreateChatId(user.email, companionEmail)
-            if (!chatRooms.has(chatId)) {
+        const companionId = searchParams.get("companionId")
+
+        console.log('logging chat rooms')
+        console.log('chatRooms:', chatRooms)
+        if (companionId) {
+            const maybeChatRoom = [...chatRooms.values()]
+                .find(chatRoom => {
+                    chatRoom.participants!.values().filter(u => u.id === companionId)
+                })
+            console.log('maybeChatRoom', maybeChatRoom)
+
+            if (maybeChatRoom) {
+                console.log(maybeChatRoom && console.log('chat room found'))
+            } else {
+                console.log('chat room not found')
+            }
+
+            let chatId: string;
+            if (!maybeChatRoom) {
+                console.log("no chatRoom found")
+                let newChatRoom = {
+                    participantsIds: [user.id, companionId],
+                    chatRoomType: ChatRoomType.ONE_TO_ONE,
+                };
+                console.log('creating chat room', newChatRoom);
+                const chatRoom = (await api.chat.createChatRoom(newChatRoom)).data;
+                chatId = chatRoom.chatId
+                console.log('chat room created', chatRoom)
                 setChatRooms((prevChatRooms) => {
                     const newChatRooms = new Map(prevChatRooms)
-                    const localChatRoom: ChatRoom = {
-                        id: localId,
-                        chatId: chatId,
-                        sender: user.email,
-                        recipient: companionEmail
-                    }
-                    newChatRooms.set(chatId, localChatRoom)
+                    newChatRooms.set(chatRoom.chatId, chatRoom)
                     return newChatRooms
                 })
+            } else {
+                chatId = maybeChatRoom.chatId
             }
-            await selectChat(chatId, companionEmail)
+            await selectChat(chatId)
+        } else if (searchParams.has("chatId")) {
+            const chatId = searchParams.get("chatId")!
+            await selectChat(chatId)
+        }
     }
 
-    const fetchAndSetChatRooms = async (email: string | undefined = user?.email) => {
-        if (!email) return
-        const rooms = await api.chat.fetchChatRooms(email)
+    const fetchAndSetChatRooms = async (id: string = user!.id) => {
+        const rooms = await api.chat.fetchChatRooms(id)
         setChatRooms(new Map(rooms.map((room) => [room.chatId, room])))
+        console.log('Fetched chat rooms', rooms)
     }
 
-    const fetchAndSetChatMessages = async (chatId: string, companionEmail: string) => {
+    const fetchAndSetChatMessages = async (chatId: string) => {
         if (!user) return
-        const messages = await api.chat.fetchChatRoomMessages(user.email, companionEmail)
-        console.log('messages from datasource:', JSON.stringify(messages))
+        const messages = await api.chat.fetchChatRoomMessages(chatId)
+        console.log('messages', messages)
         setChatRoomMessages((prev) => new Map(prev).set(chatId, messages))
     }
 
-    const selectChat = async (chatId: string, companionEmail: string) => {
+    const selectChat = async (chatId: string) => {
         setCurrentChatId(chatId)
-        setCurrentCompanion(companionEmail)
-        await fetchAndSetChatMessages(chatId, companionEmail)
+        await fetchAndSetChatMessages(chatId)
     }
 
+    /**
+     * One to one message receiving
+     * */
     const onMessageReceived = async (message: Message) => {
         const chatMessage = JSON.parse(message.body) as ChatMessage
+        console.log('message received', chatMessage)
         setChatRoomMessages((prev) => {
             const newMessages = new Map(prev)
-            newMessages.set(chatMessage.chatId, [...(newMessages.get(chatMessage.chatId) || []), chatMessage])
+            const chatMessages = prev.get(chatMessage.chatId)??[]
+            chatMessages.push(chatMessage)
+            newMessages.set(chatMessage.chatId, [...newMessages.get(chatMessage.chatId) || [], chatMessage])
             return newMessages
         });
 
         if (!chatRooms.has(chatMessage.chatId)) {
+            console.log('the block that must not be logged')
             await fetchAndSetChatRooms()
         }
     }
 
-    /**
-     * Send message that is encrypted with generated AES key.
-     * The AES key is encrypted via recipient's public key
-     * */
-    const sendMessage = async (chatMessage: ChatMessage, destination: string = '/app/chat') => {
+    function sendMessage(chatMessage: ChatMessage, destination: string = '/app/chat'): void {
         if (!user) return
         console.log('sending message', chatMessage)
         stompClientRef.current?.publish({
@@ -118,20 +143,7 @@ export function useChat() {
             newChatRoomMessages.set(currentChatId, [...messages, chatMessage])
             return newChatRoomMessages
         })
-
-        if (!chatRooms.has(currentChatId)) {
-            setChatRooms(prevChatRooms => {
-                const newChatRooms: Map<string, ChatRoom> = new Map(prevChatRooms)
-                newChatRooms.set(currentChatId, {
-                    id: localId,
-                    chatId: currentChatId,
-                    sender: chatMessage.sender,
-                    recipient: currentCompanion
-                })
-                return newChatRooms
-            })
-        }
     }
 
-    return {chatRooms, chatRoomMessages, currentChatId, currentCompanion, selectChat, sendMessage}
+    return {chatRooms, chatRoomMessages, currentChatId, selectChat, sendMessage}
 }

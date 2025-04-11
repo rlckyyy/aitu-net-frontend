@@ -6,8 +6,7 @@ export enum ChatMessageStatus {
 export type ChatMessage = {
     id?: string;
     chatId: string;
-    sender: string;
-    recipient: string;
+    senderId: string;
     content: string;
     status: ChatMessageStatus;
     type: string;

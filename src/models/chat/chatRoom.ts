@@ -1,6 +1,16 @@
-type ChatRoom = {
+import {User} from "@/models/user";
+
+
+export enum ChatRoomType {
+    ONE_TO_ONE,
+    GROUP,
+}
+
+export type ChatRoom = {
     id: string;
     chatId: string;
-    sender: string;
-    recipient: string;
+    title: string;
+    chatRoomType: ChatRoomType;
+    participants: User[];
+    empty: boolean;
 };
