@@ -14,11 +14,13 @@ export default function HomeFeed() {
     const [posts, setPosts] = useState<Post[]>([]);
     const {user} = useAuth();
 
+
     useEffect(() => {
         api.post
             .searchPosts(undefined, undefined, undefined, undefined)
             .then((r) => setPosts(r.data));
     });
+
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
@@ -51,14 +53,14 @@ export default function HomeFeed() {
     return (
         <div className="p-4 max-w-2xl mx-auto">
             {/* Кнопка "Создать пост" */}
-            <div className="flex justify-end mb-4">
+            {user && (<div className="flex justify-end mb-4">
                 <button
                     onClick={() => setIsCreatePostModalOpen(true)}
                     className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition"
                 >
                     + New Post
                 </button>
-            </div>
+            </div>)}
 
             {/* Модальное окно */}
             {isCreatePostModalOpen && (
