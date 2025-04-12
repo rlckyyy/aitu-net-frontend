@@ -25,7 +25,7 @@ export function useChat() {
         if (!user) return
 
         const stompClient = new Client({
-            webSocketFactory: () => new SockJS(SOCKET_URL),
+            webSocketFactory: () => new SockJS(SOCKET_URL), // https://aitunet.kz/api/ws
             debug: console.log,
             onConnect: onConnected,
             onStompError: (frame) => console.error(`STOMP Error: ${frame.body}`),
