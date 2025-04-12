@@ -19,7 +19,7 @@ export default function HomeFeed() {
         api.post
             .searchPosts(undefined, undefined, undefined, undefined)
             .then((r) => setPosts(r.data));
-    });
+    }, []);
 
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
