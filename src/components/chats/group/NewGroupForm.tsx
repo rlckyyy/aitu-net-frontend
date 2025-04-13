@@ -9,7 +9,7 @@ import {useRouter} from "next/navigation";
 
 type FormData = {
     title: string,
-    members: string[]
+    participantIds: string[]
 }
 
 export function NewGroupForm() {
@@ -21,7 +21,7 @@ export function NewGroupForm() {
     const {register, handleSubmit, control, formState: {errors}} = useForm<FormData>({
         defaultValues: {
             title: 'default title',
-            members: []
+            participantIds: []
         }
     })
 
@@ -68,9 +68,9 @@ export function NewGroupForm() {
             </div>
 
             <div>
-                <label className="block font-semibold mb-1">Add Members</label>
+                <label className="block font-semibold mb-1">Add Participants</label>
                 <Controller
-                    name="members"
+                    name="participantIds"
                     control={control}
                     // rules={{ validate: value => value.length > 0 || 'Select at least one person' }}
                     render={({ field }) => (
@@ -101,8 +101,8 @@ export function NewGroupForm() {
                         </select>
                     )}
                 />
-                {errors.members && (
-                    <p className="text-red-500 text-sm">{errors.members.message}</p>
+                {errors.participantIds && (
+                    <p className="text-red-500 text-sm">{errors.participantIds.message}</p>
                 )}
             </div>
 

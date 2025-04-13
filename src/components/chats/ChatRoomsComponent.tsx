@@ -5,13 +5,6 @@ import {Search, MessageCircle} from "lucide-react";
 import Dropdown from "@/components/chats/DropDown";
 import {ChatRoom} from "@/models/chat/chatRoom";
 
-// interface ChatRoom {
-// 	id: string;
-// 	chatId: string;
-// 	participants: User[];
-// 	chatRoomType: ChatRoomType
-// }
-
 interface ChatRoomsPageProps {
 	selectChat(chatId: string): void;
 	chatRooms: Map<string, ChatRoom>;
@@ -51,7 +44,7 @@ export const ChatRoomsComponent: React.FC<ChatRoomsPageProps> = ({selectChat, ch
 									<div
 										className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
 										<span
-											className="text-sm font-semibold">{chatRoom.title??'default title'.charAt(0).toUpperCase()}</span>
+											className="text-sm font-semibold">{chatRoom.title.charAt(0).toUpperCase()}</span>
 									</div>
 									<div
 										className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white dark:border-gray-800"></div>

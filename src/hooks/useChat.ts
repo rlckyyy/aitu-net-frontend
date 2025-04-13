@@ -19,8 +19,6 @@ export function useChat() {
         console.log("SOCKET_URL", SOCKET_URL);
     }
 
-    const localId = crypto.randomUUID()
-
     useEffect(() => {
         if (!user) return
 
@@ -44,7 +42,6 @@ export function useChat() {
         console.log("Connected to STOMP")
 
         stompClientRef.current?.subscribe(`/user/${user.id}/queue/messages`, onMessageReceived)
-
         await fetchAndSetChatRooms()
 
         const companionId = searchParams.get("companionId")
@@ -68,7 +65,7 @@ export function useChat() {
             if (!maybeChatRoom) {
                 console.log("no chatRoom found")
                 let newChatRoom = {
-                    participantsIds: [user.id, companionId],
+                    participantsIds: [companionId],
                     chatRoomType: ChatRoomType.ONE_TO_ONE,
                 };
                 console.log('creating chat room', newChatRoom);
@@ -116,8 +113,6 @@ export function useChat() {
         console.log('message received', chatMessage)
         setChatRoomMessages((prev) => {
             const newMessages = new Map(prev)
-            const chatMessages = prev.get(chatMessage.chatId)??[]
-            chatMessages.push(chatMessage)
             newMessages.set(chatMessage.chatId, [...newMessages.get(chatMessage.chatId) || [], chatMessage])
             return newMessages
         });
@@ -139,7 +134,7 @@ export function useChat() {
         setChatRoomMessages(prevChatRoomMessages => {
             const newChatRoomMessages = new Map(prevChatRoomMessages)
             const messages = newChatRoomMessages.get(currentChatId) || []
-            chatMessage.id = localId
+            chatMessage.id = useId()
             newChatRoomMessages.set(currentChatId, [...messages, chatMessage])
             return newChatRoomMessages
         })

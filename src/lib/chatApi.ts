@@ -14,6 +14,9 @@ export const chatApi = {
     searchUsers: async (query: string): Promise<User[]> =>
         (await request<User[]>(`/chats/users/search?query=${query}`)).data,
 
+    /**
+     * Current user will be added in backend if absent
+     * */
     createChatRoom: async (newChatRoom: {
         title?: string,
         participantsIds: string[];

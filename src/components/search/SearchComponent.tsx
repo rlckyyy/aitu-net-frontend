@@ -18,7 +18,7 @@ export default function SearchComponent() {
     const {user} = useAuth();
 
     useEffect(() => {
-        if (!query) {
+        if (!query || query === "") {
             setLoading(false);
             return;
         }
