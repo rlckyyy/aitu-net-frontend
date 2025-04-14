@@ -51,8 +51,7 @@ export const ChatRoomsComponent: React.FC<ChatRoomsPageProps> = ({selectChat, ch
 								</div>
 								<div className="flex-1 min-w-0">
 									<p className="text-sm font-medium text-gray-900 dark:text-white truncate">{chatRoom.title}</p>
-									<p className="text-xs text-gray-500 dark:text-gray-400 truncate">Click to view
-										conversation</p>
+									<p className="text-xs text-gray-500 dark:text-gray-400 truncate">Click to view conversation</p>
 								</div>
 							</button>
 						))}
@@ -64,8 +63,7 @@ export const ChatRoomsComponent: React.FC<ChatRoomsPageProps> = ({selectChat, ch
 							<MessageCircle size={24}/>
 						</div>
 						<p className="text-sm text-gray-500 dark:text-gray-400">No conversations yet</p>
-						<p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Search for users to start
-							chatting</p>
+						<p className="text-xs text-gray-400 dark:text-gray-500 mt-1">Search for users to start chatting</p>
 					</div>
 				)}
 			</div>

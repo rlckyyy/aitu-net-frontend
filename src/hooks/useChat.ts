@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useId, useRef, useState} from "react";
 import {ChatMessage} from "@/models/chat/chatMessage";
 import {Client, Message} from "@stomp/stompjs";
 import {useSearchParams} from "next/navigation";
