@@ -15,6 +15,7 @@ export function useChat() {
     const [chatRoomMessages, setChatRoomMessages] = useState<Map<string, ChatMessage[]>>(new Map());
     const [currentChatId, setCurrentChatId] = useState<string>("");
     const SOCKET_URL: string = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "defaultWebSocketUrl";
+    const id = useId();
     {
         console.log("SOCKET_URL", SOCKET_URL);
     }
@@ -23,7 +24,7 @@ export function useChat() {
         if (!user) return
 
         const stompClient = new Client({
-            webSocketFactory: () => new SockJS(SOCKET_URL), // https://aitunet.kz/api/ws
+            webSocketFactory: () => new SockJS(SOCKET_URL+`?userId=${user.id}`), // https://aitunet.kz/api/ws
             debug: console.log,
             onConnect: onConnected,
             onStompError: (frame) => console.error(`STOMP Error: ${frame.body}`),
@@ -134,10 +135,14 @@ export function useChat() {
         setChatRoomMessages(prevChatRoomMessages => {
             const newChatRoomMessages = new Map(prevChatRoomMessages)
             const messages = newChatRoomMessages.get(currentChatId) || []
-            chatMessage.id = useId()
+            chatMessage.id = genId()
             newChatRoomMessages.set(currentChatId, [...messages, chatMessage])
             return newChatRoomMessages
         })
+    }
+
+    function genId(): string {
+        return id
     }
 
     return {chatRooms, chatRoomMessages, currentChatId, selectChat, sendMessage}
