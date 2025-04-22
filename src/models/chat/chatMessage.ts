@@ -1,6 +1,13 @@
 export enum ChatMessageStatus {
-    RECEIVED,
-    DELIVERED
+    RECEIVED = "RECEIVED",
+    DELIVERED = "DELIVERED"// todo: properly process the message status
+}
+
+export enum MessageType {
+    MESSAGE_TEXT= "MESSAGE_TEXT",
+    MESSAGE_AUDIO = "MESSAGE_AUDIO",
+    JOIN = "JOIN",
+    LEAVE = "LEAVE",
 }
 
 export type ChatMessage = {
@@ -9,7 +16,7 @@ export type ChatMessage = {
     senderId: string;
     content: string;
     status: ChatMessageStatus;
-    type: string;
+    type: MessageType;
     createdAt?: Date;
     updatedAt?: Date;
 };

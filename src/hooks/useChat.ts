@@ -43,6 +43,7 @@ export function useChat() {
         console.log("Connected to STOMP")
 
         stompClientRef.current?.subscribe(`/user/${user.id}/queue/messages`, onMessageReceived)
+        stompClientRef.current?.subscribe(`/user/queue/errors`, onErrorReceived)
         await fetchAndSetChatRooms()
 
         const companionId = searchParams.get("companionId")
@@ -106,9 +107,6 @@ export function useChat() {
         await fetchAndSetChatMessages(chatId)
     }
 
-    /**
-     * One to one message receiving
-     * */
     const onMessageReceived = async (message: Message) => {
         const chatMessage = JSON.parse(message.body) as ChatMessage
         console.log('message received', chatMessage)
@@ -122,6 +120,16 @@ export function useChat() {
             console.log('the block that must not be logged')
             await fetchAndSetChatRooms()
         }
+    }
+
+    function onErrorReceived(message: Message) {
+        const {errors, invalidChatMessage}: {errors: string, invalidChatMessage: ChatMessage} = JSON.parse(message.body)
+        setChatRoomMessages(prev => {
+            const newMessages = new Map(prev)
+            const messages = newMessages.get(invalidChatMessage.chatId)??[]
+            const validChatMessages = messages.filter((message) => message.id !== invalidChatMessage.id)
+            return newMessages.set(invalidChatMessage.chatId, validChatMessages)
+        })
     }
 
     function sendMessage(chatMessage: ChatMessage, destination: string = '/app/chat'): void {

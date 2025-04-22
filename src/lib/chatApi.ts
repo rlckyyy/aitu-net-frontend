@@ -15,7 +15,7 @@ export const chatApi = {
         (await request<User[]>(`/chats/users/search?query=${query}`)).data,
 
     /**
-     * Current user will be added in backend if absent
+     * Current user will be added at api if absent
      * */
     createChatRoom: async (newChatRoom: {
         title?: string,
@@ -26,4 +26,7 @@ export const chatApi = {
 
     fetchRelatedUsers: async (): Promise<User[]> =>
         (await request<User[]>(`/chats/users/related`)).data,
+
+    uploadFile: async (formData: FormData): Promise<ChatMessage> =>
+        (await request<ChatMessage>('/chats/messages/files', {method: 'POST', data: formData, headers: 'Content-Type: multipart/form-data'})).data
 };
