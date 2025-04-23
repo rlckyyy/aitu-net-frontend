@@ -26,10 +26,10 @@ export default function SearchBar() {
 			<div className="flex items-center bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden focus-within:ring-2 focus-within:ring-indigo-400 transition-all">
 				<input
 					type="text"
-					placeholder="Search users"
+					placeholder="Search"
 					value={query}
 					onChange={handleSearchChange}
-					className="px-4 py-2 w-64 bg-transparent text-gray-800 dark:text-white focus:outline-none"
+					className="px-4 py-2 min-w-[100px] max-w-[200px] w-auto bg-transparent text-gray-800 dark:text-white focus:outline-none"
 				/>
 				<button type="submit" className="p-2 text-gray-500 dark:text-gray-300 hover:text-indigo-500 dark:hover:text-indigo-400">
 					<Search size={18} />

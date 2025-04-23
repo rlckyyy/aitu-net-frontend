@@ -12,7 +12,7 @@ interface ChatRoomsPageProps {
 
 export const ChatRoomsComponent: React.FC<ChatRoomsPageProps> = ({selectChat, chatRooms}) => {
 	return (
-		<aside className="w-1/4 min-w-[250px] border-r border-gray-200 dark:border-gray-700 h-full flex flex-col bg-white dark:bg-gray-900">
+		<aside className="w-full md:w-1/4 min-w-[250px] border-r border-gray-200 dark:border-gray-700 h-full flex flex-col bg-white dark:bg-gray-900">
 			<div className="p-4 border-b border-gray-200 dark:border-gray-700">
 				<div className="flex justify-between items-center mb-4">
 					<h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Messages</h3>

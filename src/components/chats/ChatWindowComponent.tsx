@@ -7,17 +7,21 @@ import {ChatRoom} from "@/models/chat/chatRoom";
 import {useAuth} from "@/context/AuthProvider";
 import Link from "next/link";
 import {Mic} from "lucide-react";
+import {useIsMobile} from "@/context/AdaptationProvider";
 
 interface ChatWindowComponentProps {
     chatMessages: ChatMessage[];
     chatRoom: ChatRoom;
+    selectChat(chatId: string): void
 
     handleSendMessage(chatMessage: ChatMessage): void;
 }
 
-export const ChatWindowComponent = ({chatRoom, chatMessages, handleSendMessage}: ChatWindowComponentProps) => {
+export const ChatWindowComponent = ({chatRoom, chatMessages, handleSendMessage, selectChat}: ChatWindowComponentProps) => {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const {user} = useAuth();
+    const audioRef = useRef<HTMLAudioElement>(null);
+    const isMobile = useIsMobile();
 
     if (!user) {
         return (
@@ -42,7 +46,7 @@ export const ChatWindowComponent = ({chatRoom, chatMessages, handleSendMessage}:
             case MessageType.MESSAGE_AUDIO:
                 return (<div className="flex items-center gap-2 p-2 rounded-lg bg-white/10 dark:bg-gray-700">
                     <Mic className="w-5 h-5 text-indigo-500 dark:text-indigo-300"/>
-                    <audio controls src={chatMessage.content} className="w-full focus:outline-none"/>
+                    <audio ref={audioRef} preload={"auto"} controls src={chatMessage.content} className="w-full focus:outline-none"/>
                 </div>)
             default:
                 return (<div className="text-red-500">Unknown message type</div>);
@@ -50,7 +54,17 @@ export const ChatWindowComponent = ({chatRoom, chatMessages, handleSendMessage}:
     }
 
     return (
-        <main className="flex-1 flex flex-col h-full bg-white dark:bg-gray-900">
+        <main className="flex-1 flex flex-col h-full bg-white dark:bg-gray-900 w-full">
+            {/* Mobile Back Button */}
+            {isMobile && <div className="p-2">
+                <button
+                    onClick={() => selectChat("")}
+                    className="text-sm text-indigo-500 hover:underline"
+                >
+                    ← Back
+                </button>
+            </div>}
+
             <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center">
                 <Link href="/chat/room" className="flex w-max h-max">
                     <div className="relative mr-3">

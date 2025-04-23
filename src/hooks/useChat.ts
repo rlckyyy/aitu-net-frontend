@@ -1,4 +1,4 @@
-import {useEffect, useId, useRef, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {ChatMessage} from "@/models/chat/chatMessage";
 import {Client, Message} from "@stomp/stompjs";
 import {useSearchParams} from "next/navigation";
@@ -6,6 +6,76 @@ import {useAuth} from "@/context/AuthProvider";
 import {api} from "@/lib";
 import SockJS from "sockjs-client";
 import {ChatRoom, ChatRoomType} from "@/models/chat/chatRoom";
+
+interface ChatStrategy {
+    getChatId(): Promise<string>;
+}
+
+export type NewChatRoomRequest = {
+    title?: string,
+    participantsIds: string[];
+    chatRoomType: ChatRoomType;
+}
+
+class PrivateChatStrategy implements ChatStrategy {
+
+    constructor(private readonly searchParams: URLSearchParams,
+                private readonly chatRooms: Map<string, ChatRoom>,
+                private readonly api: any,
+                private readonly pushToChatRooms: (room: ChatRoom) => void
+    ) {
+    }
+
+    async getChatId(): Promise<string> {
+        const companionId = this.searchParams.get("companionId")!
+        const maybeChatRoom = [...this.chatRooms.values()]
+            .find(chatRoom => {
+                chatRoom.participants!.values().filter(u => u.id === companionId)
+            })
+
+        if (!maybeChatRoom) {
+            const request: NewChatRoomRequest = {
+                participantsIds: [companionId],
+                chatRoomType: ChatRoomType.ONE_TO_ONE
+            }
+            const chatRoom = (await this.api.chat.createChatRoom(request)).data;
+            this.pushToChatRooms(chatRoom)
+            return chatRoom.chatId
+        } else {
+            return maybeChatRoom.chatId
+        }
+    }
+}
+
+class DefaultChatStrategy implements ChatStrategy {
+
+    constructor(private readonly searchParams: URLSearchParams) {
+    }
+
+    async getChatId(): Promise<string> {
+        return this.searchParams.get("chatId")!
+    }
+}
+
+class NoOpStrategy implements ChatStrategy {
+    async getChatId(): Promise<string> {
+        return ''
+    }
+}
+
+type StrategyDeps = {
+    searchParams: URLSearchParams,
+    chatRooms: Map<string, ChatRoom>,
+    api: any,
+    pushToChatRooms: (room: ChatRoom) => void
+}
+
+const strategyRegistry: Record<string, (deps: StrategyDeps) => ChatStrategy> = {
+    companionId: ({searchParams, chatRooms, api, pushToChatRooms}) =>
+        new PrivateChatStrategy(searchParams, chatRooms, api, pushToChatRooms),
+    chatId: ({searchParams}) =>
+        new DefaultChatStrategy(searchParams)
+}
 
 export function useChat() {
     const {user} = useAuth();
@@ -15,7 +85,6 @@ export function useChat() {
     const [chatRoomMessages, setChatRoomMessages] = useState<Map<string, ChatMessage[]>>(new Map());
     const [currentChatId, setCurrentChatId] = useState<string>("");
     const SOCKET_URL: string = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "defaultWebSocketUrl";
-    const id = useId();
     {
         console.log("SOCKET_URL", SOCKET_URL);
     }
@@ -24,7 +93,7 @@ export function useChat() {
         if (!user) return
 
         const stompClient = new Client({
-            webSocketFactory: () => new SockJS(SOCKET_URL+`?userId=${user.id}`), // https://aitunet.kz/api/ws
+            webSocketFactory: () => new SockJS(SOCKET_URL), // https://aitunet.kz/api/ws
             debug: console.log,
             onConnect: onConnected,
             onStompError: (frame) => console.error(`STOMP Error: ${frame.body}`),
@@ -43,50 +112,20 @@ export function useChat() {
         console.log("Connected to STOMP")
 
         stompClientRef.current?.subscribe(`/user/${user.id}/queue/messages`, onMessageReceived)
-        stompClientRef.current?.subscribe(`/user/queue/errors`, onErrorReceived)
-        await fetchAndSetChatRooms()
 
-        const companionId = searchParams.get("companionId")
-
-        console.log('logging chat rooms')
-        console.log('chatRooms:', chatRooms)
-        if (companionId) {
-            const maybeChatRoom = [...chatRooms.values()]
-                .find(chatRoom => {
-                    chatRoom.participants!.values().filter(u => u.id === companionId)
-                })
-            console.log('maybeChatRoom', maybeChatRoom)
-
-            if (maybeChatRoom) {
-                console.log(maybeChatRoom && console.log('chat room found'))
-            } else {
-                console.log('chat room not found')
-            }
-
-            let chatId: string;
-            if (!maybeChatRoom) {
-                console.log("no chatRoom found")
-                let newChatRoom = {
-                    participantsIds: [companionId],
-                    chatRoomType: ChatRoomType.ONE_TO_ONE,
-                };
-                console.log('creating chat room', newChatRoom);
-                const chatRoom = (await api.chat.createChatRoom(newChatRoom)).data;
-                chatId = chatRoom.chatId
-                console.log('chat room created', chatRoom)
-                setChatRooms((prevChatRooms) => {
-                    const newChatRooms = new Map(prevChatRooms)
-                    newChatRooms.set(chatRoom.chatId, chatRoom)
-                    return newChatRooms
-                })
-            } else {
-                chatId = maybeChatRoom.chatId
-            }
-            await selectChat(chatId)
-        } else if (searchParams.has("chatId")) {
-            const chatId = searchParams.get("chatId")!
-            await selectChat(chatId)
+        const deps: StrategyDeps = {
+            searchParams: searchParams,
+            chatRooms: chatRooms,
+            api: api,
+            pushToChatRooms: pushToChatRooms
         }
+        const chatIdStrategy = getStrategy(deps)
+
+        console.log(chatIdStrategy)
+
+        chatIdStrategy.getChatId()
+            .then(selectChat)
+        await fetchAndSetChatRooms()
     }
 
     const fetchAndSetChatRooms = async (id: string = user!.id) => {
@@ -103,6 +142,10 @@ export function useChat() {
     }
 
     const selectChat = async (chatId: string) => {
+        if (!chatId.trim()) {
+            setCurrentChatId(chatId)
+            return
+        }
         setCurrentChatId(chatId)
         await fetchAndSetChatMessages(chatId)
     }
@@ -110,26 +153,7 @@ export function useChat() {
     const onMessageReceived = async (message: Message) => {
         const chatMessage = JSON.parse(message.body) as ChatMessage
         console.log('message received', chatMessage)
-        setChatRoomMessages((prev) => {
-            const newMessages = new Map(prev)
-            newMessages.set(chatMessage.chatId, [...newMessages.get(chatMessage.chatId) || [], chatMessage])
-            return newMessages
-        });
-
-        if (!chatRooms.has(chatMessage.chatId)) {
-            console.log('the block that must not be logged')
-            await fetchAndSetChatRooms()
-        }
-    }
-
-    function onErrorReceived(message: Message) {
-        const {errors, invalidChatMessage}: {errors: string, invalidChatMessage: ChatMessage} = JSON.parse(message.body)
-        setChatRoomMessages(prev => {
-            const newMessages = new Map(prev)
-            const messages = newMessages.get(invalidChatMessage.chatId)??[]
-            const validChatMessages = messages.filter((message) => message.id !== invalidChatMessage.id)
-            return newMessages.set(invalidChatMessage.chatId, validChatMessages)
-        })
+        pushToChatMessages(chatMessage)
     }
 
     function sendMessage(chatMessage: ChatMessage, destination: string = '/app/chat'): void {
@@ -139,18 +163,32 @@ export function useChat() {
             destination: destination,
             body: JSON.stringify(chatMessage)
         })
+    }
 
-        setChatRoomMessages(prevChatRoomMessages => {
+    function pushToChatRooms(chatRoom: ChatRoom) {
+        setChatRooms((prevChatRooms) => {
+            const newChatRooms = new Map(prevChatRooms)
+            newChatRooms.set(chatRoom.chatId, chatRoom)
+            return newChatRooms
+        })
+    }
+
+    function pushToChatMessages(chatMessage: ChatMessage) {
+        setChatRoomMessages((prevChatRoomMessages) => {
             const newChatRoomMessages = new Map(prevChatRoomMessages)
-            const messages = newChatRoomMessages.get(currentChatId) || []
-            chatMessage.id = genId()
-            newChatRoomMessages.set(currentChatId, [...messages, chatMessage])
+            newChatRoomMessages.set(chatMessage.chatId, [...newChatRoomMessages.get(chatMessage.chatId) ?? [], chatMessage])
             return newChatRoomMessages
         })
     }
 
-    function genId(): string {
-        return id
+    function getStrategy(deps: StrategyDeps): ChatStrategy {
+        for (const key of Object.keys(strategyRegistry)) {
+            if (deps.searchParams.has(key)) {
+                return strategyRegistry[key](deps)
+            }
+        }
+
+        return new NoOpStrategy()
     }
 
     return {chatRooms, chatRoomMessages, currentChatId, selectChat, sendMessage}

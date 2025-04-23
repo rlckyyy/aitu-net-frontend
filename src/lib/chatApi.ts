@@ -1,8 +1,9 @@
 import {User} from "@/models/user";
 import {request} from "@/lib/apiClient";
 import {ChatMessage} from "@/models/chat/chatMessage";
-import {ChatRoom, ChatRoomType} from "@/models/chat/chatRoom";
+import {ChatRoom} from "@/models/chat/chatRoom";
 import {AxiosResponse} from "axios";
+import {NewChatRoomRequest} from "@/hooks/useChat";
 
 export const chatApi = {
     fetchChatRooms: async (email: string): Promise<ChatRoom[]> =>
@@ -17,12 +18,8 @@ export const chatApi = {
     /**
      * Current user will be added at api if absent
      * */
-    createChatRoom: async (newChatRoom: {
-        title?: string,
-        participantsIds: string[];
-        chatRoomType: ChatRoomType;
-    }): Promise<AxiosResponse<ChatRoom>> =>
-        (await request<ChatRoom>(`/chats/rooms`, {method: 'POST', data: newChatRoom})),
+    createChatRoom: async (chatRoomRequest: NewChatRoomRequest): Promise<AxiosResponse<ChatRoom>> =>
+        (await request<ChatRoom>(`/chats/rooms`, {method: 'POST', data: chatRoomRequest})),
 
     fetchRelatedUsers: async (): Promise<User[]> =>
         (await request<User[]>(`/chats/users/related`)).data,
