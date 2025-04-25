@@ -1,7 +1,7 @@
-interface ProblemDetail {
+interface ApiError {
     detail: string;
     instance?: string;
-    status?: number;
+    status: number;
     title?: string;
     type?: string;
 }

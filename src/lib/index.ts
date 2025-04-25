@@ -3,7 +3,7 @@ import {chatApi} from "@/lib/chatApi";
 import {authApi} from "@/lib/authApi";
 import {friendsApi} from "@/lib/friendsApi";
 import {groupApi} from "@/lib/groupApi";
-import {postApi} from "@/lib/postTs";
+import {postApi} from "@/lib/postApi";
 
 export const api = {
     auth: authApi,

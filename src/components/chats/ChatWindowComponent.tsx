@@ -1,13 +1,13 @@
 "use client";
 
 import {ChatMessage, MessageType} from "@/models/chat/chatMessage";
-import React, {useEffect, useRef} from "react";
+import React, {JSX, useEffect, useRef} from "react";
 import {InputMessageBarComponent} from "@/components/chats/InputMessageBarComponent";
 import {ChatRoom} from "@/models/chat/chatRoom";
 import {useAuth} from "@/context/AuthProvider";
 import Link from "next/link";
 import {Mic} from "lucide-react";
-import {useIsMobile} from "@/context/AdaptationProvider";
+import {useIsMobile} from "@/hooks/useIsMobile";
 
 interface ChatWindowComponentProps {
     chatMessages: ChatMessage[];
@@ -40,17 +40,31 @@ export const ChatWindowComponent = ({chatRoom, chatMessages, handleSendMessage, 
     }, [chatMessages]);
 
     function displayChatMessage(chatMessage: ChatMessage) {
-        switch (chatMessage.type) {
-            case MessageType.MESSAGE_TEXT:
-                return (<div className="break-words">{chatMessage.content}</div>)
-            case MessageType.MESSAGE_AUDIO:
-                return (<div className="flex items-center gap-2 p-2 rounded-lg bg-white/10 dark:bg-gray-700">
+        const strategy = messageRenderStrategies[chatMessage.type];
+        return strategy(chatMessage)
+    }
+
+    const messageRenderStrategies: Record<MessageType, (chatMessage: ChatMessage) => JSX.Element> = {
+        [MessageType.MESSAGE_TEXT]: chatMessage =>
+            (
+                <div className="break-words">{chatMessage.content}</div>
+            ),
+        [MessageType.MESSAGE_AUDIO]: chatMessage =>
+            (
+                <div className="flex items-center gap-2 p-2 rounded-lg bg-white/10 dark:bg-gray-700">
                     <Mic className="w-5 h-5 text-indigo-500 dark:text-indigo-300"/>
-                    <audio ref={audioRef} preload={"auto"} controls src={chatMessage.content} className="w-full focus:outline-none"/>
-                </div>)
-            default:
-                return (<div className="text-red-500">Unknown message type</div>);
-        }
+                    <audio ref={audioRef} preload={"auto"} controls src={chatMessage.content}
+                           className="w-full focus:outline-none"/>
+                </div>
+            ),
+        [MessageType.JOIN]: chatMessage =>
+            (
+                <div>{chatMessage.senderId} joined</div>
+            ),
+        [MessageType.LEAVE]: chatMessage =>
+            (
+                <div>{chatMessage.senderId} left</div>
+            )
     }
 
     return (
@@ -131,7 +145,8 @@ export const ChatWindowComponent = ({chatRoom, chatMessages, handleSendMessage, 
                 <div ref={messagesEndRef}/>
             </div>
 
-            <InputMessageBarComponent title={chatRoom.title} handleSendMessage={handleSendMessage} chatId={chatRoom.chatId}/>
+            <InputMessageBarComponent title={chatRoom.title} handleSendMessage={handleSendMessage}
+                                      chatId={chatRoom.chatId}/>
         </main>
     );
 };

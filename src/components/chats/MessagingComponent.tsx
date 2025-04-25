@@ -5,7 +5,7 @@ import {ChatRoomsComponent} from "@/components/chats/ChatRoomsComponent";
 import {ChatWindowComponent} from "@/components/chats/ChatWindowComponent";
 import {useAuth} from "@/context/AuthProvider";
 import {ChatMessage} from "@/models/chat/chatMessage";
-import {useIsMobile} from "@/context/AdaptationProvider";
+import {useIsMobile} from "@/hooks/useIsMobile";
 
 export default function MessagingComponent() {
     const {user} = useAuth();

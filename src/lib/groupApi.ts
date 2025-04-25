@@ -8,9 +8,9 @@ export const groupApi = {
     searchGroups: async (name?: string, ownerId?: string, userId?: string ) => {
         const params: Record<string, any> = {};
 
-        if (name) params.groupId = name;
+        if (name) params.name = name;
         if (ownerId) params.ownerId = ownerId;
-        if (userId) params.postType = userId;
+        if (userId) params.userId = userId;
         return await request<Group[]>(`/group/search`, params);
     },
     createGroup: async (createDto: GroupCreateDto) => {
