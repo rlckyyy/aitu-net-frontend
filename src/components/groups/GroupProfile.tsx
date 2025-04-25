@@ -6,8 +6,8 @@ import React, {useEffect, useState} from "react";
 import {api} from "@/lib";
 import {Post, PostDTO, PostType} from "@/models/post/post";
 import {PlusCircle, X} from "lucide-react";
-import {MediaFiles} from "@/components/MediaFiles";
 import {useAuth} from "@/context/AuthProvider";
+import {PostFeed} from "@/components/posts/PostFeed";
 
 export default function GroupProfile() {
     const searchParams = useSearchParams();
@@ -76,25 +76,7 @@ export default function GroupProfile() {
 
             {/* Лента постов */}
             <div className="space-y-4">
-                {posts.length === 0 ? (
-                    <p className="text-center text-gray-500 dark:text-gray-400">No posts found</p>
-                ) : (
-                    posts.map(post => (
-                        <div
-                            key={post.id}
-                            className="p-4 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow"
-                        >
-                            <h3 className="text-lg font-semibold text-gray-800 dark:text-white">{post.postType}</h3>
-                            <p className="text-sm text-gray-600 dark:text-gray-300">{post.description}</p>
-                            <div className="mt-2 text-xs text-gray-400 dark:text-gray-500">
-                                Author: {post.ownerId}
-                            </div>
-                            {post.mediaFileIds && post.mediaFileIds.length > 0 && (
-                                <MediaFiles mediaFileIds={post.mediaFileIds}/>
-                            )}
-                        </div>
-                    ))
-                )}
+                <PostFeed posts={posts}/>
             </div>
 
             {/* Модалка */}

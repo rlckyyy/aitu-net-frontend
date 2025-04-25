@@ -4,13 +4,12 @@ import React, {useEffect, useState} from "react";
 import {Post, PostDTO, PostType} from "@/models/post/post";
 import {api} from "@/lib";
 import {FileText, Plus} from "lucide-react";
-import clsx from "clsx";
 import {useAuth} from "@/context/AuthProvider";
-import {MediaFiles} from "@/components/MediaFiles";
+import {PostFeed} from "@/components/posts/PostFeed";
 
 
 export default function UserPosts() {
-    const [posts, setPosts] = useState<Post[] | null>(null);
+    const [posts, setPosts] = useState<Post[]>([]);
     const [newPostDescription, setNewPostDescription] = useState("");
     const [newPostFiles, setNewPostFiles] = useState<File[]>([]);
     const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
@@ -105,35 +104,8 @@ export default function UserPosts() {
             </div>
 
             {/* Список постов */}
-            <div className="space-y-4 mt-4">
-                {posts === null ? (
-                    <p className="text-gray-500 dark:text-gray-400 text-center py-4">Loading posts...</p>
-                ) : posts.length === 0 ? (
-                    <p className="text-gray-500 dark:text-gray-400 text-center py-4">No posts yet</p>
-                ) : (
-                    posts.map((post) => (
-                        <div
-                            key={post.id}
-                            className="bg-white dark:bg-gray-900 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
-                        >
-                            <p
-                                className={clsx(
-                                    "text-sm mb-2",
-                                    post.description
-                                        ? "text-gray-800 dark:text-gray-300"
-                                        : "italic text-gray-500 dark:text-gray-400"
-                                )}
-                            >
-                                {post.description}
-                            </p>
-
-                            {/* Отображение медиафайлов */}
-                            {post.mediaFileIds && post.mediaFileIds.length > 0 && (
-                                <MediaFiles mediaFileIds={post.mediaFileIds}/>
-                            )}
-                        </div>
-                    ))
-                )}
+            <div className="space-y-4">
+                <PostFeed posts={posts}/>
             </div>
         </div>
     );

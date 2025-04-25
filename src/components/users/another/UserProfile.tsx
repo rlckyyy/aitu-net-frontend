@@ -6,10 +6,13 @@ import {api} from "@/lib";
 import {useRouter, useSearchParams} from "next/navigation";
 import {FileText, Mail, MessageCircle, Shield, UserIcon, UserPlus, Users} from "lucide-react";
 import {useAuth} from "@/context/AuthProvider";
+import {Post, PostType} from "@/models/post/post";
+import {PostFeed} from "@/components/posts/PostFeed";
 
 export default function UserProfile() {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
+    const [posts, setPosts] = useState<Post[]>([])
     const searchParams = useSearchParams();
     const userId = searchParams.get("userId");
     const router = useRouter();
@@ -30,6 +33,13 @@ export default function UserProfile() {
                 .finally(() => setLoading(false));
         }
     }, [userId]);
+
+    useEffect(() => {
+        api.post.searchPosts(undefined, userId?.toString(), PostType.USER, undefined)
+            .then(data => {
+                setPosts(data.data)
+            }).catch(e => console.error("Error while fetching posts", e));
+    }, [posts]);
 
     const handleSendMessage = () => {
         if (user?.email) {
@@ -171,6 +181,9 @@ export default function UserProfile() {
                         </div>
                     </div>
                 </div>
+            </div>
+            <div className="m-6">
+                <PostFeed posts={posts}/>
             </div>
         </div>
     );

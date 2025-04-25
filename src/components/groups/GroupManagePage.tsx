@@ -6,8 +6,8 @@ import {api} from "@/lib";
 import {FileText, Plus} from "lucide-react";
 import {AccessType} from "@/models/group/accessType";
 import {Post, PostType} from "@/models/post/post";
-import {MediaFiles} from "@/components/MediaFiles";
 import Link from "next/link";
+import {PostFeed} from "@/components/posts/PostFeed";
 
 export default function GroupManagePage() {
     const [groups, setGroups] = useState<Group[]>([]);
@@ -112,22 +112,7 @@ export default function GroupManagePage() {
 
                 {/* Список постов */}
                 <div className="mt-6 space-y-4">
-                    {posts.length === 0 ? (
-                        <p className="text-center text-gray-500 dark:text-gray-400">No posts found</p>
-                    ) : (
-                        posts.map(post => (
-                            <div
-                                key={post.id}
-                                className="bg-white dark:bg-gray-900 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm"
-                            >
-                                <h3 className="text-lg font-semibold text-gray-800 dark:text-white">{post.groupId}</h3>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">{post.description}</p>
-                                {post.mediaFileIds && post.mediaFileIds.length > 0 && (
-                                    <MediaFiles mediaFileIds={post.mediaFileIds}/>
-                                )}
-                            </div>
-                        ))
-                    )}
+                    <PostFeed posts={posts}/>
                 </div>
             </div>
 
