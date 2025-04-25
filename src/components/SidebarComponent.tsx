@@ -1,22 +1,24 @@
 import Link from "next/link";
 import {Group, Home, MessageCircle, User, Users} from "lucide-react";
 import {User as UserModel} from "../models/user"
-import {useIsMobile} from "@/context/AdaptationProvider";
+import {useIsMobile} from "@/hooks/useIsMobile";
 import React, {ReactNode} from "react";
 
-const defaulticonClassName = "text-indigo-500";
+const defaultIconClassName = "text-indigo-500";
+const defaultIconSize = 20;
 
 const authLinks: { href: string, label: string, icon: ReactNode }[] = [
-    {href: '/', label: 'Home', icon: <Home size={20} className={defaulticonClassName}/>},
-    {href: '/users/profile', label: 'Me', icon: <User size={20} className={defaulticonClassName}/>},
-    {href: '/chat', label: 'Chat', icon: <MessageCircle size={20} className={defaulticonClassName}/>},
-    {href: '/group', label: 'Group', icon: <Group size={20} className={defaulticonClassName}/>},
+    {href: '/', label: 'Home', icon: <Home size={defaultIconSize} className={defaultIconClassName}/>},
+    {href: '/users/profile', label: 'Me', icon: <User size={defaultIconSize} className={defaultIconClassName}/>},
+    {href: '/chat', label: 'Chat', icon: <MessageCircle size={defaultIconSize} className={defaultIconClassName}/>},
+    {href: '/group', label: 'Group', icon: <Group size={defaultIconSize} className={defaultIconClassName}/>},
+    {href: '/friends', label: 'Friends', icon: <Users size={defaultIconSize} className={defaultIconClassName}/>},
 ];
 
 const publicLinks: { href: string, label: string, icon: ReactNode }[] = [
-    {href: '/', label: 'Home', icon: <Home size={20} className={defaulticonClassName}/>},
-    {href: '/auth/login', label: 'Login', icon: <User size={20} className={defaulticonClassName}/>},
-    {href: '/auth/register', label: 'Register', icon: <Users size={20} className={defaulticonClassName}/>},
+    {href: '/', label: 'Home', icon: <Home size={defaultIconSize} className={defaultIconClassName}/>},
+    {href: '/auth/login', label: 'Login', icon: <User size={defaultIconSize} className={defaultIconClassName}/>},
+    {href: '/auth/register', label: 'Register', icon: <Users size={defaultIconSize} className={defaultIconClassName}/>},
 ];
 
 const linksMap = new Map<boolean, { href: string, label: string, icon: ReactNode }[]>([
@@ -43,7 +45,7 @@ interface SidebarComponentProps {
 }
 
 const SidebarComponent: React.FC<SidebarComponentProps> = ({user}) => {
-    const navLinks = linksMap.get(!!user)??[];
+    const navLinks = linksMap.get(!!user) ?? [];
     const isMobile = useIsMobile();
 
     return (
