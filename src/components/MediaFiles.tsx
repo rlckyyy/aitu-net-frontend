@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 export const MediaFiles = ({mediaFileIds}: { mediaFileIds: string[] }) => {
     const [fileTypes, setFileTypes] = useState<string[]>([]);
 
-    const getFileType = async (url: string) => {
+    const getFileType = async (url: string): Promise<string> => {
         console.log("getFileType", url);
         const fileExtension = url.split('.').pop()?.toLowerCase();
         if (["jpg", "jpeg", "png", "gif"].includes(fileExtension || '')) {
@@ -25,11 +25,8 @@ export const MediaFiles = ({mediaFileIds}: { mediaFileIds: string[] }) => {
     };
 
     useEffect(() => {
-        const fetchFileTypes = async () => {
-            const types = await Promise.all(mediaFileIds.map(url => getFileType(url)));
-            setFileTypes(types);
-        };
-        fetchFileTypes();
+        Promise.all(mediaFileIds.map(url => getFileType(url)))
+            .then(types => setFileTypes(types))
     }, [mediaFileIds]);
 
     return (

@@ -8,6 +8,7 @@ import {useState} from "react";
 import SearchBar from "@/components/SearchBar";
 import {Bell, Settings, User} from "lucide-react";
 import SidebarComponent from "@/components/SidebarComponent";
+import {defaultPfp} from "../../public/modules/defaultPfp";
 
 export default function ClientLayout({children}: { children: React.ReactNode }) {
     const {user} = useAuth();
@@ -25,7 +26,7 @@ export default function ClientLayout({children}: { children: React.ReactNode }) 
                     <SearchBar/>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
                     {user && (
                         <>
                             <button
@@ -41,7 +42,7 @@ export default function ClientLayout({children}: { children: React.ReactNode }) 
                                 <button onClick={() => setMenuOpen(!menuOpen)}
                                         className="flex items-center focus:outline-none">
                                     <img
-                                        src={user?.avatar?.location || "/def_pfp.svg"}
+                                        src={user?.avatar?.location || defaultPfp.src}
                                         alt="User Avatar"
                                         width={40}
                                         height={40}
