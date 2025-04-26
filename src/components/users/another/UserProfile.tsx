@@ -8,6 +8,7 @@ import {FileText, Mail, MessageCircle, Shield, UserIcon, UserPlus, Users} from "
 import {useAuth} from "@/context/AuthProvider";
 import {Post, PostType} from "@/models/post/post";
 import {PostFeed} from "@/components/posts/PostFeed";
+import {Loading} from "@/components/Loading";
 
 export default function UserProfile() {
     const [user, setUser] = useState<User | null>(null);
@@ -67,9 +68,7 @@ export default function UserProfile() {
 
     if (loading)
         return (
-            <div className="flex justify-center items-center h-96">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
-            </div>
+            <Loading/>
         );
 
     if (!user)

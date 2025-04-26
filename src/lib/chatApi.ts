@@ -10,7 +10,7 @@ export const chatApi = {
         (await request<ChatRoom[]>(`/chats/rooms/${email}`)).data,
 
     fetchChatRoomMessages: async (chatId: string): Promise<ChatMessage[]> =>
-        (await request<ChatMessage[]>(`/chats/messages/${chatId}`)).data,
+        (await request<ChatMessage[]>(`/chats/rooms/${chatId}/messages`)).data,
 
     searchUsers: async (query: string): Promise<User[]> =>
         (await request<User[]>(`/chats/users/search?query=${query}`)).data,
@@ -24,6 +24,6 @@ export const chatApi = {
     fetchRelatedUsers: async (): Promise<User[]> =>
         (await request<User[]>(`/chats/users/related`)).data,
 
-    uploadFile: async (formData: FormData): Promise<ChatMessage> =>
+    uploadFileMessage: async (formData: FormData): Promise<ChatMessage> =>
         (await request<ChatMessage>('/chats/messages/files', {method: 'POST', data: formData, headers: 'Content-Type: multipart/form-data'})).data
 };

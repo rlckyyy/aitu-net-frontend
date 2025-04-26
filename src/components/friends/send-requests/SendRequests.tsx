@@ -7,6 +7,7 @@ import { FriendRequestStatus } from "@/models/friend/FriendRequestStatus";
 import { useAuth } from "@/context/AuthProvider";
 import { Clock, User } from "lucide-react";
 import Link from "next/link";
+import {Loading} from "@/components/Loading";
 
 export default function SendRequests() {
 	const { user } = useAuth();
@@ -23,9 +24,7 @@ export default function SendRequests() {
 
 	if (loading)
 		return (
-			<div className="flex justify-center items-center h-96">
-				<div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
-			</div>
+			<Loading/>
 		);
 
 	return (

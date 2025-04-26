@@ -7,6 +7,7 @@ import Link from "next/link";
 import {api} from "@/lib";
 import {Camera, Edit, FileText, Mail, Shield, Trash2, User, Users} from "lucide-react";
 import UserPosts from "@/components/users/UsersPosts";
+import {Loading} from "@/components/Loading";
 
 
 export default function Profile() {
@@ -78,9 +79,7 @@ export default function Profile() {
 
     if (loading)
         return (
-            <div className="flex justify-center items-center h-96">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
-            </div>
+            <Loading/>
         );
 
     if (!user) return null;

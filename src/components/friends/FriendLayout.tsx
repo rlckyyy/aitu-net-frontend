@@ -68,6 +68,7 @@ export default function FriendLayout() {
 
                         return (
                             <button
+                                key={tab.tab}
                                 onClick={() => setSelectedTab(tab.tab as tabTypes)}
                                 type={"button"}
                                 className={`flex items-center gap-2 ${baseClasses} ${borderClassNames} ${roundedClassNames}`}

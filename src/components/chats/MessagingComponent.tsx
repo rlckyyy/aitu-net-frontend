@@ -6,6 +6,7 @@ import {ChatWindowComponent} from "@/components/chats/ChatWindowComponent";
 import {useAuth} from "@/context/AuthProvider";
 import {ChatMessage} from "@/models/chat/chatMessage";
 import {useIsMobile} from "@/hooks/useIsMobile";
+import {Loading} from "@/components/Loading";
 
 export default function MessagingComponent() {
     const {user} = useAuth();
@@ -14,9 +15,7 @@ export default function MessagingComponent() {
 
     if (!user)
         return (
-            <div className="flex justify-center items-center h-96">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
-            </div>
+            <Loading/>
         );
 
     const handleSendMessage = (chatMessage: ChatMessage) => {
