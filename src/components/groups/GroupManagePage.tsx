@@ -16,6 +16,7 @@ export default function GroupManagePage() {
     const [groupDescription, setGroupDescription] = useState<string>("");
     const [accessType, setAccessType] = useState<AccessType>(AccessType.PUBLIC);
     const [posts, setPosts] = useState<Post[]>([]);
+    const [avatar, setAvatar] = useState<File>();
 
     useEffect(() => {
         api.post
@@ -25,16 +26,22 @@ export default function GroupManagePage() {
             .then(r => setGroups(r.data as Group[]));
     }, []);
 
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files.length > 0) {
+            setAvatar(e.target.files[0]);
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const group: GroupCreateDto = {
             name: groupName,
             description: groupDescription,
-            accessType
+            accessType: accessType
         };
 
         try {
-            await api.group.createGroup(group);
+            await api.group.createGroup(group, avatar);
             setGroupDescription("");
             setGroupName("");
             setAccessType(AccessType.PUBLIC);
@@ -97,6 +104,11 @@ export default function GroupManagePage() {
                                     <option value={AccessType.PUBLIC}>Public</option>
                                     <option value={AccessType.PRIVATE}>Private</option>
                                 </select>
+                                <input
+                                    type="file"
+                                    onChange={handleFileChange}
+                                    className="mb-4 w-full text-sm text-gray-600 dark:text-gray-300"
+                                />
                                 <div className="flex justify-end">
                                     <button
                                         type="submit"
@@ -130,17 +142,36 @@ export default function GroupManagePage() {
                         >
                             <Link
                                 href={`/group/profile?groupId=${group.id}`}
-                                className="flex items-center px-3 py-1.5 bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 rounded-md text-sm font-medium transition-colors"
+                                className="flex items-start px-3 py-1.5 bg-gray-100 text-gray-800 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 rounded-md text-sm font-medium transition-colors"
                             >
-                                <span className="mr-1">👤</span>
-                                View Profile
+                                {/* Аватарка */}
+                                <div className="mr-3">
+                                    {group.avatar.location ? (
+                                        <img
+                                            src={group.avatar.location}
+                                            alt={group.name}
+                                            className="w-8 h-8 rounded-full object-cover"
+                                        />
+                                    ) : (
+                                        <span className="w-8 h-8 flex items-center justify-center bg-gray-300 dark:bg-gray-600 rounded-full text-xs">
+                            👤
+                        </span>
+                                    )}
+                                </div>
+
+                                {/* Название и описание */}
+                                <div className="flex flex-col">
+                                    <h3 className="text-sm font-medium text-gray-900 dark:text-white">{group.name}</h3>
+                                    <p className="text-xs text-gray-600 dark:text-gray-400 truncate">{group.description}</p>
+                                </div>
                             </Link>
-                            <h3 className="text-sm font-medium text-gray-900 dark:text-white">{group.name}</h3>
-                            <p className="text-xs text-gray-600 dark:text-gray-400 truncate">{group.description}</p>
                         </div>
                     ))}
+
                     {groups.length > 5 && (
-                        <p className="text-sm text-gray-500 dark:text-gray-400 text-center">+ {groups.length - 5} more</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
+                            + {groups.length - 5} more
+                        </p>
                     )}
                 </div>
             </div>

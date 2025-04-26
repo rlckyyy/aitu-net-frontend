@@ -13,7 +13,7 @@ export const postApi = {
         if (ownerId) params.ownerId = ownerId;
         if (postType) params.postType = postType;
         if (description) params.description = description;
-        return await request<Post[]>(`/post`, {
+        return await request<Post[]>(`/post/public`, {
             params: params,
         });
     },

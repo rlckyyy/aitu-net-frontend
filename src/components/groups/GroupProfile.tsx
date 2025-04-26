@@ -51,13 +51,21 @@ export default function GroupProfile() {
         <div className="max-w-4xl mx-auto mt-6 p-6 bg-white dark:bg-gray-900 shadow-lg rounded-2xl">
             {/* Информация о группе */}
             {group ? (
-                <div className="mb-6">
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{group.name}</h1>
-                    <p className="text-gray-600 dark:text-gray-300 mb-2">{group.description}</p>
-                    <span
-                        className="text-sm px-3 py-1 bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-300 rounded-full">
-                        {group.accessType}
-                    </span>
+                <div className="mb-6 flex items-center gap-4">
+                    <img
+                        src={group.avatar?.location || "/def_pfp.svg"}
+                        alt="Group Avatar"
+                        className="w-40 h-40 rounded-full object-cover border-2 border-indigo-500"
+                    />
+
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                            {group.name}
+                        </h1>
+                        <p className="text-gray-600 dark:text-gray-300 text-sm mb-2">
+                            {group.description}
+                        </p>
+                    </div>
                 </div>
             ) : (
                 <p className="text-gray-500 dark:text-gray-400">Loading group...</p>

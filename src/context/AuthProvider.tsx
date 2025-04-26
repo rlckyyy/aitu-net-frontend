@@ -33,6 +33,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
 			const data = response.data as AuthCheckResponse;
 			setIsAuthenticated(data.authenticated);
 			if (data.authenticated) {
+				console.log('checking auth');
+				console.log('data', data);
 				await loadUser();
 			}
 		} catch (err) {
@@ -49,7 +51,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 				await checkAuth();
 			}
 		} catch (err) {
-			console.error("Login failed:", err);
+			throw new Error("Invalid login credentials");
 		}
 	};
 
@@ -69,7 +71,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 			const response = await api.auth.register(userRegData);
 			console.log("Registration successful:", response.data);
 		} catch (error: any) {
-			console.error("Registration failed:", error.response?.data?.message || error.message);
+			const detail = error?.response?.data?.detail || error.message || "Registration failed.";
+			console.error("Registration failed:", detail);
+			throw new Error(detail);
 		}
 	};
 

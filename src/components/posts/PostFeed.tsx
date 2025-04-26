@@ -1,15 +1,13 @@
-'use client'
-
-import {Post} from "@/models/post/post";
+import { Post } from "@/models/post/post";
 import clsx from "clsx";
-import {MediaFiles} from "@/components/MediaFiles";
-import {formatDistanceToNow} from 'date-fns';
+import { MediaFiles } from "@/components/MediaFiles";
+import { formatDistanceToNow } from "date-fns";
 
 export interface PostFeedProps {
     posts: Post[];
 }
 
-export const PostFeed: React.FC<PostFeedProps> = ({posts}) => {
+export const PostFeed: React.FC<PostFeedProps> = ({ posts }) => {
     if (!posts) {
         return <p className="text-gray-500 dark:text-gray-400 text-center py-4">Loading posts...</p>;
     }
@@ -39,7 +37,9 @@ export const PostFeed: React.FC<PostFeedProps> = ({posts}) => {
                                 {post.resource || "Unknown"}
                             </span>
                             <span className="text-xs text-gray-500 dark:text-gray-400">
-                                {post.createdAt ? formatDistanceToNow(new Date(post.createdAt), {addSuffix: true}) : "Just now"}
+                                {post.createdAt
+                                    ? formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })
+                                    : "Just now"}
                             </span>
                         </div>
                     </div>
@@ -58,7 +58,7 @@ export const PostFeed: React.FC<PostFeedProps> = ({posts}) => {
 
                     {/* Media */}
                     {post.mediaFileIds && post.mediaFileIds.length > 0 && (
-                        <MediaFiles mediaFileIds={post.mediaFileIds}/>
+                        <MediaFiles mediaFileIds={post.mediaFileIds} />
                     )}
                 </div>
             ))}
