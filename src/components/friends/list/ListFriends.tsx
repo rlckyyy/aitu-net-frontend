@@ -9,6 +9,7 @@ import {useRouter} from "next/navigation";
 import useSWR from "swr";
 import {Loading} from "@/components/Loading";
 import {fetcher} from "@/lib/fetcher";
+import {defaultPfp} from "../../../../public/modules/defaultPfp";
 
 export default function ListFriends() {
     const {user} = useAuth();
@@ -50,7 +51,7 @@ export default function ListFriends() {
                                 <div className="flex items-center">
                                     <div className="relative">
                                         <img
-                                            src={friend.avatar?.location || "/def_pfp.svg"}
+                                            src={friend.avatar?.location || defaultPfp}
                                             alt="Avatar"
                                             className="w-12 h-12 rounded-full object-cover bg-white"
                                         />
