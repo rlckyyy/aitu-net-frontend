@@ -33,9 +33,9 @@ export const VoiceRecorderComponent: React.FC<VoiceRecorderProps> = ({handleSend
         mediaRecorder.ondataavailable = (e) => chunks.push(e.data)
 
         mediaRecorder.onstop = () => {
-            const audioBlob = new Blob(chunks)
+            const audioBlob = new Blob(chunks, {type: "audio/ogg"})
             const formData = new FormData()
-            const fileName = 'audio-file-message.webm';
+            const fileName = 'audio-file-message.ogg';
             formData.append("file", audioBlob, fileName)
 
             const message: ChatMessage = {
