@@ -1,7 +1,7 @@
 "use client";
 
 import {ChatMessage, MessageType} from "@/models/chat/chatMessage";
-import React, {JSX, useEffect, useRef} from "react";
+import React, {JSX, RefObject, useEffect, useRef} from "react";
 import {InputMessageBarComponent} from "@/components/chats/InputMessageBarComponent";
 import {ChatRoom} from "@/models/chat/chatRoom";
 import {useAuth} from "@/context/AuthProvider";
@@ -9,16 +9,26 @@ import Link from "next/link";
 import {Mic} from "lucide-react";
 import {useIsMobile} from "@/hooks/useIsMobile";
 import {Loading} from "@/components/Loading";
+import {Client} from "@stomp/stompjs";
+import AudioCall from "@/components/chats/AudioCallComponent";
 
 interface ChatWindowComponentProps {
     chatMessages: ChatMessage[];
     chatRoom: ChatRoom;
+    stompClientRef: RefObject<Client | null>;
+
     selectChat(chatId: string): void
 
     handleSendMessage(chatMessage: ChatMessage): void;
 }
 
-export const ChatWindowComponent = ({chatRoom, chatMessages, handleSendMessage, selectChat}: ChatWindowComponentProps) => {
+export const ChatWindowComponent = ({
+                                        chatRoom,
+                                        chatMessages,
+                                        stompClientRef,
+                                        handleSendMessage,
+                                        selectChat
+                                    }: ChatWindowComponentProps) => {
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const {user} = useAuth();
     const audioRef = useRef<HTMLAudioElement>(null);
@@ -94,6 +104,10 @@ export const ChatWindowComponent = ({chatRoom, chatMessages, handleSendMessage, 
                         <p className="text-xs text-gray-500 dark:text-gray-400">Online</p>
                     </div>
                 </Link>
+                {stompClientRef && stompClientRef.current && <AudioCall stompClient={stompClientRef.current}
+                           localUserId={user.id}
+                           remoteUserId={chatRoom.participants.find(u => u.id !== user.id)!.id}
+                />}
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-3">

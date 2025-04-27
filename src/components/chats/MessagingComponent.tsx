@@ -10,10 +10,10 @@ import {Loading} from "@/components/Loading";
 
 export default function MessagingComponent() {
     const {user} = useAuth();
-    const {chatRooms, chatRoomMessages, currentChatId, selectChat, sendMessage} = useChat();
+    const {chatRooms, chatRoomMessages, currentChatId,  stompClientRef,selectChat, sendMessage} = useChat();
     const isMobile = useIsMobile();
 
-    if (!user)
+    if (!user || !stompClientRef.current)
         return (
             <Loading/>
         );
@@ -46,6 +46,7 @@ export default function MessagingComponent() {
                         <ChatWindowComponent
                             chatMessages={chatRoomMessages.get(currentChatId) || []}
                             chatRoom={chatRooms.get(currentChatId)!}
+                            stompClientRef={stompClientRef}
                             handleSendMessage={handleSendMessage}
                             selectChat={selectChat}
                         />

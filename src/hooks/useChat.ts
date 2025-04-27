@@ -191,5 +191,5 @@ export function useChat() {
         return new NoOpStrategy()
     }
 
-    return {chatRooms, chatRoomMessages, currentChatId, selectChat, sendMessage}
+    return {chatRooms, chatRoomMessages, currentChatId, stompClientRef, selectChat, sendMessage}
 }
