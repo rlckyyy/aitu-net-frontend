@@ -44,7 +44,7 @@ export default function UserProfile() {
 
     const handleSendMessage = () => {
         if (user?.email) {
-            router.push(`/chat?companionEmail=${user.email}`);
+            router.push(`/chat?companionId=${user.id}`);
         }
     };
 

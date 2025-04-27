@@ -72,7 +72,7 @@ export default function ListFriends() {
                                 </div>
 
                                 <button
-                                    onClick={() => router.push(`/chat?companionEmail=${friend.email}`)}
+                                    onClick={() => router.push(`/chat?companionId=${friend.id}`)}
                                     className="flex items-center px-3 py-1.5 bg-indigo-100 text-indigo-800 hover:bg-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-400 dark:hover:bg-indigo-800/40 rounded-md text-sm font-medium transition-colors"
                                 >
                                     <MessageCircle size={16} className="mr-1"/>
