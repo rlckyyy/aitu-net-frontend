@@ -7,7 +7,7 @@ import {useAuth} from "@/context/AuthProvider";
 import Link from "next/link";
 import {Lock, Mail, User, UserPlus} from "lucide-react";
 
-export default function AuthForm({type}: { type: "register" | "login" }) {
+export default function AuthForm() {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -20,9 +20,7 @@ export default function AuthForm({type}: { type: "register" | "login" }) {
         setError("");
 
         try {
-            if (type === "register") {
-                await register({username: username, email: email, password: password});
-            }
+            await register({username: username, email: email, password: password});
             router.push("/auth/login");
         } catch (err: any) {
             setError(err.message);
@@ -54,29 +52,28 @@ export default function AuthForm({type}: { type: "register" | "login" }) {
                     )}
 
                     <form onSubmit={handleSubmit} className="space-y-6">
-                        {type === "register" && (
-                            <div>
-                                <label htmlFor="username"
-                                       className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    Username
-                                </label>
-                                <div className="mt-1 relative rounded-md shadow-sm">
-                                    <div
-                                        className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                        <User size={16} className="text-gray-400"/>
-                                    </div>
-                                    <input
-                                        id="username"
-                                        type="text"
-                                        placeholder="johndoe"
-                                        value={username}
-                                        onChange={e => setUsername(e.target.value)}
-                                        required
-                                        className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 dark:text-white dark:bg-gray-700 sm:text-sm"
-                                    />
+                        <div>
+                            <label htmlFor="username"
+                                   className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Username
+                            </label>
+                            <div className="mt-1 relative rounded-md shadow-sm">
+                                <div
+                                    className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <User size={16} className="text-gray-400"/>
                                 </div>
+                                <input
+                                    id="username"
+                                    type="text"
+                                    placeholder="johndoe"
+                                    value={username}
+                                    onChange={e => setUsername(e.target.value)}
+                                    required
+                                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-gray-900 dark:text-white dark:bg-gray-700 sm:text-sm"
+                                />
                             </div>
-                        )}
+                        </div>
+
 
                         <div>
                             <label htmlFor="email"

@@ -15,7 +15,7 @@ export default function ListFriends() {
     const [friends, setFriends] = useState<User[]>([]);
     const router = useRouter();
 
-    const {data: friendsData, isLoading, error} = useSWR(user ? `/friend/${user.id}` : null, fetcher)
+    const {data: friendsData, isLoading, error} = useSWR(user ? `/friends/${user.id}` : null, fetcher)
 
     useEffect(() => {
         friendsData && setFriends(friendsData)

@@ -5,9 +5,10 @@ import type React from "react";
 import {useEffect, useRef, useState} from "react";
 import Link from "next/link";
 import {api} from "@/lib";
-import {Camera, Edit, FileText, Mail, Shield, Trash2, User, Users} from "lucide-react";
+import {Camera, Edit, FileText, Mail, Shield, Trash2} from "lucide-react";
 import UserPosts from "@/components/users/UsersPosts";
 import {Loading} from "@/components/Loading";
+import FriendsSideBar from "@/components/users/user/FriendsSideBar";
 
 
 export default function Profile() {
@@ -183,41 +184,7 @@ export default function Profile() {
                     </div>
 
                     {/* Right column - Friends */}
-                    <div className="flex-1">
-                        <div
-                            className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                            <div className="flex items-center justify-between mb-4">
-                                <h2 className="text-lg font-medium text-gray-900 dark:text-white flex items-center">
-                                    <Users className="w-5 h-5 mr-2"/>
-                                    Friends
-                                </h2>
-                                <Link href="/friends/list"
-                                      className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
-                                    View all
-                                </Link>
-                            </div>
-
-                            {user?.friendList && user.friendList.length > 0 ? (
-                                <div className="grid grid-cols-2 gap-3">
-                                    {user.friendList.slice(0, 4).map((friend, index) => (
-                                        <div
-                                            key={index}
-                                            className="flex items-center p-2 bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
-                                        >
-                                            <div
-                                                className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mr-3">
-                                                <User size={16}/>
-                                            </div>
-                                            <span
-                                                className="text-sm text-gray-700 dark:text-gray-300 truncate">{friend}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="text-gray-500 dark:text-gray-400 text-center py-4">No friends yet</p>
-                            )}
-                        </div>
-                    </div>
+                    <FriendsSideBar userId={user.id}/>
                 </div>
             </div>
             <div className="px-8 pb-8">

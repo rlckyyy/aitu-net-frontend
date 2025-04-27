@@ -4,11 +4,12 @@ import {useEffect, useState} from "react";
 import type {User} from "@/models/user";
 import {api} from "@/lib";
 import {useRouter, useSearchParams} from "next/navigation";
-import {FileText, Mail, MessageCircle, Shield, UserIcon, UserPlus, Users} from "lucide-react";
+import {FileText, Mail, MessageCircle, Shield, UserPlus} from "lucide-react";
 import {useAuth} from "@/context/AuthProvider";
 import {Post, PostType} from "@/models/post/post";
 import {PostFeed} from "@/components/posts/PostFeed";
 import {Loading} from "@/components/Loading";
+import FriendsSideBar from "@/components/users/user/FriendsSideBar";
 
 export default function UserProfile() {
     const [user, setUser] = useState<User | null>(null);
@@ -148,37 +149,7 @@ export default function UserProfile() {
                     </div>
 
                     {/* Right column - Friends */}
-                    <div className="flex-1">
-                        <div
-                            className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                            <div className="flex items-center mb-4">
-                                <h2 className="text-lg font-medium text-gray-900 dark:text-white flex items-center">
-                                    <Users className="w-5 h-5 mr-2"/>
-                                    Friends
-                                </h2>
-                            </div>
-
-                            {user?.friendList && user.friendList.length > 0 ? (
-                                <div className="grid grid-cols-2 gap-3">
-                                    {user.friendList.slice(0, 4).map((friend, index) => (
-                                        <div
-                                            key={index}
-                                            className="flex items-center p-2 bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
-                                        >
-                                            <div
-                                                className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-400 mr-3">
-                                                <UserIcon size={16}/>
-                                            </div>
-                                            <span
-                                                className="text-sm text-gray-700 dark:text-gray-300 truncate">{friend}</span>
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="text-gray-500 dark:text-gray-400 text-center py-4">No friends yet</p>
-                            )}
-                        </div>
-                    </div>
+                    <FriendsSideBar userId={user.id}/>
                 </div>
             </div>
             <div className="m-6">
