@@ -9,6 +9,7 @@ import {useAuth} from "@/context/AuthProvider";
 import {Post, PostType} from "@/models/post/post";
 import {PostFeed} from "@/components/posts/PostFeed";
 import {Loading} from "@/components/Loading";
+import {defaultPfp} from "../../../../public/modules/defaultPfp";
 
 export default function UserProfile() {
     const [user, setUser] = useState<User | null>(null);
@@ -40,10 +41,10 @@ export default function UserProfile() {
             .then(data => {
                 setPosts(data.data)
             }).catch(e => console.error("Error while fetching posts", e));
-    }, [posts]);
+    }, []);
 
     const handleSendMessage = () => {
-        if (user?.email) {
+        if (user?.id) {
             router.push(`/chat?companionId=${user.id}`);
         }
     };
@@ -85,7 +86,7 @@ export default function UserProfile() {
             <div className="h-48 bg-gradient-to-r from-indigo-500 to-purple-600 relative">
                 <div className="absolute -bottom-16 left-8">
                     <img
-                        src={user?.avatar?.location || "/def_pfp.svg"}
+                        src={user?.avatar?.location || defaultPfp}
                         alt="Profile"
                         className="w-32 h-32 rounded-full border-4 border-white dark:border-gray-800 object-cover bg-white"
                     />
@@ -101,7 +102,7 @@ export default function UserProfile() {
                             Message
                         </button>
 
-                        {!currUser.friendList.includes(user.email) && (
+                        {!currUser.friendList.includes(user.id) && (
                             <button
                                 onClick={handleSendFriendRequest}
                                 className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition-colors"

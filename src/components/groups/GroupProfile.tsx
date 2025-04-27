@@ -8,6 +8,7 @@ import {Post, PostDTO, PostType} from "@/models/post/post";
 import {PlusCircle, X} from "lucide-react";
 import {useAuth} from "@/context/AuthProvider";
 import {PostFeed} from "@/components/posts/PostFeed";
+import {defaultPfp} from "../../../public/modules/defaultPfp";
 
 export default function GroupProfile() {
     const searchParams = useSearchParams();
@@ -53,7 +54,7 @@ export default function GroupProfile() {
             {group ? (
                 <div className="mb-6 flex items-center gap-4">
                     <img
-                        src={group.avatar?.location || "/def_pfp.svg"}
+                        src={group.avatar?.location || defaultPfp}
                         alt="Group Avatar"
                         className="w-40 h-40 rounded-full object-cover border-2 border-indigo-500"
                     />

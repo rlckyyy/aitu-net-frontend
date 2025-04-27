@@ -8,6 +8,7 @@ import {api} from "@/lib";
 import {Camera, Edit, FileText, Mail, Shield, Trash2, User, Users} from "lucide-react";
 import UserPosts from "@/components/users/UsersPosts";
 import {Loading} from "@/components/Loading";
+import {defaultPfp} from "../../../public/modules/defaultPfp";
 
 
 export default function Profile() {
@@ -92,7 +93,7 @@ export default function Profile() {
                 <div className="absolute -bottom-16 left-8">
                     <div className="relative">
                         <img
-                            src={user?.avatar?.location || "/def_pfp.svg"}
+                            src={user?.avatar?.location || defaultPfp}
                             alt="Profile"
                             className="w-32 h-32 rounded-full border-4 border-white dark:border-gray-800 object-cover bg-white"
                             onClick={toggleMenu}
@@ -199,7 +200,7 @@ export default function Profile() {
 
                             {user?.friendList && user.friendList.length > 0 ? (
                                 <div className="grid grid-cols-2 gap-3">
-                                    {user.friendList.slice(0, 4).map((friend, index) => (
+                                    {user.friendList.slice(0, 4).map((friendId, index) => (
                                         <div
                                             key={index}
                                             className="flex items-center p-2 bg-white dark:bg-gray-900 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700"
@@ -209,7 +210,7 @@ export default function Profile() {
                                                 <User size={16}/>
                                             </div>
                                             <span
-                                                className="text-sm text-gray-700 dark:text-gray-300 truncate">{friend}</span>
+                                                className="text-sm text-gray-700 dark:text-gray-300 truncate">{friendId}</span>
                                         </div>
                                     ))}
                                 </div>
