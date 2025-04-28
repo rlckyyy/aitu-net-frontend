@@ -10,6 +10,7 @@ export default function AudioCall({localUserId, remoteUserId, stompClient}: {
     const localStreamRef = useRef<MediaStream | null>(null);
     const remoteAudioRef = useRef<HTMLAudioElement>(null);
     const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
+    const pendingCandidates = useRef<RTCIceCandidateInit[]>([])
 
     useEffect(() => {
         console.log('use effect')
@@ -62,12 +63,26 @@ export default function AudioCall({localUserId, remoteUserId, stompClient}: {
                 })
             }
 
-            if (message.type === "CALL_ANSWER") {
+            if (message.type === "CALL_ANSWER" && peer.signalingState === "have-local-offer") {
+                const peer = peerConnectionRef.current!;
+                console.log('in call answer', peer)
                 await peer.setRemoteDescription(new RTCSessionDescription(message.sdp));
+
+                for (const candidateInit of pendingCandidates.current) {
+                    await peer.addIceCandidate(new RTCIceCandidate(candidateInit))
+                }
+
+                pendingCandidates.current = []
             }
 
             if (message.type === "ICE_CANDIDATE") {
-                await peer.addIceCandidate(new RTCIceCandidate(message.candidate));
+                const peer = peerConnectionRef.current!;
+                if (!peer.currentRemoteDescription) {
+                    console.log('Buffering ICE Candidate');
+                    pendingCandidates.current.push(message.candidate)
+                } else {
+                    await peer.addIceCandidate(new RTCIceCandidate(message.candidate));
+                }
             }
         })
     }, []);
@@ -78,7 +93,19 @@ export default function AudioCall({localUserId, remoteUserId, stompClient}: {
             console.log('initiate call')
             setCalling(true)
             const peer = peerConnectionRef.current;
-            const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+
+            const constraints: MediaStreamConstraints = {
+                audio: {
+                    channelCount: {ideal: 2},
+                    sampleRate: {ideal: 48000},
+                    sampleSize: {ideal: 24},
+                    autoGainControl: false,
+                    echoCancellation: false,
+                    noiseSuppression: false
+                }
+            }
+
+            const stream = await navigator.mediaDevices.getUserMedia(constraints);
             localStreamRef.current = stream;
             stream.getTracks().forEach((track) => peer.addTrack(track, stream));
 

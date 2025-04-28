@@ -10,7 +10,7 @@ import {Loading} from "@/components/Loading";
 
 export default function MessagingComponent() {
     const {user} = useAuth();
-    const {chatRooms, chatRoomMessages, currentChatId,  stompClientRef,selectChat, sendMessage} = useChat();
+    const {chatRooms, chatRoomMessages, currentChatId, stompClientRef, selectChat, sendMessage} = useChat();
     const isMobile = useIsMobile();
 
     if (!user || !stompClientRef.current)
@@ -26,17 +26,18 @@ export default function MessagingComponent() {
     };
 
     return (
-        <div className="bg-white dark:bg-gray-900 shadow rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 h-[calc(100vh-180px)]">
+        <div
+            className="bg-white dark:bg-gray-900 shadow rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 h-[calc(100vh-180px)]">
             <div className="flex h-full flex-col md:flex-row">
                 {/* Chat Rooms Sidebar (mobile: only visible if no chat is selected) */}
                 {isMobile ? ((!currentChatId || !chatRooms.has(currentChatId)) && (
                     <div className="flex flex-1">
-                        <ChatRoomsComponent chatRooms={chatRooms} selectChat={selectChat} />
+                        <ChatRoomsComponent chatRooms={chatRooms} selectChat={selectChat}/>
                     </div>
                 )) : (
                     // Desktop Sidebar
                     <div className="md:flex">
-                        <ChatRoomsComponent chatRooms={chatRooms} selectChat={selectChat} />
+                        <ChatRoomsComponent chatRooms={chatRooms} selectChat={selectChat}/>
                     </div>
                 )}
 

@@ -1,16 +1,16 @@
 "use client";
 
 import {ChatMessage, MessageType} from "@/models/chat/chatMessage";
-import React, {JSX, RefObject, useEffect, useRef} from "react";
+import React, {JSX, RefObject, useEffect, useRef, useState} from "react";
 import {InputMessageBarComponent} from "@/components/chats/InputMessageBarComponent";
 import {ChatRoom} from "@/models/chat/chatRoom";
 import {useAuth} from "@/context/AuthProvider";
-import Link from "next/link";
 import {Mic} from "lucide-react";
 import {useIsMobile} from "@/hooks/useIsMobile";
 import {Loading} from "@/components/Loading";
 import {Client} from "@stomp/stompjs";
 import AudioCall from "@/components/chats/AudioCallComponent";
+import {ChatRoomDetails} from "@/components/chats/ChatRoomDetails";
 
 interface ChatWindowComponentProps {
     chatMessages: ChatMessage[];
@@ -33,6 +33,7 @@ export const ChatWindowComponent = ({
     const {user} = useAuth();
     const audioRef = useRef<HTMLAudioElement>(null);
     const isMobile = useIsMobile();
+    const [chatDetailsOpen, setChatDetailsOpen] = useState<boolean>(false);
 
     if (!user) {
         return <Loading/>
@@ -86,12 +87,17 @@ export const ChatWindowComponent = ({
                 </button>
             </div>}
 
+            {chatDetailsOpen && <ChatRoomDetails chatRoom={chatRoom} setIsChatDetailsOpen={setChatDetailsOpen}/>}
+
             <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center">
-                <Link href="/chat/room" className="flex w-max h-max">
+                <a
+                    onClick={() => setChatDetailsOpen(true)}
+                    className="flex w-max h-max">
                     <div className="relative mr-3">
-                        <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                        <div
+                            className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
                             <img
-                                src={user?.avatar?.location || "/def_pfp.svg"}
+                                src={user.avatar?.location || "/def_pfp.svg"}
                                 alt="Profile"
                                 className="w-15 h-12 rounded-full border-4 border-white dark:border-gray-800 object-cover bg-white"
                             />
@@ -103,10 +109,10 @@ export const ChatWindowComponent = ({
                         <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{chatRoom.title}</h2>
                         <p className="text-xs text-gray-500 dark:text-gray-400">Online</p>
                     </div>
-                </Link>
+                </a>
                 {stompClientRef && stompClientRef.current && <AudioCall stompClient={stompClientRef.current}
-                           localUserId={user.id}
-                           remoteUserId={chatRoom.participants.find(u => u.id !== user.id)!.id}
+                                                                        localUserId={user.id}
+                                                                        remoteUserId={chatRoom.participants.find(u => u.id !== user.id)!.id}
                 />}
             </div>
 

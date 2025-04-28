@@ -2,6 +2,7 @@ import React, {useRef, useState} from "react";
 import {api} from "@/lib";
 import {ChatMessage, ChatMessageStatus, MessageType} from "@/models/chat/chatMessage";
 import {useAuth} from "@/context/AuthProvider";
+import {Mic, MicOff} from "lucide-react";
 
 interface VoiceRecorderProps {
     handleSendMessage(chatMessage: ChatMessage): void;
@@ -26,8 +27,25 @@ export const VoiceRecorderComponent: React.FC<VoiceRecorderProps> = ({handleSend
 
     async function startRecording() {
         if (!user) return
-        const stream = await navigator.mediaDevices.getUserMedia({audio: true})
-        const mediaRecorder = new MediaRecorder(stream)
+        const constraints: MediaStreamConstraints = {
+            audio: {
+                channelCount: {ideal: 2},
+                sampleRate: {ideal: 48000},
+                sampleSize: {ideal: 24},
+                autoGainControl: false,
+                echoCancellation: false,
+                noiseSuppression: false
+            }
+        }
+
+        const stream = await navigator.mediaDevices.getUserMedia(constraints)
+
+        const mro: MediaRecorderOptions = {
+            mimeType: 'audio/webm;codec=opus',
+            audioBitsPerSecond: 128000
+        }
+
+        const mediaRecorder = new MediaRecorder(stream, mro)
         mediaRecorderRef.current = mediaRecorder
 
         mediaRecorder.ondataavailable = (e) => chunks.push(e.data)
@@ -60,45 +78,19 @@ export const VoiceRecorderComponent: React.FC<VoiceRecorderProps> = ({handleSend
         <div className="flex justify-center">
             <button
                 onClick={recording ? stopRecording : startRecording}
-                className={`relative px-5 py-2 text-white font-semibold rounded-full transition-all duration-300
+                className={`relative px-5 py-2 text-white font-semibold transition-all duration-300
             ${recording ? "bg-red-600 animate-pulse shadow-lg" : "bg-indigo-600 hover:bg-indigo-700 shadow-md"}`}
             >
                 {recording ? (
                     <span className="flex items-center gap-2">
-				<svg
-                    className="w-4 h-4"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-					<path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M6 18L18 6M6 6l12 12"
-                    />
-				</svg>
-			</span>
+                        <MicOff size={20} strokeWidth={2.5}/>
+                    </span>
                 ) : (
                     <span className="flex items-center gap-2">
-				<svg
-                    className="w-4 h-4"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-					<path d="M10 2a2 2 0 00-2 2v6a2 2 0 104 0V4a2 2 0 00-2-2z" />
-					<path
-                        fillRule="evenodd"
-                        d="M4 10a6 6 0 0012 0h-2a4 4 0 11-8 0H4zm6 7a7 7 0 007-7h-2a5 5 0 01-10 0H3a7 7 0 007 7z"
-                        clipRule="evenodd"
-                    />
-				</svg>
-			</span>
+                        <Mic size={20} strokeWidth={2.5}/>
+                    </span>
                 )}
             </button>
         </div>
-
     )
 }
