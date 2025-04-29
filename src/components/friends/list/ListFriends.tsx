@@ -10,13 +10,17 @@ import useSWR from "swr";
 import {Loading} from "@/components/Loading";
 import {fetcher} from "@/lib/fetcher";
 import {defaultPfp} from "../../../../public/modules/defaultPfp";
+import {friendsApi} from "@/lib/friendsApi";
 
 export default function ListFriends() {
     const {user} = useAuth();
     const [friends, setFriends] = useState<User[]>([]);
     const router = useRouter();
 
-    const {data: friendsData, isLoading, error} = useSWR(user ? `/friends/${user.id}` : null, fetcher)
+    const {data: friendsData, isLoading, error} = useSWR(
+        user ? ['friends-list', user.id] : null,
+        ([_, args]) => fetcher(friendsApi.getUserFriendList, args)
+    )
 
     useEffect(() => {
         friendsData && setFriends(friendsData)

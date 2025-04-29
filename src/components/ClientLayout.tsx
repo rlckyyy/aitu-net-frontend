@@ -42,7 +42,7 @@ export default function ClientLayout({children}: { children: React.ReactNode }) 
                                 <button onClick={() => setMenuOpen(!menuOpen)}
                                         className="flex items-center focus:outline-none">
                                     <img
-                                        src={user?.avatar?.location || defaultPfp.src}
+                                        src={user?.avatar?.location || defaultPfp}
                                         alt="User Avatar"
                                         width={40}
                                         height={40}
@@ -87,7 +87,7 @@ export default function ClientLayout({children}: { children: React.ReactNode }) 
 
             {/* Main Content */}
             <main
-                className={`flex-1 p-6 pb-20 bg-gray-50 dark:bg-gray-900 flex flex-col justify-start items-center transition-all duration-300 ml-0 md:ml-64 mt-16 min-h-screen`}
+                className={`flex-1 p-6 pb-20 bg-gray-50 dark:bg-gray-900 flex flex-col justify-start items-center transition-all duration-300 ml-0 md:ml-64 mt-16 pt-16`}
             >
                 <div className="w-full max-w-5xl">{children}</div>
             </main>

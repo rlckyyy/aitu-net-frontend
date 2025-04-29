@@ -9,6 +9,7 @@ import {Camera, Edit, FileText, Mail, Shield, Trash2} from "lucide-react";
 import UserPosts from "@/components/users/UsersPosts";
 import {Loading} from "@/components/Loading";
 import FriendsSideBar from "@/components/users/user/FriendsSideBar";
+import {defaultPfp} from "../../../public/modules/defaultPfp";
 
 
 export default function Profile() {
@@ -93,7 +94,7 @@ export default function Profile() {
                 <div className="absolute -bottom-16 left-8">
                     <div className="relative">
                         <img
-                            src={user?.avatar?.location || "/def_pfp.svg"}
+                            src={user?.avatar?.location || defaultPfp}
                             alt="Profile"
                             className="w-32 h-32 rounded-full border-4 border-white dark:border-gray-800 object-cover bg-white"
                             onClick={toggleMenu}

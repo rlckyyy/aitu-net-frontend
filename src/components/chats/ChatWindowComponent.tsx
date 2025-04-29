@@ -11,6 +11,7 @@ import {Loading} from "@/components/Loading";
 import {Client} from "@stomp/stompjs";
 import AudioCall from "@/components/chats/AudioCallComponent";
 import {ChatRoomDetails} from "@/components/chats/ChatRoomDetails";
+import {defaultPfp} from "../../../public/modules/defaultPfp";
 
 interface ChatWindowComponentProps {
     chatMessages: ChatMessage[];
@@ -97,7 +98,7 @@ export const ChatWindowComponent = ({
                         <div
                             className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
                             <img
-                                src={user.avatar?.location || "/def_pfp.svg"}
+                                src={user.avatar?.location || defaultPfp}
                                 alt="Profile"
                                 className="w-15 h-12 rounded-full border-4 border-white dark:border-gray-800 object-cover bg-white"
                             />

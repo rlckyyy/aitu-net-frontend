@@ -1,9 +1,9 @@
-import {apiClient} from "@/lib/apiClient";
+import {AxiosResponse} from "axios";
 
-export async function fetcher(url: string, params?: any) {
-    const resp = await apiClient.get(url, {params: params});
-    if (!resp.data) {
-        throw new Error(resp.data)
+export async function fetcher<T>(axiosFetcher: (...args: any) => Promise<AxiosResponse<T>>, args: any) {
+    const response = await axiosFetcher(args)
+    if (!response.data) {
+        throw new Error(response.statusText, {cause: response})
     }
-    return resp.data
+    return response.data
 }

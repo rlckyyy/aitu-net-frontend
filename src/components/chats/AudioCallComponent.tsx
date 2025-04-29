@@ -34,6 +34,12 @@ export default function AudioCall({
     };
 
     useEffect(() => {
+        preparePeer();
+
+        return cleanup;
+    }, []);
+
+    function preparePeer() {
         stompClient.subscribe(
             `/user/${localUserId}/queue/signaling`,
             async (message) => {
@@ -44,9 +50,7 @@ export default function AudioCall({
                     .catch(reason => console.log(reason)) // ignorit ete bereik
             }
         );
-
-        return cleanup;
-    }, []);
+    }
 
     async function handleSignal(signal: Signal, peer: RTCPeerConnection) {
         switch (signal.type) {

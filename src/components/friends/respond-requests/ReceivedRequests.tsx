@@ -1,4 +1,4 @@
-"use client";
+    "use client";
 
 import {useAuth} from "@/context/AuthProvider";
 import {useEffect, useState} from "react";
@@ -10,14 +10,16 @@ import {Check, X, User} from "lucide-react";
 import {Loading} from "@/components/Loading";
 import useSWR from "swr";
 import {fetcher} from "@/lib/fetcher";
+    import {friendsApi} from "@/lib/friendsApi";
 
 export default function ReceivedRequests() {
     const {user} = useAuth();
     const [friendRequests, setFriendRequests] = useState<FriendRequest[]>([]);
     const [actionStatus, setActionStatus] = useState<Record<string, { status: "accepted" | "declined" | null }>>({});
+
     const {data: receivedRequests, isLoading, error} = useSWR(
-        ['friend/received', {status: FriendRequestStatus.PENDING}],
-        ([url, params]) => fetcher(url, params)
+        ['received-friend-requests', FriendRequestStatus.PENDING],
+        ([_, args]) => fetcher(friendsApi.getReceivedFriendRequests, args)
     )
 
     useEffect(() => {

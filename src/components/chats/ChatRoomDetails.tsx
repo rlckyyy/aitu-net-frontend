@@ -3,6 +3,7 @@
 import React, {useEffect, useRef} from "react";
 import {ChatRoom} from "@/models/chat/chatRoom";
 import Link from "next/link";
+import {defaultPfp} from "../../../public/modules/defaultPfp";
 
 interface ChatRoomDetailsProps {
     chatRoom: ChatRoom;
@@ -54,7 +55,7 @@ export const ChatRoomDetails: React.FC<ChatRoomDetailsProps> = ({chatRoom, setIs
                                       href={`/users/profile/another?userId=${participant.id}`} passHref
                                 >
                                     <img className="w-8 h-8 rounded-full object-cover"
-                                         src={participant.avatar?.location || './def_pfp.svg'}
+                                         src={participant.avatar?.location || defaultPfp}
                                          alt="Avatar"/>
                                     <span className="text-gray-800 dark:text-white">{participant.username}</span>
                                 </Link>

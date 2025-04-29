@@ -10,6 +10,7 @@ import {Post, PostType} from "@/models/post/post";
 import {PostFeed} from "@/components/posts/PostFeed";
 import {Loading} from "@/components/Loading";
 import FriendsSideBar from "@/components/users/user/FriendsSideBar";
+import {defaultPfp} from "../../../../public/modules/defaultPfp";
 
 export default function UserProfile() {
     const [user, setUser] = useState<User | null>(null);
@@ -86,7 +87,7 @@ export default function UserProfile() {
             <div className="h-48 bg-gradient-to-r from-indigo-500 to-purple-600 relative">
                 <div className="absolute -bottom-16 left-8">
                     <img
-                        src={user?.avatar?.location || "/def_pfp.svg"}
+                        src={user?.avatar?.location || defaultPfp}
                         alt="Profile"
                         className="w-32 h-32 rounded-full border-4 border-white dark:border-gray-800 object-cover bg-white"
                     />
