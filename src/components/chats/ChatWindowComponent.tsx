@@ -77,7 +77,7 @@ export const ChatWindowComponent = ({
     }
 
     return (
-        <main className="flex-1 flex flex-col h-full bg-white dark:bg-gray-900 w-full">
+        <main className="flex-1 flex flex-col h-screen bg-white dark:bg-gray-900 w-full">
             {/* Mobile Back Button */}
             {isMobile && <div className="p-2">
                 <button
