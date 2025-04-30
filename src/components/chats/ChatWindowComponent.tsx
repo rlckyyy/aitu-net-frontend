@@ -90,7 +90,7 @@ export const ChatWindowComponent = ({
 
             {chatDetailsOpen && <ChatRoomDetails chatRoom={chatRoom} setIsChatDetailsOpen={setChatDetailsOpen}/>}
 
-            <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex items-center">
+            <div className="p-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
                 <a
                     onClick={() => setChatDetailsOpen(true)}
                     className="flex w-max h-max">

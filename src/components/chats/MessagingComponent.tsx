@@ -27,8 +27,8 @@ export default function MessagingComponent() {
 
     return (
         <div
-            className="bg-white dark:bg-gray-900 shadow rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 h-[calc(100vh-180px)]">
-            <div className="flex h-full flex-col md:flex-row">
+            className="bg-white dark:bg-gray-900 shadow rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+            <div className="flex h-screen flex-col md:flex-row">
                 {/* Chat Rooms Sidebar (mobile: only visible if no chat is selected) */}
                 {isMobile ? ((!currentChatId || !chatRooms.has(currentChatId)) && (
                     <div className="flex flex-1">
