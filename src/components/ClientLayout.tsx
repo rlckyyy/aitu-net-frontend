@@ -87,7 +87,7 @@ export default function ClientLayout({children}: { children: React.ReactNode }) 
 
             {/* Main Content */}
             <main
-                className={`flex-1 p-6 bg-gray-50 dark:bg-gray-900 flex flex-col justify-start items-center transition-all duration-300 ml-0 md:ml-64 mt-2 pt-16`}
+                className={`flex-1 p-6 pb-20 bg-gray-50 dark:bg-gray-900 flex flex-col justify-start items-center transition-all duration-300 ml-0 md:ml-64 mt-2 pt-16`}
             >
                 <div className="w-full max-w-5xl">{children}</div>
             </main>
