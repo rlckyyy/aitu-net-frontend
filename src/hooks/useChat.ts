@@ -6,6 +6,7 @@ import {useAuth} from "@/context/AuthProvider";
 import {api} from "@/lib";
 import SockJS from "sockjs-client";
 import {ChatRoom, ChatRoomType} from "@/models/chat/chatRoom";
+import {ChatRoomWithMessages} from "@/models/chat/chatRoomWithMessages";
 
 interface ChatStrategy {
     getChatId(): Promise<string>;
@@ -17,7 +18,10 @@ export type NewChatRoomRequest = {
     chatRoomType: ChatRoomType;
 }
 
-class PrivateChatStrategy implements ChatStrategy {
+/**
+ * Chat strategy that depends on other users
+ * */
+class CompanionChatStrategy implements ChatStrategy {
 
     constructor(private readonly searchParams: URLSearchParams,
                 private readonly chatRooms: Map<string, ChatRoom>,
@@ -30,7 +34,7 @@ class PrivateChatStrategy implements ChatStrategy {
         const companionId = this.searchParams.get("companionId")!
         const maybeChatRoom = [...this.chatRooms.values()]
             .find(chatRoom => {
-                chatRoom.participants!.values().filter(u => u.id === companionId)
+                chatRoom.participants.values().filter(u => u.id === companionId)
             })
 
         if (!maybeChatRoom) {
@@ -47,6 +51,9 @@ class PrivateChatStrategy implements ChatStrategy {
     }
 }
 
+/**
+ * Native behavioural chat strategy
+ * */
 class DefaultChatStrategy implements ChatStrategy {
 
     constructor(private readonly searchParams: URLSearchParams) {
@@ -57,6 +64,9 @@ class DefaultChatStrategy implements ChatStrategy {
     }
 }
 
+/**
+ * Empty chat strategy
+ * */
 class NoOpStrategy implements ChatStrategy {
     async getChatId(): Promise<string> {
         return ''
@@ -72,7 +82,7 @@ type StrategyDeps = {
 
 const strategyRegistry: Record<string, (deps: StrategyDeps) => ChatStrategy> = {
     companionId: ({searchParams, chatRooms, api, pushToChatRooms}) =>
-        new PrivateChatStrategy(searchParams, chatRooms, api, pushToChatRooms),
+        new CompanionChatStrategy(searchParams, chatRooms, api, pushToChatRooms),
     chatId: ({searchParams}) =>
         new DefaultChatStrategy(searchParams)
 }
@@ -107,7 +117,7 @@ export function useChat() {
         }
     }, [user])
 
-    const onConnected = async () => {
+    const onConnected = () => {
         if (!user) return
         console.log("Connected to STOMP")
 
@@ -125,39 +135,58 @@ export function useChat() {
 
         chatIdStrategy.getChatId()
             .then(selectChat)
-        await fetchAndSetChatRooms()
+
+        fetchAndSetChats()
     }
 
-    const fetchAndSetChatRooms = async (id: string = user!.id) => {
-        const rooms = await api.chat.fetchChatRooms(id)
-        setChatRooms(new Map(rooms.map((room) => [room.chatId, room])))
-        console.log('Fetched chat rooms', rooms)
+    function fetchAndSetChatRooms(userId?: string) {
+        api.chat.fetchChatRooms(userId)
+            .then(response => response.data)
+            .then(rooms => {
+                console.log('Fetched chat rooms', rooms)
+                setChatRooms(new Map(rooms.map((room) => [room.chatId, room])));
+            })
     }
 
-    const fetchAndSetChatMessages = async (chatId: string) => {
-        if (!user) return
-        const messages = await api.chat.fetchChatRoomMessages(chatId)
-        console.log('messages', messages)
-        setChatRoomMessages((prev) => new Map(prev).set(chatId, messages))
+    function fetchAndSetChatMessages(chatId: string) {
+        api.chat.fetchChatRoomMessages(chatId)
+            .then(response => response.data)
+            .then(messages => {
+                console.log('Fetched messages', messages)
+                setChatRoomMessages((prev) => new Map(prev).set(chatId, messages));
+            })
+    }
+
+    function fetchAndSetChats(userId?: string) {
+        api.chat.fetchChats(userId)
+            .then(response => response.data)
+            .then((chats: ChatRoomWithMessages[]) => {
+                const rooms = new Map(chats.map(chat => [chat.chatRoom.chatId, chat.chatRoom]))
+
+                const messages = Map.groupBy(
+                    chats.flatMap(val => val.messages),
+                    message => message.chatId
+                )
+
+                setChatRooms(rooms)
+                setChatRoomMessages(messages)
+            })
     }
 
     const selectChat = async (chatId: string) => {
-        if (!chatId.trim()) {
-            setCurrentChatId(chatId)
-            return
-        }
         setCurrentChatId(chatId)
-        await fetchAndSetChatMessages(chatId)
     }
 
-    const onMessageReceived = async (message: Message) => {
+    const onMessageReceived = (message: Message) => {
         const chatMessage = JSON.parse(message.body) as ChatMessage
         console.log('message received', chatMessage)
+        if (!chatRooms.has(chatMessage.chatId)) {
+            fetchAndSetChatRooms()
+        }
         pushToChatMessages(chatMessage)
     }
 
     function sendMessage(chatMessage: ChatMessage, destination: string = '/app/chat'): void {
-        if (!user) return
         console.log('sending message', chatMessage)
         stompClientRef.current?.publish({
             destination: destination,

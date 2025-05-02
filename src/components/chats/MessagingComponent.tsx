@@ -3,17 +3,15 @@
 import {useChat} from "@/hooks/useChat";
 import {ChatRoomsComponent} from "@/components/chats/ChatRoomsComponent";
 import {ChatWindowComponent} from "@/components/chats/ChatWindowComponent";
-import {useAuth} from "@/context/AuthProvider";
 import {ChatMessage} from "@/models/chat/chatMessage";
 import {useIsMobile} from "@/hooks/useIsMobile";
 import {Loading} from "@/components/Loading";
 
 export default function MessagingComponent() {
-    const {user} = useAuth();
     const {chatRooms, chatRoomMessages, currentChatId, stompClientRef, selectChat, sendMessage} = useChat();
     const isMobile = useIsMobile();
 
-    if (!user || !stompClientRef.current)
+    if (!stompClientRef.current)
         return (
             <Loading/>
         );

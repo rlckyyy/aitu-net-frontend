@@ -20,6 +20,6 @@ apiClient.interceptors.response.use(
 	}
 );
 
-export async function request<T>(endpoint: string, options: any = {}): Promise<AxiosResponse<T>> {
-	return await apiClient.request({ url: endpoint, ...options });
+export function request<T>(endpoint: string, options: any = {}): Promise<AxiosResponse<T>> {
+	return apiClient.request({ url: endpoint, ...options });
 }

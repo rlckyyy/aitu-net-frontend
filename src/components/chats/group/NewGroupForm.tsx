@@ -27,6 +27,7 @@ export function NewGroupForm() {
 
     useEffect(() => {
         api.chat.fetchRelatedUsers()
+            .then(response => response.data)
             .then(users => new Map(users.map(user => [user.id, user])))
             .then(setRelatedUsers)
     }, []);

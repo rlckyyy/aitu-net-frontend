@@ -66,8 +66,8 @@ export const VoiceRecorderComponent: React.FC<VoiceRecorderProps> = ({handleSend
             formData.set("chatMessage", new Blob([JSON.stringify(message)], {type: "application/json"}))
 
             api.chat.uploadFileMessage(formData)
-                .then(handleSendMessage)
-                .then(resetChunks)
+                .then(response => handleSendMessage(response.data))
+                .finally(resetChunks)
         }
 
         mediaRecorder.start()

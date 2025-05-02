@@ -62,8 +62,14 @@ export const ChatWindowComponent = ({
             (
                 <div className="flex items-center gap-2 p-2 rounded-lg bg-white/10 dark:bg-gray-700">
                     <Mic className="w-5 h-5 text-indigo-500 dark:text-indigo-300"/>
-                    <audio ref={audioRef} preload={"auto"} controls src={chatMessage.content}
-                           className="w-full focus:outline-none"/>
+                    <audio ref={audioRef} preload={"none"} controls src={chatMessage.content}
+                           className="w-full focus:outline-none">
+                        <source type="audio/mp4"/>
+                        <source type="audio/ogg"/>
+                        <source type="audio/webm"/>
+                        <source type="audio/mp3"/>
+                        <source type="audio/mpeg3"/>
+                    </audio>
                 </div>
             ),
         [MessageType.JOIN]: chatMessage =>

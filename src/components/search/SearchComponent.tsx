@@ -24,8 +24,8 @@ export default function SearchComponent() {
         }
         api.chat
             .searchUsers(query)
-            .then(setUsers)
-            .then(() => setLoading(false));
+            .then(response => setUsers(response.data))
+            .finally(() => setLoading(false));
     }, [query]);
 
     const handleFriendRequest = async (userId: string) => {
