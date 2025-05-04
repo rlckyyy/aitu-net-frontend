@@ -1,13 +1,14 @@
-import { Post } from "@/models/post/post";
+import {Post} from "@/models/post/post";
 import clsx from "clsx";
-import { MediaFiles } from "@/components/MediaFiles";
-import { formatDistanceToNow } from "date-fns";
+import {MediaFiles} from "@/components/MediaFiles";
+import {formatDistanceToNow} from "date-fns";
+import {defaultPfp} from "../../../public/modules/defaultPfp";
 
 export interface PostFeedProps {
     posts: Post[];
 }
 
-export const PostFeed: React.FC<PostFeedProps> = ({ posts }) => {
+export const PostFeed: React.FC<PostFeedProps> = ({posts}) => {
     if (!posts) {
         return <p className="text-gray-500 dark:text-gray-400 text-center py-4">Loading posts...</p>;
     }
@@ -25,20 +26,18 @@ export const PostFeed: React.FC<PostFeedProps> = ({ posts }) => {
                 >
                     {/* Header */}
                     <div className="flex items-center space-x-4 mb-3">
-                        {post.avatarUrl && (
-                            <img
-                                src={post.avatarUrl}
-                                alt="avatar"
-                                className="w-10 h-10 rounded-full object-cover"
-                            />
-                        )}
+                        <img
+                            src={post.avatarUrl || defaultPfp}
+                            alt="avatar"
+                            className="w-10 h-10 rounded-full object-cover"
+                        />
                         <div className="flex flex-col">
                             <span className="font-semibold text-gray-900 dark:text-white">
                                 {post.resource || "Unknown"}
                             </span>
                             <span className="text-xs text-gray-500 dark:text-gray-400">
                                 {post.createdAt
-                                    ? formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })
+                                    ? formatDistanceToNow(new Date(post.createdAt), {addSuffix: true})
                                     : "Just now"}
                             </span>
                         </div>
@@ -58,7 +57,7 @@ export const PostFeed: React.FC<PostFeedProps> = ({ posts }) => {
 
                     {/* Media */}
                     {post.mediaFileIds && post.mediaFileIds.length > 0 && (
-                        <MediaFiles mediaFileIds={post.mediaFileIds} />
+                        <MediaFiles mediaFileIds={post.mediaFileIds}/>
                     )}
                 </div>
             ))}
