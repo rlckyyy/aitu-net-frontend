@@ -3,12 +3,14 @@ import clsx from "clsx";
 import {MediaFiles} from "@/components/MediaFiles";
 import {formatDistanceToNow} from "date-fns";
 import {defaultPfp} from "../../../public/modules/defaultPfp";
+import {useAuth} from "@/context/AuthProvider";
 
 export interface PostFeedProps {
     posts: Post[];
 }
 
 export const PostFeed: React.FC<PostFeedProps> = ({posts}) => {
+    const {user} = useAuth();
     if (!posts) {
         return <p className="text-gray-500 dark:text-gray-400 text-center py-4">Loading posts...</p>;
     }
@@ -27,7 +29,7 @@ export const PostFeed: React.FC<PostFeedProps> = ({posts}) => {
                     {/* Header */}
                     <div className="flex items-center space-x-4 mb-3">
                         <img
-                            src={post.avatarUrl || defaultPfp}
+                            src={user?.avatar.location || defaultPfp}
                             alt="avatar"
                             className="w-10 h-10 rounded-full object-cover"
                         />

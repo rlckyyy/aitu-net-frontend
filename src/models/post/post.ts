@@ -10,7 +10,6 @@ export interface Post {
     ownerId?: string;
     groupId?: string;
     postType?: PostType;
-    avatarUrl?: string;
     createdAt?: Date;
     updatedAt?: Date;
     resource?: string;
