@@ -5,7 +5,7 @@ import React, {JSX, RefObject, useEffect, useRef, useState} from "react";
 import {InputMessageBarComponent} from "@/components/chats/InputMessageBarComponent";
 import {ChatRoom} from "@/models/chat/chatRoom";
 import {useAuth} from "@/context/AuthProvider";
-import {Mic} from "lucide-react";
+import {Mic, Video} from "lucide-react";
 import {useIsMobile} from "@/hooks/useIsMobile";
 import {Loading} from "@/components/Loading";
 import {Client} from "@stomp/stompjs";
@@ -62,7 +62,7 @@ export const ChatWindowComponent = ({
             (
                 <div className="flex items-center gap-2 p-2 rounded-lg bg-white/10 dark:bg-gray-700">
                     <Mic className="w-5 h-5 text-indigo-500 dark:text-indigo-300"/>
-                    <audio ref={audioRef} preload={"none"} controls src={chatMessage.content}
+                    <audio ref={audioRef} preload={"metadata"} controls src={chatMessage.content}
                            className="w-full focus:outline-none">
                         <source type="audio/mp4"/>
                         <source type="audio/ogg"/>
@@ -72,6 +72,27 @@ export const ChatWindowComponent = ({
                     </audio>
                 </div>
             ),
+        [MessageType.MESSAGE_VIDEO]: chatMessage => (
+            <div className="flex items-center gap-2 p-2 rounded-full bg-white/10 dark:bg-gray-700 border">
+                <Video
+                    className="w-5 h-5 text-indigo-500 dark:text-indigo-300"/> {/*MouseEvent<HTMLVideoElement, MouseEvent>*/}
+                <video onClick={(e: React.MouseEvent<HTMLVideoElement, MouseEvent>) => {
+                    e.currentTarget.paused
+                        ? e.currentTarget.play()
+                        : e.currentTarget.pause()
+                }} preload={"metadata"} src={chatMessage.content}
+                       className="w-full focus:outline-none rounded-full object-cover"
+                       width={150}
+                       height={150}
+                >
+                    <source type="video/mp4"/>
+                    <source type="video/ogg"/>
+                    <source type="video/webm"/>
+                    <source type="video/mp3"/>
+                    <source type="video/mpeg3"/>
+                </video>
+            </div>
+        ),
         [MessageType.JOIN]: chatMessage =>
             (
                 <div>{chatMessage.senderId} joined</div>

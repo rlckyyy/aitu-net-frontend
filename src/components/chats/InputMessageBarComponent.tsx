@@ -1,10 +1,10 @@
 "use client";
 
 import React, {useState} from "react";
-import {Send, Paperclip, Smile} from "lucide-react";
+import {Paperclip, Send, Smile} from "lucide-react";
 import {ChatMessage, ChatMessageStatus, MessageType} from "@/models/chat/chatMessage";
 import {useAuth} from "@/context/AuthProvider";
-import {VoiceRecorderComponent} from "@/components/chats/VoiceRecorderComponent";
+import {FileMessageType, MediaRecorderComponent} from "@/components/chats/MediaRecorderComponent";
 
 interface InputMessageBarProps {
     handleSendMessage(chatMessage: ChatMessage): void;
@@ -74,10 +74,20 @@ export const InputMessageBarComponent: React.FC<InputMessageBarProps> = ({
                 >
                     <Send size={20}/>
                 </button>
+
                 {inputMessage.trim() ? null : (
-                    <div className={"shrink-0"}>
-                        <VoiceRecorderComponent chatId={chatId} handleSendMessage={handleSendMessage}/>
-                    </div>
+                    <>
+                        <div className={"shrink-0"}>
+                            <MediaRecorderComponent chatId={chatId}
+                                                    handleChatMessage={handleSendMessage}
+                                                    type={FileMessageType.AUDIO}/>
+                        </div>
+                        <div className={"shrink-0"}>
+                            <MediaRecorderComponent chatId={chatId}
+                                                    handleChatMessage={handleSendMessage}
+                                                    type={FileMessageType.VIDEO}/>
+                        </div>
+                    </>
                 )}
             </div>
         </div>

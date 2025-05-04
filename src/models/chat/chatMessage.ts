@@ -6,6 +6,7 @@ export enum ChatMessageStatus {
 export enum MessageType {
     MESSAGE_TEXT= "MESSAGE_TEXT",
     MESSAGE_AUDIO = "MESSAGE_AUDIO",
+    MESSAGE_VIDEO = "MESSAGE_VIDEO",
     JOIN = "JOIN",
     LEAVE = "LEAVE",
 }
