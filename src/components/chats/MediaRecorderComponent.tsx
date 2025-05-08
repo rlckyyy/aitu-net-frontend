@@ -126,7 +126,7 @@ export const MediaRecorderComponent: React.FC<VideoRecorderProps> = ({chatId, ha
 
             const extension = extractExtension(mimeType);
             const fileName = `${chatId}_${user.id}.${extension}`
-            formData.append("file", mediaBlob, fileName)
+            formData.set("fileMessage", mediaBlob, fileName)
 
             const message: ChatMessage = {
                 chatId: chatId,
@@ -167,7 +167,7 @@ export const MediaRecorderComponent: React.FC<VideoRecorderProps> = ({chatId, ha
             <button
                 onClick={recording ? stopRecording : startRecording}
                 className={`relative px-5 py-2 text-white font-semibold transition-all duration-300
-            ${recording ? "bg-red-600 shadow-lg animate-pulse" : "bg-indigo-600 hover:bg-indigo-700 shadow-md"}`}
+            ${recording ? "bg-red-600 shadow-lg" : "bg-indigo-600 hover:bg-indigo-700 shadow-md"}`}
             >
                 {recording
                     ? (type === FileMessageType.VIDEO

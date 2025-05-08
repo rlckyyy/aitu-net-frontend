@@ -1,5 +1,4 @@
 import React, {Ref} from "react";
-import {Video} from "lucide-react";
 
 interface VideoMessagePreviewModalProps {
     videoPreviewRef: Ref<HTMLVideoElement>;
@@ -23,9 +22,7 @@ export const VideoMessagePreviewModal: React.FC<VideoMessagePreviewModalProps> =
                         <div className="max-w-full">
                             <div
                                 className="flex items-center gap-2 p-2 rounded-full bg-white/10 dark:bg-gray-700 border">
-                                <Video
-                                    className="w-5 h-5 text-indigo-500 dark:text-indigo-300"/> {/*MouseEvent<HTMLVideoElement, MouseEvent>*/}
-                                <video className="w-full focus:outline-none rounded-full object-cover"
+                                <video className="rounded-full object-cover w-[250px] h-[250px] focus:outline-none"
                                        ref={videoPreviewRef}
                                        autoPlay={true}
                                        muted={true}

@@ -8,7 +8,7 @@ import {ChatRoomWithMessages} from "@/models/chat/chatRoomWithMessages";
 
 export const chatApi = {
     fetchChatRooms: (idOrEmail?: string): Promise<AxiosResponse<ChatRoom[]>> =>
-        (request<ChatRoom[]>(`/chats/rooms/${idOrEmail}`)),
+        (request<ChatRoom[]>(`/chats/rooms/${idOrEmail??''}`)),
 
     fetchChatRoomMessages: (chatId: string): Promise<AxiosResponse<ChatMessage[]>> =>
         (request<ChatMessage[]>(`/chats/rooms/${chatId}/messages`)),
@@ -34,5 +34,5 @@ export const chatApi = {
         })),
 
     fetchChats: (userId?: string): Promise<AxiosResponse<ChatRoomWithMessages[]>> =>
-        (request<ChatRoomWithMessages[]>(`/chats/${userId}`))
+        (request<ChatRoomWithMessages[]>(`/chats/chats/${userId??''}`))
 };

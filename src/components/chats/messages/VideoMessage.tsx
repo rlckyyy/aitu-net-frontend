@@ -16,7 +16,7 @@ export const VideoMessage: React.FC<MessageRenderProps> = ({chatMessage, current
                                ? e.currentTarget.play()
                                : e.currentTarget.pause()
                        }}
-                       preload={"metadata"} src={`${chatMessage.content}`}
+                       preload={"metadata"} src={`${chatMessage.content}#t=0.5`}
                        className={"rounded-full object-cover w-[250px] h-[250px]"}
                 >
                     <source type="video/mp4"/>

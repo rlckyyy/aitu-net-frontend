@@ -1,9 +1,7 @@
-import React, {useRef} from "react";
+import React from "react";
 import {MessageRenderProps} from "@/components/chats/messages/messageRenderProps";
 
 export const AudioMessage: React.FC<MessageRenderProps> = ({chatMessage, currentUser}) => {
-
-    const audioRef = useRef<HTMLAudioElement>(null)
 
     const isOwn = chatMessage.senderId === currentUser.id
 
@@ -11,7 +9,7 @@ export const AudioMessage: React.FC<MessageRenderProps> = ({chatMessage, current
         <>
             <div
                  className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
-                <audio ref={audioRef} preload={"metadata"} controls src={chatMessage.content}
+                <audio preload={"metadata"} controls src={chatMessage.content}
                 >
                     <source type="audio/mp3"/>
                 </audio>
