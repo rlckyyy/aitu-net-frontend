@@ -29,7 +29,7 @@ export const PostFeed: React.FC<PostFeedProps> = ({posts}) => {
                     {/* Header */}
                     <div className="flex items-center space-x-4 mb-3">
                         <img
-                            src={user?.avatar.location || defaultPfp}
+                            src={user?.avatar?.location || defaultPfp}
                             alt="avatar"
                             className="w-10 h-10 rounded-full object-cover"
                         />

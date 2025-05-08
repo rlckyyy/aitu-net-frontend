@@ -148,15 +148,6 @@ export function useChat() {
             })
     }
 
-    function fetchAndSetChatMessages(chatId: string) {
-        api.chat.fetchChatRoomMessages(chatId)
-            .then(response => response.data)
-            .then(messages => {
-                console.log('Fetched messages', messages)
-                setChatRoomMessages((prev) => new Map(prev).set(chatId, messages));
-            })
-    }
-
     function fetchAndSetChats(userId?: string) {
         api.chat.fetchChats(userId)
             .then(response => response.data)

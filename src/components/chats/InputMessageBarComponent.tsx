@@ -29,6 +29,7 @@ export const InputMessageBarComponent: React.FC<InputMessageBarProps> = ({
             chatId: chatId,
             type: MessageType.MESSAGE_TEXT,
             content: inputMessage,
+            length: inputMessage.trim().length,
             senderId: user.id,
             status: ChatMessageStatus.DELIVERED,
             createdAt: new Date(),

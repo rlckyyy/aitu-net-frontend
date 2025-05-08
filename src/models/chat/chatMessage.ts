@@ -16,6 +16,7 @@ export type ChatMessage = {
     chatId: string;
     senderId: string;
     content: string;
+    length: number;
     status: ChatMessageStatus;
     type: MessageType;
     createdAt?: Date;

@@ -5,13 +5,15 @@ import React, {JSX, RefObject, useEffect, useRef, useState} from "react";
 import {InputMessageBarComponent} from "@/components/chats/InputMessageBarComponent";
 import {ChatRoom} from "@/models/chat/chatRoom";
 import {useAuth} from "@/context/AuthProvider";
-import {Mic, Video} from "lucide-react";
 import {useIsMobile} from "@/hooks/useIsMobile";
 import {Loading} from "@/components/Loading";
 import {Client} from "@stomp/stompjs";
 import AudioCall from "@/components/chats/AudioCallComponent";
 import {ChatRoomDetails} from "@/components/chats/ChatRoomDetails";
 import {defaultPfp} from "../../../public/modules/defaultPfp";
+import {VideoMessage} from "@/components/chats/messages/VideoMessage";
+import {AudioMessage} from "@/components/chats/messages/AudioMessage";
+import {TextMessage} from "@/components/chats/messages/TextMessage";
 
 interface ChatWindowComponentProps {
     chatMessages: ChatMessage[];
@@ -30,69 +32,40 @@ export const ChatWindowComponent = ({
                                         handleSendMessage,
                                         selectChat
                                     }: ChatWindowComponentProps) => {
-    const messagesEndRef = useRef<HTMLDivElement>(null);
-    const {user} = useAuth();
-    const audioRef = useRef<HTMLAudioElement>(null);
-    const isMobile = useIsMobile();
-    const [chatDetailsOpen, setChatDetailsOpen] = useState<boolean>(false);
+    const messagesEndRef = useRef<HTMLDivElement>(null)
+    const {user} = useAuth()
+    const isMobile = useIsMobile()
+    const [chatDetailsOpen, setChatDetailsOpen] = useState<boolean>(false)
 
     if (!user) {
         return <Loading/>
     }
 
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({behavior: "smooth"});
-    };
+        messagesEndRef.current?.scrollIntoView({behavior: "smooth"})
+    }
 
     useEffect(() => {
-        scrollToBottom();
-    }, [chatMessages]);
+        scrollToBottom()
+    }, [chatMessages])
 
     function displayChatMessage(chatMessage: ChatMessage) {
-        const strategy = messageRenderStrategies[chatMessage.type];
-        return strategy(chatMessage)
+        return messageRenderStrategies[chatMessage.type](chatMessage)
     }
 
     const messageRenderStrategies: Record<MessageType, (chatMessage: ChatMessage) => JSX.Element> = {
         [MessageType.MESSAGE_TEXT]: chatMessage =>
             (
-                <div className="break-words">{chatMessage.content}</div>
+                <TextMessage chatMessage={chatMessage} currentUser={user}/>
             ),
         [MessageType.MESSAGE_AUDIO]: chatMessage =>
             (
-                <div className="flex items-center gap-2 p-2 rounded-lg bg-white/10 dark:bg-gray-700">
-                    <Mic className="w-5 h-5 text-indigo-500 dark:text-indigo-300"/>
-                    <audio ref={audioRef} preload={"metadata"} controls src={chatMessage.content}
-                           className="w-full focus:outline-none">
-                        <source type="audio/mp4"/>
-                        <source type="audio/ogg"/>
-                        <source type="audio/webm"/>
-                        <source type="audio/mp3"/>
-                        <source type="audio/mpeg3"/>
-                    </audio>
-                </div>
+                <AudioMessage chatMessage={chatMessage} currentUser={user}/>
             ),
-        [MessageType.MESSAGE_VIDEO]: chatMessage => (
-            <div className="flex items-center gap-2 p-2 rounded-full bg-white/10 dark:bg-gray-700 border">
-                <Video
-                    className="w-5 h-5 text-indigo-500 dark:text-indigo-300"/> {/*MouseEvent<HTMLVideoElement, MouseEvent>*/}
-                <video onClick={(e: React.MouseEvent<HTMLVideoElement, MouseEvent>) => {
-                    e.currentTarget.paused
-                        ? e.currentTarget.play()
-                        : e.currentTarget.pause()
-                }} preload={"metadata"} src={chatMessage.content}
-                       className="w-full focus:outline-none rounded-full object-cover"
-                       width={150}
-                       height={150}
-                >
-                    <source type="video/mp4"/>
-                    <source type="video/ogg"/>
-                    <source type="video/webm"/>
-                    <source type="video/mp3"/>
-                    <source type="video/mpeg3"/>
-                </video>
-            </div>
-        ),
+        [MessageType.MESSAGE_VIDEO]: chatMessage =>
+            (
+                <VideoMessage chatMessage={chatMessage} currentUser={user}/>
+            ),
         [MessageType.JOIN]: chatMessage =>
             (
                 <div>{chatMessage.senderId} joined</div>
@@ -147,26 +120,9 @@ export const ChatWindowComponent = ({
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {chatMessages ? (
                     chatMessages.map(chatMessage => (
-                        <div key={chatMessage.id}
-                             className={`flex ${chatMessage.senderId === user?.id ? "justify-end" : "justify-start"}`}>
-                            <div
-                                className={`max-w-[85%] w-fit sm:w-[75%] rounded-lg px-4 py-2 ${
-                                    chatMessage.senderId === user?.id
-                                        ? "bg-indigo-600 text-white rounded-br-none"
-                                        : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white rounded-bl-none"
-                                }`}
-                            >
-                                <div className="max-w-full">
-                                    {displayChatMessage(chatMessage)}
-                                </div>
-                                {chatMessage.createdAt && <div className="text-xs opacity-70 text-right mt-1">
-                                    {new Date(chatMessage.createdAt).toLocaleTimeString([], {
-                                        hour: "2-digit",
-                                        minute: "2-digit",
-                                    })}
-                                </div>}
-                            </div>
-                        </div>
+                        <React.Fragment key={chatMessage.id}>
+                            {displayChatMessage(chatMessage)}
+                        </React.Fragment>
                     ))
                 ) : (
                     <div className="flex items-center justify-center h-full">
@@ -193,8 +149,10 @@ export const ChatWindowComponent = ({
                 <div ref={messagesEndRef}/>
             </div>
 
-            <InputMessageBarComponent title={chatRoom.title} handleSendMessage={handleSendMessage}
-                                      chatId={chatRoom.chatId}/>
+            <InputMessageBarComponent title={chatRoom.title}
+                                      handleSendMessage={handleSendMessage}
+                                      chatId={chatRoom.chatId}
+            />
         </main>
-    );
-};
+    )
+}

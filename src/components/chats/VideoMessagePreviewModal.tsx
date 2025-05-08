@@ -1,11 +1,12 @@
-import React from "react";
+import React, {Ref} from "react";
 import {Video} from "lucide-react";
 
 interface VideoMessagePreviewModalProps {
-    recordingBlobs: Blob[];
+    videoPreviewRef: Ref<HTMLVideoElement>;
 }
 
-export const VideoMessagePreviewModal: React.FC<VideoMessagePreviewModalProps> = ({recordingBlobs}) => {
+export const VideoMessagePreviewModal: React.FC<VideoMessagePreviewModalProps> = ({videoPreviewRef}) => {
+
     return (
         <div
             className="fixed inset-0 z-40 min-h-full overflow-y-auto overflow-x-hidden transition flex items-center">
@@ -25,16 +26,13 @@ export const VideoMessagePreviewModal: React.FC<VideoMessagePreviewModalProps> =
                                 <Video
                                     className="w-5 h-5 text-indigo-500 dark:text-indigo-300"/> {/*MouseEvent<HTMLVideoElement, MouseEvent>*/}
                                 <video className="w-full focus:outline-none rounded-full object-cover"
-                                       width={150}
-                                       height={150}
-                                       src={URL.createObjectURL(new Blob(recordingBlobs))}
-                                >
-                                    <source type="video/mp4"/>
-                                    <source type="video/ogg"/>
-                                    <source type="video/webm"/>
-                                    <source type="video/mp3"/>
-                                    <source type="video/mpeg3"/>
-                                </video>
+                                       ref={videoPreviewRef}
+                                       autoPlay={true}
+                                       muted={true}
+                                       width={25}
+                                       height={25}
+                                       playsInline={true}
+                                />
                             </div>
                         </div>
                     </div>
