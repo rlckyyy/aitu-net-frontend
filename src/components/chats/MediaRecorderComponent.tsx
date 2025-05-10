@@ -100,7 +100,6 @@ export const MediaRecorderComponent: React.FC<VideoRecorderProps> = ({chatId, ha
         if (!user) return
 
         setRecording(true)
-        start()
         const stream = await navigator.mediaDevices.getUserMedia(mediaRecorderConfig.mediaStreamConstraints)
 
         const mediaRecorder = new MediaRecorder(stream, mediaRecorderConfig.mediaRecorderOptions)
@@ -145,6 +144,7 @@ export const MediaRecorderComponent: React.FC<VideoRecorderProps> = ({chatId, ha
         }
 
         mediaRecorder.start()
+        start()
     }
 
     function resetChunks() {
