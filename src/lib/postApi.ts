@@ -1,5 +1,6 @@
 import {request} from "@/lib/apiClient";
 import {Post, PostDTO, PostType} from "@/models/post/post";
+import {Reaction} from "@/models/reaction/reaction";
 
 export const postApi = {
     getById: async (id: string) => {
@@ -46,4 +47,21 @@ export const postApi = {
             method: "DELETE",
         });
     },
+
+    updatePostReaction: async (reaction: Reaction) => {
+        return await request<Post>(`/post/reactions`, {
+            method: "PATCH",
+            data: reaction,
+        });
+    },
+
+    deletePostReaction: async (postId: string, userId: string) => {
+        return await request<Post>(`/post/${postId}/reactions/${userId}`, {
+            method: "DELETE",
+        });
+    },
+
+    getReactions: async (postId: string) => {
+        return await request<Reaction[]>(`/post/public/${postId}/reactions`);
+    }
 };
