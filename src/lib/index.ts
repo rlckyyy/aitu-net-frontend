@@ -4,6 +4,7 @@ import {authApi} from "@/lib/authApi";
 import {friendsApi} from "@/lib/friendsApi";
 import {groupApi} from "@/lib/groupApi";
 import {postApi} from "@/lib/postApi";
+import {commentApi} from "@/lib/commentApi";
 
 export const api = {
     auth: authApi,
@@ -11,5 +12,6 @@ export const api = {
     chat: chatApi,
     friends: friendsApi,
     group: groupApi,
-    post: postApi
+    post: postApi,
+    comment: commentApi
 };
