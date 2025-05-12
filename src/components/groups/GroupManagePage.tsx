@@ -8,6 +8,7 @@ import {AccessType} from "@/models/group/accessType";
 import {Post, PostType} from "@/models/post/post";
 import Link from "next/link";
 import {PostFeed} from "@/components/posts/PostFeed";
+import {defaultPfp} from "../../../public/modules/defaultPfp";
 
 export default function GroupManagePage() {
     const [groups, setGroups] = useState<Group[]>([]);
@@ -51,6 +52,7 @@ export default function GroupManagePage() {
         } catch (error) {
             console.error("Error creating group:", error);
         }
+        setAvatar(undefined);
     };
 
     return (
@@ -146,17 +148,13 @@ export default function GroupManagePage() {
                             >
                                 {/* Аватарка */}
                                 <div className="mr-3">
-                                    {group.avatar.location ? (
-                                        <img
-                                            src={group.avatar.location}
-                                            alt={group.name}
-                                            className="w-8 h-8 rounded-full object-cover"
-                                        />
-                                    ) : (
-                                        <span className="w-8 h-8 flex items-center justify-center bg-gray-300 dark:bg-gray-600 rounded-full text-xs">
-                            👤
-                        </span>
-                                    )}
+
+                                    <img
+                                        src={group.avatar?.location || defaultPfp}
+                                        alt={group.name}
+                                        className="w-8 h-8 rounded-full object-cover"
+                                    />
+
                                 </div>
 
                                 {/* Название и описание */}
