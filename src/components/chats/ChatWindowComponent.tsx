@@ -3,11 +3,11 @@
 import {ChatMessage, MessageType} from "@/models/chat/chatMessage";
 import React, {JSX, RefObject, useEffect, useRef, useState} from "react";
 import {InputMessageBarComponent} from "@/components/chats/InputMessageBarComponent";
-import {ChatRoom} from "@/models/chat/chatRoom";
+import {ChatRoom, ChatRoomType} from "@/models/chat/chatRoom";
 import {useAuth} from "@/context/AuthProvider";
 import {useIsMobile} from "@/hooks/useIsMobile";
 import {Loading} from "@/components/Loading";
-import {Client} from "@stomp/stompjs";
+import {Client, Message} from "@stomp/stompjs";
 import AudioCall from "@/components/chats/AudioCallComponent";
 import {ChatRoomDetails} from "@/components/chats/ChatRoomDetails";
 import {defaultPfp} from "../../../public/modules/defaultPfp";
@@ -19,16 +19,28 @@ interface ChatWindowComponentProps {
     chatMessages: ChatMessage[];
     chatRoom: ChatRoom;
     stompClientRef: RefObject<Client | null>;
+    currentChatId: string;
 
     selectChat(chatId: string): void
 
     handleSendMessage(chatMessage: ChatMessage): void;
 }
 
+type ConnectionStatus = "OFFLINE" | "ONLINE"
+
+interface Body {
+    status: ConnectionStatus
+}
+
+const connMap: Map<boolean, ConnectionStatus> = new Map()
+connMap.set(true, "ONLINE")
+connMap.set(false, "OFFLINE")
+
 export const ChatWindowComponent = ({
                                         chatRoom,
                                         chatMessages,
                                         stompClientRef,
+                                        currentChatId,
                                         handleSendMessage,
                                         selectChat
                                     }: ChatWindowComponentProps) => {
@@ -36,6 +48,7 @@ export const ChatWindowComponent = ({
     const {user} = useAuth()
     const isMobile = useIsMobile()
     const [chatDetailsOpen, setChatDetailsOpen] = useState<boolean>(false)
+    const [connStatus, setConnStatus] = useState<ConnectionStatus | undefined>(undefined)
 
     if (!user) {
         return <Loading/>
@@ -46,8 +59,38 @@ export const ChatWindowComponent = ({
     }
 
     useEffect(() => {
+        if (!currentChatId) return
+
+        let destination: string
+        if (chatRoom.chatRoomType === ChatRoomType.ONE_TO_ONE) {
+            const companion = chatRoom.participants.filter(participant => participant.id !== user.id).pop()
+            if (!companion) {
+                throw new Error("Companion not present in one to one chat room")
+            }
+
+            companion.connected && setConnStatus(connMap.get(companion.connected))
+
+            destination = `/user/${companion.id}/queue/status`
+            subscribeForStatus(destination)
+        }
+
+        return () => {
+            stompClientRef.current?.unsubscribe(destination)
+        }
+    }, [currentChatId])
+
+    useEffect(() => {
         scrollToBottom()
     }, [chatMessages])
+
+    function subscribeForStatus(destination: string) {
+        stompClientRef.current?.subscribe(destination, onStatusReceived)
+    }
+
+    function onStatusReceived(message: Message) {
+        const statusMessage: Body = JSON.parse(message.body)
+        setConnStatus(statusMessage.status)
+    }
 
     function displayChatMessage(chatMessage: ChatMessage) {
         return messageRenderStrategies[chatMessage.type](chatMessage)
@@ -108,7 +151,7 @@ export const ChatWindowComponent = ({
                     </div>
                     <div>
                         <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{chatRoom.title}</h2>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">Online</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">{connStatus}</p>
                     </div>
                 </a>
                 {stompClientRef && stompClientRef.current && <AudioCall stompClient={stompClientRef.current}
