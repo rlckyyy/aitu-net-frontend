@@ -10,9 +10,6 @@ export const chatApi = {
     fetchChatRooms: (idOrEmail?: string): Promise<AxiosResponse<ChatRoom[]>> =>
         (request<ChatRoom[]>(`/chats/rooms/${idOrEmail??''}`)),
 
-    fetchChatRoomMessages: (chatId: string): Promise<AxiosResponse<ChatMessage[]>> =>
-        (request<ChatMessage[]>(`/chats/rooms/${chatId}/messages`)),
-
     searchUsers: (query: string): Promise<AxiosResponse<User[]>> =>
         (request<User[]>(`/chats/users/search?query=${query}`)),
 
@@ -34,5 +31,5 @@ export const chatApi = {
         })),
 
     fetchChats: (userId?: string): Promise<AxiosResponse<ChatRoomWithMessages[]>> =>
-        (request<ChatRoomWithMessages[]>(`/chats/chats/${userId??''}`))
+        (request<ChatRoomWithMessages[]>(`/chats/${userId??''}`))
 };
