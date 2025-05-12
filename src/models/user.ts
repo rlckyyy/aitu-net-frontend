@@ -6,7 +6,10 @@ export interface User {
     roles: string[];
     friendList: string[];
     avatar?: Avatar;
-    publicKey: string;
+    connected: boolean;
+    showConnectionDetails: boolean;
+    leftOn: Date;
+    connectedOn: Date;
 }
 
 export interface Avatar {

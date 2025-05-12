@@ -48,6 +48,7 @@ export default function MessagingComponent() {
                             stompClientRef={stompClientRef}
                             handleSendMessage={handleSendMessage}
                             selectChat={selectChat}
+                            currentChatId={currentChatId}
                         />
                     </div>
                 )}
