@@ -1,7 +1,7 @@
 "use client";
 
-import {ChatMessage, MessageType} from "@/models/chat/chatMessage";
-import React, {JSX, RefObject, useEffect, useRef, useState} from "react";
+import {ChatMessage} from "@/models/chat/chatMessage";
+import React, {RefObject, useEffect, useRef, useState} from "react";
 import {InputMessageBarComponent} from "@/components/chats/InputMessageBarComponent";
 import {ChatRoom, ChatRoomType} from "@/models/chat/chatRoom";
 import {useAuth} from "@/context/AuthProvider";
@@ -11,9 +11,7 @@ import {Client, Message} from "@stomp/stompjs";
 import AudioCall from "@/components/chats/AudioCallComponent";
 import {ChatRoomDetails} from "@/components/chats/ChatRoomDetails";
 import {defaultPfp} from "../../../public/modules/defaultPfp";
-import {VideoMessage} from "@/components/chats/messages/VideoMessage";
-import {AudioMessage} from "@/components/chats/messages/AudioMessage";
-import {TextMessage} from "@/components/chats/messages/TextMessage";
+import {MessageRenderer, MessageRendererProps} from "@/components/chats/messages/MessageRenderer";
 
 interface ChatWindowComponentProps {
     chatMessages: ChatMessage[];
@@ -24,6 +22,8 @@ interface ChatWindowComponentProps {
     selectChat(chatId: string): void
 
     handleSendMessage(chatMessage: ChatMessage): void;
+
+    markMessageAsRead(chatMessage: ChatMessage): void;
 }
 
 type ConnectionStatus = "OFFLINE" | "ONLINE"
@@ -32,23 +32,21 @@ interface Body {
     status: ConnectionStatus
 }
 
-const connMap: Map<boolean, ConnectionStatus> = new Map()
-connMap.set(true, "ONLINE")
-connMap.set(false, "OFFLINE")
-
 export const ChatWindowComponent = ({
                                         chatRoom,
                                         chatMessages,
                                         stompClientRef,
                                         currentChatId,
                                         handleSendMessage,
-                                        selectChat
+                                        selectChat,
+                                        markMessageAsRead
                                     }: ChatWindowComponentProps) => {
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const {user} = useAuth()
     const isMobile = useIsMobile()
     const [chatDetailsOpen, setChatDetailsOpen] = useState<boolean>(false)
     const [connStatus, setConnStatus] = useState<ConnectionStatus | undefined>(undefined)
+    const messageRenderStrategies = MessageRenderer({markMessageAsRead} as MessageRendererProps)
 
     if (!user) {
         return <Loading/>
@@ -68,7 +66,7 @@ export const ChatWindowComponent = ({
                 throw new Error("Companion not present in one to one chat room")
             }
 
-            companion.connected && setConnStatus(connMap.get(companion.connected))
+            companion.connected && setConnStatus(companion.connected ? "ONLINE" : "OFFLINE")
 
             destination = `/user/${companion.id}/queue/status`
             subscribeForStatus(destination)
@@ -94,29 +92,6 @@ export const ChatWindowComponent = ({
 
     function displayChatMessage(chatMessage: ChatMessage) {
         return messageRenderStrategies[chatMessage.type](chatMessage)
-    }
-
-    const messageRenderStrategies: Record<MessageType, (chatMessage: ChatMessage) => JSX.Element> = {
-        [MessageType.MESSAGE_TEXT]: chatMessage =>
-            (
-                <TextMessage chatMessage={chatMessage} currentUser={user}/>
-            ),
-        [MessageType.MESSAGE_AUDIO]: chatMessage =>
-            (
-                <AudioMessage chatMessage={chatMessage} currentUser={user}/>
-            ),
-        [MessageType.MESSAGE_VIDEO]: chatMessage =>
-            (
-                <VideoMessage chatMessage={chatMessage} currentUser={user}/>
-            ),
-        [MessageType.JOIN]: chatMessage =>
-            (
-                <div>{chatMessage.senderId} joined</div>
-            ),
-        [MessageType.LEAVE]: chatMessage =>
-            (
-                <div>{chatMessage.senderId} left</div>
-            )
     }
 
     return (

@@ -88,16 +88,16 @@ const strategyRegistry: Record<string, (deps: StrategyDeps) => ChatStrategy> = {
 }
 
 export function useChat() {
-    const {user} = useAuth();
-    const searchParams = useSearchParams();
-    const stompClientRef = useRef<Client | null>(null);
-    const [chatRooms, setChatRooms] = useState<Map<string, ChatRoom>>(new Map());
-    const [chatRoomMessages, setChatRoomMessages] = useState<Map<string, ChatMessage[]>>(new Map());
-    const [currentChatId, setCurrentChatId] = useState<string>("");
-    const SOCKET_URL: string = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "defaultWebSocketUrl";
-    {
-        console.log("SOCKET_URL", SOCKET_URL);
-    }
+    const {user} = useAuth()
+    const searchParams = useSearchParams()
+    const stompClientRef = useRef<Client | null>(null)
+    const [chatRooms, setChatRooms] = useState<Map<string, ChatRoom>>(new Map())
+    const [chatRoomMessages, setChatRoomMessages] = useState<Map<string, ChatMessage[]>>(new Map())
+    const [currentChatId, setCurrentChatId] = useState<string>("")
+    const timeoutRef = useRef<NodeJS.Timeout>(null)
+    const readMessagesRef = useRef<Map<string, ChatMessage>>(new Map())
+    const [newMessagesCount, setNewMessagesCount] = useState<Map<string, number>>(new Map())
+    const SOCKET_URL: string = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "defaultWebSocketUrl"
 
     useEffect(() => {
         if (!user) return
@@ -113,9 +113,25 @@ export function useChat() {
         stompClientRef.current = stompClient
 
         return () => {
-            stompClient.deactivate().catch(console.log)
+            markBufferedMessagesAsRead()
+            stompClient.deactivate()
+                .catch(console.log)
         }
     }, [user])
+
+    useEffect(() => {
+        chatRooms?.size && Array.from(chatRooms.keys()).map(chatId => {
+            api.chat.countNewMessages(chatId)
+                .then(response => response.data.count)
+                .then(count => {
+                    setNewMessagesCount(prev => {
+                        const newState = new Map(prev)
+                        newState.set(chatId, count)
+                        return newState
+                    })
+                })
+        })
+    }, [chatRooms])
 
     const onConnected = () => {
         if (!user) return
@@ -185,6 +201,39 @@ export function useChat() {
         })
     }
 
+    async function markMessageAsRead(chatMessage: ChatMessage): Promise<void> {
+        readMessagesRef.current.set(chatMessage.id!, chatMessage)
+
+        timeoutRef.current && clearTimeout(timeoutRef.current)
+
+        timeoutRef.current = setTimeout(() => {
+            const messageIds = Array.from(readMessagesRef.current.keys())
+            send(messageIds)
+            readMessagesRef.current.clear()
+        }, 3000)
+
+        setNewMessagesCount(prev => {
+            const newState = new Map(prev)
+            newState.get(chatMessage.chatId) && newState.set(chatMessage.chatId, newState.get(chatMessage.chatId)! - 1)
+            return newState
+        })
+    }
+
+    function send(messageIds: string[]) {
+        stompClientRef.current?.publish({
+            destination: `/app/chat/message/status`,
+            body: JSON.stringify({messageIds})
+        })
+    }
+
+    function markBufferedMessagesAsRead() {
+        if (readMessagesRef.current.size > 0) {
+            timeoutRef.current && clearTimeout(timeoutRef.current)
+
+            send(Array.from(readMessagesRef.current.keys()))
+        }
+    }
+
     function pushToChatRooms(chatRoom: ChatRoom) {
         setChatRooms((prevChatRooms) => {
             const newChatRooms = new Map(prevChatRooms)
@@ -211,5 +260,5 @@ export function useChat() {
         return new NoOpStrategy()
     }
 
-    return {chatRooms, chatRoomMessages, currentChatId, stompClientRef, selectChat, sendMessage}
+    return {chatRooms, chatRoomMessages, currentChatId, stompClientRef, newMessagesCount, selectChat, sendMessage, markMessageAsRead}
 }

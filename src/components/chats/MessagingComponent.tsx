@@ -8,20 +8,20 @@ import {useIsMobile} from "@/hooks/useIsMobile";
 import {Loading} from "@/components/Loading";
 
 export default function MessagingComponent() {
-    const {chatRooms, chatRoomMessages, currentChatId, stompClientRef, selectChat, sendMessage} = useChat();
-    const isMobile = useIsMobile();
+    const {chatRooms, chatRoomMessages, currentChatId, stompClientRef, newMessagesCount, selectChat, sendMessage, markMessageAsRead} = useChat()
+    const isMobile = useIsMobile()
 
     if (!stompClientRef.current)
         return (
             <Loading/>
-        );
+        )
 
     const handleSendMessage = (chatMessage: ChatMessage) => {
-        if (!chatMessage.content.trim()) return;
-        console.log(`Sending: ${chatMessage}`);
+        if (!chatMessage.content.trim()) return
+        console.log(`Sending: ${chatMessage}`)
 
-        sendMessage(chatMessage);
-    };
+        sendMessage(chatMessage)
+    }
 
     return (
         <div
@@ -30,12 +30,12 @@ export default function MessagingComponent() {
                 {/* Chat Rooms Sidebar (mobile: only visible if no chat is selected) */}
                 {isMobile ? ((!currentChatId || !chatRooms.has(currentChatId)) && (
                     <div className="flex flex-1">
-                        <ChatRoomsComponent chatRooms={chatRooms} selectChat={selectChat}/>
+                        <ChatRoomsComponent chatRooms={chatRooms} selectChat={selectChat} newMessagesCount={newMessagesCount}/>
                     </div>
                 )) : (
                     // Desktop Sidebar
                     <div className="md:flex">
-                        <ChatRoomsComponent chatRooms={chatRooms} selectChat={selectChat}/>
+                        <ChatRoomsComponent chatRooms={chatRooms} selectChat={selectChat} newMessagesCount={newMessagesCount}/>
                     </div>
                 )}
 
@@ -49,10 +49,11 @@ export default function MessagingComponent() {
                             handleSendMessage={handleSendMessage}
                             selectChat={selectChat}
                             currentChatId={currentChatId}
+                            markMessageAsRead={markMessageAsRead}
                         />
                     </div>
                 )}
             </div>
         </div>
-    );
+    )
 }

@@ -1,13 +1,29 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {MessageRenderProps} from "@/components/chats/messages/messageRenderProps";
+import {useIsShown} from "@/components/chats/messages/useIsShown";
+import {ChatMessage, ChatMessageStatus} from "@/models/chat/chatMessage";
+export const TextMessage: React.FC<MessageRenderProps> = ({chatMessage, currentUser, markMessageAsRead}) => {
 
-export const TextMessage: React.FC<MessageRenderProps> = ({chatMessage, currentUser}) => {
-
+    const [ref, isShown] = useIsShown<HTMLDivElement>()
     const isOwn = chatMessage.senderId === currentUser.id
+    const isUnread = !isOwn && isUnreadMessage(chatMessage)
+
+    useEffect(() => {
+        if (isShown && isUnread) {
+            chatMessage.status = ChatMessageStatus.RECEIVED
+
+            markMessageAsRead(chatMessage)
+        }
+    }, [isShown]);
+
+    function isUnreadMessage(chatMessage: ChatMessage): boolean {
+        return chatMessage.status !== ChatMessageStatus.RECEIVED
+    }
 
     return (
         <div
-             className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
+            ref={isUnread ? ref : null}
+            className={`flex ${isOwn ? "justify-end" : "justify-start"}`}>
             <div
                 className={`max-w-[85%] w-fit sm:w-[75%] rounded-lg px-4 py-2 ${
                     isOwn

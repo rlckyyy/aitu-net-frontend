@@ -19,7 +19,7 @@ export const PostFeed: React.FC<PostFeedProps> = ({posts}) => {
     return (
         <div className="space-y-6 mt-6">
             {posts.map(post => (
-                <PostUnit post={post}/>
+                <PostUnit post={post} key={post.id}/>
             ))}
         </div>
     );

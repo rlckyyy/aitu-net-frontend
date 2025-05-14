@@ -6,15 +6,21 @@ import Dropdown from "@/components/chats/DropDown";
 import {ChatRoom} from "@/models/chat/chatRoom";
 import {useAuth} from "@/context/AuthProvider";
 import {defaultPfp} from "../../../public/modules/defaultPfp";
+import {Loading} from "@/components/Loading";
 
 interface ChatRoomsPageProps {
     selectChat(chatId: string): void;
 
     chatRooms: Map<string, ChatRoom>;
+    newMessagesCount: Map<string, number>;
 }
 
-export const ChatRoomsComponent: React.FC<ChatRoomsPageProps> = ({selectChat, chatRooms}) => {
-    const {user} = useAuth();
+export const ChatRoomsComponent: React.FC<ChatRoomsPageProps> = ({selectChat, chatRooms, newMessagesCount}) => {
+    const {user} = useAuth()
+
+    if (!user) {
+        return <Loading/>
+    }
 
     return (
         <aside
@@ -63,6 +69,8 @@ export const ChatRoomsComponent: React.FC<ChatRoomsPageProps> = ({selectChat, ch
                                     <p className="text-xs text-gray-500 dark:text-gray-400 truncate">Click to view
                                         conversation</p>
                                 </div>
+                                <div>{newMessagesCount.get(chatRoom.chatId)}</div>
+                                <div></div>
                             </button>
                         ))}
                     </div>
