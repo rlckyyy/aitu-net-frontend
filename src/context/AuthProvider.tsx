@@ -50,8 +50,11 @@ export function AuthProvider({children}: AuthProviderProps) {
                 localStorage.setItem("token", response.data.token);
                 await checkAuth();
             }
-        } catch (err) {
-            throw new Error("Invalid login credentials");
+        } catch (err: any) {
+            const errorMessage =
+                err?.response?.data?.detail ||
+                "An unknown error occurred during login.";
+            throw new Error(errorMessage);
         }
     };
 
@@ -79,11 +82,13 @@ export function AuthProvider({children}: AuthProviderProps) {
 
     const loadUser = async () => {
         try {
-            const response = await api.auth.getUser();
-            if (response.status === 200) {
-                setUser(response.data);
-            } else {
-                setUser(null);
+            if (authenticated === true) {
+                const response = await api.auth.getUser();
+                if (response.status === 200) {
+                    setUser(response.data);
+                } else {
+                    setUser(null);
+                }
             }
         } catch (err) {
             setUser(null);

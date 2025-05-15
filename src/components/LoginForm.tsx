@@ -19,10 +19,12 @@ export default function LoginForm() {
 		setError("");
 
 		try {
-			await loginUser({ email, password });
+			await loginUser({email, password});
 			router.push("/users/profile");
-		} catch (err) {
-			setError("Invalid credentials");
+		} catch (err: any) {
+			console.log(err)
+			console.error("Login failed:", err?.response?.data?.message || err?.message);
+			setError(err.message || "Invalid credentials");
 		}
 	};
 
