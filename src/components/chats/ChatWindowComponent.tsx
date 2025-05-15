@@ -1,6 +1,6 @@
 "use client";
 
-import {ChatMessage} from "@/models/chat/chatMessage";
+import {ChatMessage, ChatMessageStatus} from "@/models/chat/chatMessage";
 import React, {RefObject, useEffect, useRef, useState} from "react";
 import {InputMessageBarComponent} from "@/components/chats/InputMessageBarComponent";
 import {ChatRoom, ChatRoomType} from "@/models/chat/chatRoom";
@@ -53,7 +53,7 @@ export const ChatWindowComponent = ({
     }
 
     const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({behavior: "smooth"})
+        messagesEndRef.current?.scrollIntoView({behavior: "smooth", inline: "nearest", block: "end"})
     }
 
     useEffect(() => {
@@ -92,6 +92,12 @@ export const ChatWindowComponent = ({
 
     function displayChatMessage(chatMessage: ChatMessage) {
         return messageRenderStrategies[chatMessage.type](chatMessage)
+    }
+
+    function isFirstUnreadMessage(chatMessage: ChatMessage) {
+        return chatMessage.status === ChatMessageStatus.RECEIVED && messagesEndRef.current === null
+            ? messagesEndRef
+            : null;
     }
 
     return (
@@ -137,11 +143,15 @@ export const ChatWindowComponent = ({
 
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {chatMessages ? (
-                    chatMessages.map(chatMessage => (
-                        <React.Fragment key={chatMessage.id}>
-                            {displayChatMessage(chatMessage)}
-                        </React.Fragment>
-                    ))
+                    chatMessages.map(chatMessage => {
+                        return (
+                            <div ref={isFirstUnreadMessage(chatMessage)}>
+                                <React.Fragment key={chatMessage.id}>
+                                    {displayChatMessage(chatMessage)}
+                                </React.Fragment>
+                            </div>
+                        );
+                    })
                 ) : (
                     <div className="flex items-center justify-center h-full">
                         <div className="text-center">
@@ -164,7 +174,6 @@ export const ChatWindowComponent = ({
                         </div>
                     </div>
                 )}
-                <div ref={messagesEndRef}/>
             </div>
 
             <InputMessageBarComponent title={chatRoom.title}

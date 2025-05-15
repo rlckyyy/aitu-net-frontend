@@ -9,7 +9,7 @@ import {ArrowLeft, FileText, Save, User} from "lucide-react";
 import Link from "next/link";
 
 export default function () {
-    const {user, loadUser} = useAuth();
+    const {user} = useAuth();
     const [username, setUsername] = useState<string | null>(null);
     const [description, setDescription] = useState<string | null>(null);
     const router = useRouter();
@@ -20,7 +20,7 @@ export default function () {
             username: username ?? user?.username,
             description: description ?? user?.description,
         };
-        api.user.updateUser(req).then(_ => loadUser());
+        api.user.updateUser(req)
         router.push(`/users/profile`);
     };
 

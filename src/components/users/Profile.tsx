@@ -1,8 +1,7 @@
 "use client";
 
 import {useAuth} from "@/context/AuthProvider";
-import type React from "react";
-import {useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import Link from "next/link";
 import {api} from "@/lib";
 import {Camera, Edit, FileText, Mail, Shield, Trash2} from "lucide-react";
@@ -14,20 +13,9 @@ import {defaultPfp} from "../../../public/modules/defaultPfp";
 
 export default function Profile() {
     const {user, loadUser} = useAuth();
-    const [loading, setLoading] = useState(true);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [menuOpen, setMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement | null>(null);
-
-    useEffect(() => {
-        loadUser();
-    }, []);
-
-    useEffect(() => {
-        if (user) {
-            setLoading(false);
-        }
-    }, [user]);
 
     useEffect(() => {
         handleUpload();
@@ -59,9 +47,8 @@ export default function Profile() {
     const handleUpload = async () => {
         if (!selectedFile || !user) return;
         try {
-            await api.user.uploadProfilePhoto(selectedFile);
-            alert("Successfully uploaded photo");
-            loadUser();
+            api.user.uploadProfilePhoto(selectedFile)
+                .finally(() => loadUser())
         } catch (error) {
             console.error("Error with upload", error);
             alert("Error with upload");
@@ -73,18 +60,18 @@ export default function Profile() {
     };
 
     const handleDelete = () => {
-        api.user.deleteProfilePhoto();
-        console.log("Photo deleted");
-        setMenuOpen(false);
-        window.location.reload();
+        user?.avatar && api.user.deleteProfilePhoto()
+            .finally(() => {
+                console.log("Photo deleted")
+                loadUser()
+            })
+        setMenuOpen(false)
     };
 
-    if (loading)
+    if (!user)
         return (
             <Loading/>
         );
-
-    if (!user) return null;
 
     return (
         <div

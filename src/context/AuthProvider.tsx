@@ -21,78 +21,58 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export function AuthProvider({children}: AuthProviderProps) {
     const [user, setUser] = useState<User | null>(null);
-    const [authenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
     useEffect(() => {
-        checkAuth();
+        loadUser()
     }, []);
 
-    const checkAuth = async () => {
+    const loginUser = (userData: { email: string; password: string }) => {
         try {
-            const response = await api.auth.checkAuth();
-            const data = response.data as AuthCheckResponse;
-            setIsAuthenticated(data.authenticated);
-            if (data.authenticated) {
-                console.log('checking auth');
-                console.log('data', data);
-                await loadUser();
-            }
-        } catch (err) {
-            setIsAuthenticated(false);
-        }
-    };
-
-    const loginUser = async (userData: { email: string; password: string }) => {
-        try {
-            const response = await api.auth.login(userData);
-            if (response.status === 200) {
-                console.log("Successfully logged in");
-                localStorage.setItem("token", response.data.token);
-                await checkAuth();
-            }
-        } catch (err: any) {
-            const errorMessage =
-                err?.response?.data?.detail ||
-                "An unknown error occurred during login.";
-            throw new Error(errorMessage);
+            api.auth.login(userData)
+                .then(response => {
+                    if (response.status === 200) {
+                        console.log("Successfully logged in");
+                        loadUser()
+                    }
+                })
+        } catch (error: any) {
+            const problemDetail: ProblemDetail = error
+            throw new Error(problemDetail.detail || "An unknown error occurred during login.");
         }
     };
 
     const logout = async () => {
         try {
-            await api.auth.logout();
-            setUser(null);
-            setIsAuthenticated(false);
-            console.log("Logout successful");
+            api.auth.logout()
+                .finally(() => {
+                    setUser(null)
+                    console.log("Logout successful")
+                })
         } catch (error: any) {
-            console.error("Logout failed:", error.response?.data?.message || error.message);
+            const problemDetail: ProblemDetail = error
+            throw new Error(problemDetail.detail || "Logout failed")
+        }
+    }
+
+    const register = (userRegData: UserRegister) => {
+        try {
+            api.auth.register(userRegData)
+                .then(response => console.log("Registration successful:", response.data))
+        } catch (error: any) {
+            const problemDetail: ProblemDetail = error
+            throw new Error(problemDetail.detail || "Registration failed.");
         }
     };
 
-    const register = async (userRegData: UserRegister) => {
-        try {
-            const response = await api.auth.register(userRegData);
-            console.log("Registration successful:", response.data);
-        } catch (error: any) {
-            const detail = error?.response?.data?.detail || error.message || "Registration failed.";
-            console.error("Registration failed:", detail);
-            throw new Error(detail);
-        }
-    };
-
-    const loadUser = async () => {
-        try {
-            if (authenticated === true) {
-                const response = await api.auth.getUser();
+    const loadUser = () => {
+        api.auth.getUser()
+            .then(response => {
                 if (response.status === 200) {
                     setUser(response.data);
                 } else {
                     setUser(null);
                 }
-            }
-        } catch (err) {
-            setUser(null);
-        }
+            });
     };
 
     return <AuthContext.Provider
