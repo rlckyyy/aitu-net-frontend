@@ -8,9 +8,9 @@ import {UserRegister} from "@/models/userRegister";
 interface AuthContextType {
     user: User | null;
     loadUser: () => void;
-    loginUser: (userData: { email: string; password: string }) => void;
+    loginUser: (userData: { email: string; password: string }) => Promise<void>;
     logout: () => void;
-    register: (userRegData: UserRegister) => void;
+    register: (userRegData: UserRegister) => Promise<void>;
 }
 
 interface AuthProviderProps {
@@ -26,53 +26,50 @@ export function AuthProvider({children}: AuthProviderProps) {
         loadUser()
     }, []);
 
-    const loginUser = (userData: { email: string; password: string }) => {
-        try {
-            api.auth.login(userData)
-                .then(response => {
-                    if (response.status === 200) {
-                        console.log("Successfully logged in");
-                        loadUser()
-                    }
-                })
-        } catch (error: any) {
-            const problemDetail: ProblemDetail = error
-            throw new Error(problemDetail.detail || "An unknown error occurred during login.");
-        }
-    };
-
-    const logout = async () => {
-        try {
-            api.auth.logout()
-                .finally(() => {
-                    setUser(null)
-                    console.log("Logout successful")
-                })
-        } catch (error: any) {
-            const problemDetail: ProblemDetail = error
-            throw new Error(problemDetail.detail || "Logout failed")
-        }
+    const loginUser = async (userData: { email: string; password: string }) => {
+        return api.auth.login(userData)
+            .then(response => {
+                if (response.status === 200) {
+                    console.log("Successfully logged in")
+                    loadUser()
+                }
+            })
+            .catch(error => {
+                console.log("Failed logging in", error.response.data)
+                return Promise.reject(error.response.data)
+            })
     }
 
-    const register = (userRegData: UserRegister) => {
-        try {
-            api.auth.register(userRegData)
-                .then(response => console.log("Registration successful:", response.data))
-        } catch (error: any) {
-            const problemDetail: ProblemDetail = error
-            throw new Error(problemDetail.detail || "Registration failed.");
-        }
+    const logout = async () => {
+        api.auth.logout()
+            .catch(error => {
+                const problemDetail: ProblemDetail = error
+                throw new Error(problemDetail.detail || "Logout failed")
+            })
+            .finally(() => {
+                setUser(null)
+                console.log("Logout successful")
+            })
+    }
+
+    const register = async (userRegData: UserRegister) => {
+        return api.auth.register(userRegData)
+            .then(response => console.log("Registration successful:", response.data))
+            .catch(error => {
+                return Promise.reject(error.response.data);
+            })
     };
 
     const loadUser = () => {
         api.auth.getUser()
             .then(response => {
                 if (response.status === 200) {
-                    setUser(response.data);
+                    setUser(response.data)
                 } else {
                     setUser(null);
                 }
-            });
+            })
+            .catch(error => console.log("error while load user", error))
     };
 
     return <AuthContext.Provider

@@ -5,14 +5,13 @@ import {UserRegister} from "@/models/userRegister";
 
 export const authApi = {
     register: (userRegData: UserRegister) =>
-        request('/auth/register', {method: 'POST', data: userRegData}),
+        request<User>('/auth/register', {method: 'POST', data: userRegData}),
 
-    login: (userData: { email: string; password: string }): Promise<AxiosResponse<{ token: string }>> =>
-        request<{ token: string }>('/auth/login', {method: 'POST', data: userData}),
+    login: async (userData: { email: string; password: string }): Promise<AxiosResponse<{ token: string }>> =>
+        await request<{ token: string }>('/auth/login', {method: 'POST', data: userData}),
 
     getUser: async (): Promise<AxiosResponse<User>> =>
         await request<User>('/auth/me'),
 
     logout: () => request('/auth/logout', {method: 'POST'}),
-    checkAuth: () => request('/auth/check', {method: 'GET'}),
 };

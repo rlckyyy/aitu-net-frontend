@@ -19,12 +19,12 @@ export default function AuthForm() {
         e.preventDefault();
         setError("");
 
-        try {
-            await register({username: username, email: email, password: password});
-            router.push("/auth/login");
-        } catch (err: any) {
-            setError(err.message);
-        }
+        register({username: username, email: email, password: password})
+            .then(() => router.push("/auth/login"))
+            .catch(error => {
+                const pd: ProblemDetail = error
+                setError(pd.detail)
+            })
     };
 
     return (
