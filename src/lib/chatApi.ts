@@ -3,8 +3,8 @@ import {request} from "@/lib/apiClient";
 import {ChatMessage} from "@/models/chat/ChatMessage";
 import {ChatRoom} from "@/models/chat/ChatRoom";
 import {AxiosResponse} from "axios";
-import {NewChatRoomRequest} from "@/hooks/useChat";
 import {ChatRoomWithMessages} from "@/models/chat/ChatRoomWithMessages";
+import {NewChatRoomRequest} from "@/models/chat/NewChatRoomRequest";
 
 export const chatApi = {
     fetchChatRooms: (idOrEmail?: string): Promise<AxiosResponse<ChatRoom[]>> =>
