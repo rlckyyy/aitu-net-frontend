@@ -9,7 +9,7 @@ WORKDIR /app
 COPY . .
 COPY --from=base /app/node_modules ./node_modules
 RUN npm run build
-RUN ls -la .next
+RUN ls -la .next/BUILD_ID || (echo "Build failed! BUILD_ID is not present in .next/" && exit 1)
 
 FROM node:22.9.0 as runner
 WORKDIR /app
