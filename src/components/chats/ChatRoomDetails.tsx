@@ -1,7 +1,7 @@
 "use client";
 
 import React, {useEffect, useRef} from "react";
-import {ChatRoom} from "@/models/chat/chatRoom";
+import {ChatRoom} from "@/models/chat/ChatRoom";
 import Link from "next/link";
 import {defaultPfp} from "../../../public/modules/defaultPfp";
 

@@ -1,6 +1,6 @@
 import {request} from "@/lib/apiClient";
 import {ProfileUpdate} from "@/models/ProfileUpdate";
-import {User} from "@/models/user";
+import {User} from "@/models/User";
 import {AxiosResponse} from "axios";
 
 export const userApi = {

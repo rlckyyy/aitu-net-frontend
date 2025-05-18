@@ -2,9 +2,9 @@
 
 import {api} from "@/lib";
 import {useEffect, useState} from "react";
-import {User} from "@/models/user";
+import {User} from "@/models/User";
 import {Controller, useForm} from "react-hook-form";
-import {ChatRoomType} from "@/models/chat/chatRoom";
+import {ChatRoomType} from "@/models/chat/ChatRoom";
 import {useRouter} from "next/navigation";
 
 type FormData = {

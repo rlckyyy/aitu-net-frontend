@@ -1,7 +1,7 @@
 import {request} from "@/lib/apiClient";
 import {FriendRequestStatus} from "@/models/friend/FriendRequestStatus";
 import {FriendRequest} from "@/models/friend/FriendRequest";
-import {User} from "@/models/user";
+import {User} from "@/models/User";
 
 export const friendsApi = {
     sendFriendRequest: async (userId: string) => {

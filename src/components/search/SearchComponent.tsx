@@ -2,7 +2,7 @@
 
 import {useRouter, useSearchParams} from "next/navigation";
 import {useEffect, useState} from "react";
-import type {User} from "@/models/user";
+import type {User} from "@/models/User";
 import {api} from "@/lib";
 import {Mail, MessageCircle, Search, UserPlus} from "lucide-react";
 import {useAuth} from "@/context/AuthProvider";

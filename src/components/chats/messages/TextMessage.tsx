@@ -1,7 +1,7 @@
 import React, {useEffect} from "react";
 import {MessageRenderProps} from "@/components/chats/messages/messageRenderProps";
-import {useIsShown} from "@/components/chats/messages/useIsShown";
-import {ChatMessage, ChatMessageStatus} from "@/models/chat/chatMessage";
+import {useIsShown} from "@/components/useIsShown";
+import {ChatMessage, ChatMessageStatus} from "@/models/chat/ChatMessage";
 export const TextMessage: React.FC<MessageRenderProps> = ({chatMessage, currentUser, markMessageAsRead}) => {
 
     const [ref, isShown] = useIsShown<HTMLDivElement>()

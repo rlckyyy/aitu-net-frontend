@@ -1,4 +1,4 @@
-import {Avatar} from "@/models/user";
+import {Avatar} from "@/models/User";
 import {AccessType} from "@/models/group/accessType";
 
 export interface GroupCreateDto {

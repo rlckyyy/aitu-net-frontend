@@ -1,7 +1,7 @@
 "use client";
 
 import {useEffect, useState} from "react";
-import type {User} from "@/models/user";
+import type {User} from "@/models/User";
 import {api} from "@/lib";
 import {useRouter, useSearchParams} from "next/navigation";
 import {FileText, Mail, MessageCircle, Shield, UserPlus} from "lucide-react";
@@ -17,12 +17,12 @@ export default function UserProfile() {
     const [loading, setLoading] = useState(true);
     const [posts, setPosts] = useState<Post[]>([])
     const searchParams = useSearchParams();
-    const userId = searchParams.get("userId");
+    const userId = searchParams.get("userId") ? searchParams.get("userId")! : undefined;
     const router = useRouter();
     const {user: currUser} = useAuth();
 
     useEffect(() => {
-        if (typeof userId === "string") {
+        if (userId) {
             setLoading(true);
             console.log("Fetching user data for ID:", userId);
 
@@ -38,10 +38,9 @@ export default function UserProfile() {
     }, [userId]);
 
     useEffect(() => {
-        api.post.searchPosts(undefined, userId?.toString(), PostType.USER, undefined)
-            .then(data => {
-                setPosts(data.data)
-            }).catch(e => console.error("Error while fetching posts", e));
+        api.post.searchPosts(undefined, userId, PostType.USER, undefined)
+            .then(response => setPosts(response.data))
+            .catch(e => console.error("Error while fetching posts", e));
     }, [posts]);
 
     const handleSendMessage = () => {
@@ -87,7 +86,7 @@ export default function UserProfile() {
             <div className="h-48 bg-gradient-to-r from-indigo-500 to-purple-600 relative">
                 <div className="absolute -bottom-16 left-8">
                     <img
-                        src={user?.avatar?.location || defaultPfp}
+                        src={user.avatar?.location || defaultPfp}
                         alt="Profile"
                         className="w-32 h-32 rounded-full border-4 border-white dark:border-gray-800 object-cover bg-white"
                     />

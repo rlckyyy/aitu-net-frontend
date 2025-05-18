@@ -1,14 +1,14 @@
 "use client";
 
-import {ChatMessage, ChatMessageStatus} from "@/models/chat/chatMessage";
+import {ChatMessage, ChatMessageStatus} from "@/models/chat/ChatMessage";
 import React, {RefObject, useEffect, useRef, useState} from "react";
 import {InputMessageBarComponent} from "@/components/chats/InputMessageBarComponent";
-import {ChatRoom, ChatRoomType} from "@/models/chat/chatRoom";
+import {ChatRoom, ChatRoomType} from "@/models/chat/ChatRoom";
 import {useAuth} from "@/context/AuthProvider";
 import {useIsMobile} from "@/hooks/useIsMobile";
 import {Loading} from "@/components/Loading";
 import {Client, Message} from "@stomp/stompjs";
-import AudioCall from "@/components/chats/AudioCallComponent";
+import AudioCall from "@/components/chats/messages/AudioCallComponent";
 import {ChatRoomDetails} from "@/components/chats/ChatRoomDetails";
 import {defaultPfp} from "../../../public/modules/defaultPfp";
 import {MessageRenderer, MessageRendererProps} from "@/components/chats/messages/MessageRenderer";
@@ -28,8 +28,8 @@ interface ChatWindowComponentProps {
 
 type ConnectionStatus = "OFFLINE" | "ONLINE"
 
-interface Body {
-    status: ConnectionStatus
+interface StatusMessage {
+    status: ConnectionStatus;
 }
 
 export const ChatWindowComponent = ({
@@ -73,7 +73,7 @@ export const ChatWindowComponent = ({
         }
 
         return () => {
-            stompClientRef.current?.unsubscribe(destination)
+            destination && stompClientRef.current?.unsubscribe(destination)
         }
     }, [currentChatId])
 
@@ -86,7 +86,7 @@ export const ChatWindowComponent = ({
     }
 
     function onStatusReceived(message: Message) {
-        const statusMessage: Body = JSON.parse(message.body)
+        const statusMessage: StatusMessage = JSON.parse(message.body)
         setConnStatus(statusMessage.status)
     }
 
@@ -94,10 +94,13 @@ export const ChatWindowComponent = ({
         return messageRenderStrategies[chatMessage.type](chatMessage)
     }
 
-    function isFirstUnreadMessage(chatMessage: ChatMessage) {
+    function isFirstUnreadMessage(chatMessage: ChatMessage, index: number) {
+        if (index === chatMessages.length - 1) {
+            return messagesEndRef
+        }
         return chatMessage.status === ChatMessageStatus.RECEIVED && messagesEndRef.current === null
             ? messagesEndRef
-            : null;
+            : null
     }
 
     return (
@@ -143,14 +146,12 @@ export const ChatWindowComponent = ({
 
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {chatMessages ? (
-                    chatMessages.map(chatMessage => {
+                    chatMessages.map((chatMessage, index) => {
                         return (
-                            <div ref={isFirstUnreadMessage(chatMessage)}>
-                                <React.Fragment key={chatMessage.id}>
-                                    {displayChatMessage(chatMessage)}
-                                </React.Fragment>
+                            <div key={chatMessage.id} ref={isFirstUnreadMessage(chatMessage, index)}>
+                                {displayChatMessage(chatMessage)}
                             </div>
-                        );
+                        )
                     })
                 ) : (
                     <div className="flex items-center justify-center h-full">

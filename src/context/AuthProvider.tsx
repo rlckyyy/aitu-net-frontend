@@ -1,16 +1,16 @@
 "use client";
 
-import {User} from "@/models/user";
+import {User} from "@/models/User";
 import {createContext, ReactNode, useContext, useEffect, useState} from "react";
 import {api} from "@/lib";
-import {UserRegister} from "@/models/userRegister";
+import {NewUserRequest} from "@/models/NewUserRequest";
 
 interface AuthContextType {
     user: User | null;
     loadUser: () => void;
     loginUser: (userData: { email: string; password: string }) => Promise<void>;
     logout: () => void;
-    register: (userRegData: UserRegister) => Promise<void>;
+    register: (userRegData: NewUserRequest) => Promise<void>;
 }
 
 interface AuthProviderProps {
@@ -52,7 +52,7 @@ export function AuthProvider({children}: AuthProviderProps) {
             })
     }
 
-    const register = async (userRegData: UserRegister) => {
+    const register = async (userRegData: NewUserRequest) => {
         return api.auth.register(userRegData)
             .then(response => console.log("Registration successful:", response.data))
             .catch(error => {

@@ -1,91 +1,14 @@
 import {useEffect, useRef, useState} from "react";
-import {ChatMessage} from "@/models/chat/chatMessage";
+import {ChatMessage} from "@/models/chat/ChatMessage";
 import {Client, Message} from "@stomp/stompjs";
 import {useSearchParams} from "next/navigation";
 import {useAuth} from "@/context/AuthProvider";
 import {api} from "@/lib";
 import SockJS from "sockjs-client";
-import {ChatRoom, ChatRoomType} from "@/models/chat/chatRoom";
-import {ChatRoomWithMessages} from "@/models/chat/chatRoomWithMessages";
-
-interface ChatStrategy {
-    getChatId(): Promise<string>;
-}
-
-export type NewChatRoomRequest = {
-    title?: string,
-    participantsIds: string[];
-    chatRoomType: ChatRoomType;
-}
-
-/**
- * Chat strategy that depends on other users
- * */
-class CompanionChatStrategy implements ChatStrategy {
-
-    constructor(private readonly searchParams: URLSearchParams,
-                private readonly chatRooms: Map<string, ChatRoom>,
-                private readonly api: any,
-                private readonly pushToChatRooms: (room: ChatRoom) => void
-    ) {
-    }
-
-    async getChatId(): Promise<string> {
-        const companionId = this.searchParams.get("companionId")!
-        const maybeChatRoom = [...this.chatRooms.values()]
-            .find(chatRoom => {
-                chatRoom.participants.values().filter(u => u.id === companionId)
-            })
-
-        if (!maybeChatRoom) {
-            const request: NewChatRoomRequest = {
-                participantsIds: [companionId],
-                chatRoomType: ChatRoomType.ONE_TO_ONE
-            }
-            const chatRoom = (await this.api.chat.createChatRoom(request)).data;
-            this.pushToChatRooms(chatRoom)
-            return chatRoom.chatId
-        } else {
-            return maybeChatRoom.chatId
-        }
-    }
-}
-
-/**
- * Native behavioural chat strategy
- * */
-class DefaultChatStrategy implements ChatStrategy {
-
-    constructor(private readonly searchParams: URLSearchParams) {
-    }
-
-    async getChatId(): Promise<string> {
-        return this.searchParams.get("chatId")!
-    }
-}
-
-/**
- * Empty chat strategy
- * */
-class NoOpStrategy implements ChatStrategy {
-    async getChatId(): Promise<string> {
-        return ''
-    }
-}
-
-type StrategyDeps = {
-    searchParams: URLSearchParams,
-    chatRooms: Map<string, ChatRoom>,
-    api: any,
-    pushToChatRooms: (room: ChatRoom) => void
-}
-
-const strategyRegistry: Record<string, (deps: StrategyDeps) => ChatStrategy> = {
-    companionId: ({searchParams, chatRooms, api, pushToChatRooms}) =>
-        new CompanionChatStrategy(searchParams, chatRooms, api, pushToChatRooms),
-    chatId: ({searchParams}) =>
-        new DefaultChatStrategy(searchParams)
-}
+import {ChatRoom} from "@/models/chat/ChatRoom";
+import {ChatRoomWithMessages} from "@/models/chat/ChatRoomWithMessages";
+import {WSMessage, WSMessageType} from "@/models/chat/WSMessage";
+import {getStrategy, StrategyDeps} from "@/strategies/chat/registry";
 
 export function useChat() {
     const {user} = useAuth()
@@ -120,7 +43,7 @@ export function useChat() {
     }, [user])
 
     useEffect(() => {
-        chatRooms?.size && Array.from(chatRooms.keys()).map(chatId => {
+        Array.from(chatRooms.keys()).map(chatId => {
             api.chat.countNewMessages(chatId)
                 .then(response => response.data.count)
                 .then(count => {
@@ -185,12 +108,19 @@ export function useChat() {
     }
 
     const onMessageReceived = (message: Message) => {
-        const chatMessage = JSON.parse(message.body) as ChatMessage
-        console.log('message received', chatMessage)
-        if (!chatRooms.has(chatMessage.chatId)) {
-            fetchAndSetChatRooms()
+        const messageObject: WSMessage = JSON.parse(message.body)
+        if (messageObject.type === WSMessageType.CHAT_MESSAGE) {
+            const chatMessage: ChatMessage = messageObject.message
+            console.log('message received', chatMessage)
+            if (!chatRooms.has(chatMessage.chatId)) {
+                fetchAndSetChatRooms()
+            }
+            pushToChatMessages(chatMessage)
+        } else if (messageObject.type === WSMessageType.CHAT_ROOM) {
+            const chatRoom: ChatRoom = messageObject.message
+            console.log("NEW CHAT ROOM CREATED", chatRoom)
+            pushToChatRooms(chatRoom)
         }
-        pushToChatMessages(chatMessage)
     }
 
     function sendMessage(chatMessage: ChatMessage, destination: string = '/app/chat'): void {
@@ -248,16 +178,6 @@ export function useChat() {
             newChatRoomMessages.set(chatMessage.chatId, [...newChatRoomMessages.get(chatMessage.chatId) ?? [], chatMessage])
             return newChatRoomMessages
         })
-    }
-
-    function getStrategy(deps: StrategyDeps): ChatStrategy {
-        for (const key of Object.keys(strategyRegistry)) {
-            if (deps.searchParams.has(key)) {
-                return strategyRegistry[key](deps)
-            }
-        }
-
-        return new NoOpStrategy()
     }
 
     return {chatRooms, chatRoomMessages, currentChatId, stompClientRef, newMessagesCount, selectChat, sendMessage, markMessageAsRead}

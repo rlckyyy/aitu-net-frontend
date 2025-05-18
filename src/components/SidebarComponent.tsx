@@ -1,6 +1,6 @@
 import Link from "next/link";
-import {Group, Home, MessageCircle, User, Users} from "lucide-react";
-import {User as UserModel} from "../models/user"
+import {Group, Home, MessageCircle, User as UserIcon, Users} from "lucide-react";
+import {User} from "@/models/User"
 import {useIsMobile} from "@/hooks/useIsMobile";
 import React, {ReactNode} from "react";
 
@@ -9,7 +9,7 @@ const defaultIconSize = 20;
 
 const authLinks: { href: string, label: string, icon: ReactNode }[] = [
     {href: '/', label: 'Home', icon: <Home size={defaultIconSize} className={defaultIconClassName}/>},
-    {href: '/users/profile', label: 'Me', icon: <User size={defaultIconSize} className={defaultIconClassName}/>},
+    {href: '/users/profile', label: 'Me', icon: <UserIcon size={defaultIconSize} className={defaultIconClassName}/>},
     {href: '/chat', label: 'Chat', icon: <MessageCircle size={defaultIconSize} className={defaultIconClassName}/>},
     {href: '/group', label: 'Group', icon: <Group size={defaultIconSize} className={defaultIconClassName}/>},
     {href: '/friends', label: 'Friends', icon: <Users size={defaultIconSize} className={defaultIconClassName}/>},
@@ -17,7 +17,7 @@ const authLinks: { href: string, label: string, icon: ReactNode }[] = [
 
 const publicLinks: { href: string, label: string, icon: ReactNode }[] = [
     {href: '/', label: 'Home', icon: <Home size={defaultIconSize} className={defaultIconClassName}/>},
-    {href: '/auth/login', label: 'Login', icon: <User size={defaultIconSize} className={defaultIconClassName}/>},
+    {href: '/auth/login', label: 'Login', icon: <UserIcon size={defaultIconSize} className={defaultIconClassName}/>},
     {href: '/auth/register', label: 'Register', icon: <Users size={defaultIconSize} className={defaultIconClassName}/>},
 ];
 
@@ -41,7 +41,7 @@ const NavLink: React.FC<NavLinkProps> = ({href, label, icon}) => (
 );
 
 interface SidebarComponentProps {
-    user: UserModel | null
+    user: User | null
 }
 
 const SidebarComponent: React.FC<SidebarComponentProps> = ({user}) => {

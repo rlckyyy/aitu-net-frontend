@@ -1,10 +1,10 @@
 import {request} from "@/lib/apiClient";
-import {User} from "@/models/user";
+import {User} from "@/models/User";
 import {AxiosResponse} from "axios";
-import {UserRegister} from "@/models/userRegister";
+import {NewUserRequest} from "@/models/NewUserRequest";
 
 export const authApi = {
-    register: (userRegData: UserRegister) =>
+    register: (userRegData: NewUserRequest) =>
         request<User>('/auth/register', {method: 'POST', data: userRegData}),
 
     login: async (userData: { email: string; password: string }): Promise<AxiosResponse<{ token: string }>> =>

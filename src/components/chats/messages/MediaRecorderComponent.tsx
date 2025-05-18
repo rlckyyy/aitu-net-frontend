@@ -1,9 +1,9 @@
 import React, {ReactElement, useRef, useState} from "react";
 import {Mic, MicOff, Video, VideoOff} from "lucide-react";
-import {ChatMessage, ChatMessageStatus, MessageType} from "@/models/chat/chatMessage";
+import {ChatMessage, ChatMessageStatus, MessageType} from "@/models/chat/ChatMessage";
 import {api} from "@/lib";
 import {useAuth} from "@/context/AuthProvider";
-import {VideoMessagePreviewModal} from "@/components/chats/VideoMessagePreviewModal";
+import {VideoMessagePreviewModal} from "@/components/chats/messages/VideoMessagePreviewModal";
 import {useTime} from "@/hooks/useTime";
 
 interface VideoRecorderProps {

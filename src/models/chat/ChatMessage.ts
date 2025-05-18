@@ -1,6 +1,6 @@
 export enum ChatMessageStatus {
     RECEIVED = "RECEIVED",
-    DELIVERED = "DELIVERED"// todo: properly process the message status
+    DELIVERED = "DELIVERED"
 }
 
 export enum MessageType {

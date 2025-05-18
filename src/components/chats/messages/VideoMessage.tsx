@@ -1,7 +1,7 @@
 import React, {useRef} from "react";
 import {MessageRenderProps} from "@/components/chats/messages/messageRenderProps";
 
-export const VideoMessage: React.FC<MessageRenderProps> = ({chatMessage, currentUser}) => {
+export const VideoMessage: React.FC<MessageRenderProps> = ({chatMessage, currentUser, markMessageAsRead}) => {
 
     const videoRef = useRef<HTMLVideoElement>(null)
     const isOwn = chatMessage.senderId === currentUser.id
@@ -16,7 +16,8 @@ export const VideoMessage: React.FC<MessageRenderProps> = ({chatMessage, current
                                ? e.currentTarget.play()
                                : e.currentTarget.pause()
                        }}
-                       preload={"metadata"} src={`${chatMessage.content}#t=0.5`}
+                       onPlay={() => markMessageAsRead(chatMessage)}
+                       preload={"metadata"} playsInline={true} src={`${chatMessage.content}#t=0.5`}
                        className={"rounded-full object-cover w-[250px] h-[250px]"}
                 >
                     <source type="video/mp4"/>
@@ -24,7 +25,7 @@ export const VideoMessage: React.FC<MessageRenderProps> = ({chatMessage, current
             </div>
             <div className={`flex ${isOwn ? "justify-end" : "justify-start"}`}
             >
-                The length of video message {chatMessage.length}
+                {chatMessage.length} secs
             </div>
         </>
     )

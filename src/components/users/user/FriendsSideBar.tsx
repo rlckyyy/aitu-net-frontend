@@ -3,7 +3,7 @@
 import {User as UserIcon, Users} from "lucide-react";
 import Link from "next/link";
 import React, {useEffect, useState} from "react";
-import {User} from "@/models/user";
+import {User} from "@/models/User";
 import {api} from "@/lib";
 
 export default function FriendsSideBar({userId}: { userId: string }) {

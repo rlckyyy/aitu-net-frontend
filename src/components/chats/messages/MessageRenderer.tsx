@@ -1,4 +1,4 @@
-import {ChatMessage, MessageType} from "@/models/chat/chatMessage";
+import {ChatMessage, MessageType} from "@/models/chat/ChatMessage";
 import React, {JSX} from "react";
 import {TextMessage} from "@/components/chats/messages/TextMessage";
 import {AudioMessage} from "@/components/chats/messages/AudioMessage";

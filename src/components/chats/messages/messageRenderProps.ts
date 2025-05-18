@@ -1,5 +1,5 @@
-import {ChatMessage} from "@/models/chat/chatMessage";
-import {User} from "@/models/user";
+import {ChatMessage} from "@/models/chat/ChatMessage";
+import {User} from "@/models/User";
 
 export interface MessageRenderProps {
     chatMessage: ChatMessage;

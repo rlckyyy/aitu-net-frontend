@@ -8,7 +8,7 @@ import {formatDistanceToNow} from "date-fns";
 import clsx from "clsx";
 import {MediaFiles} from "@/components/MediaFiles";
 import {useAuth} from "@/context/AuthProvider";
-import {User} from "@/models/user";
+import {User} from "@/models/User";
 import {ThumbsDown, ThumbsUp} from "lucide-react";
 
 interface PostUnitProps {

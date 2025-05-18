@@ -1,10 +1,10 @@
-import {User} from "@/models/user";
+import {User} from "@/models/User";
 import {request} from "@/lib/apiClient";
-import {ChatMessage} from "@/models/chat/chatMessage";
-import {ChatRoom} from "@/models/chat/chatRoom";
+import {ChatMessage} from "@/models/chat/ChatMessage";
+import {ChatRoom} from "@/models/chat/ChatRoom";
 import {AxiosResponse} from "axios";
 import {NewChatRoomRequest} from "@/hooks/useChat";
-import {ChatRoomWithMessages} from "@/models/chat/chatRoomWithMessages";
+import {ChatRoomWithMessages} from "@/models/chat/ChatRoomWithMessages";
 
 export const chatApi = {
     fetchChatRooms: (idOrEmail?: string): Promise<AxiosResponse<ChatRoom[]>> =>

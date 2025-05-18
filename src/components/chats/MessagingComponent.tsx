@@ -3,7 +3,7 @@
 import {useChat} from "@/hooks/useChat";
 import {ChatRoomsComponent} from "@/components/chats/ChatRoomsComponent";
 import {ChatWindowComponent} from "@/components/chats/ChatWindowComponent";
-import {ChatMessage} from "@/models/chat/chatMessage";
+import {ChatMessage} from "@/models/chat/ChatMessage";
 import {useIsMobile} from "@/hooks/useIsMobile";
 import {Loading} from "@/components/Loading";
 

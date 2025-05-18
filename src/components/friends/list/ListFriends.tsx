@@ -2,7 +2,7 @@
 
 import {useAuth} from "@/context/AuthProvider";
 import {useEffect, useState} from "react";
-import type {User} from "@/models/user";
+import type {User} from "@/models/User";
 import Link from "next/link";
 import {MessageCircle, UserIcon} from "lucide-react";
 import {useRouter} from "next/navigation";

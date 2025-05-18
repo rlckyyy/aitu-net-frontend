@@ -3,7 +3,7 @@
 import React from "react";
 import {MessageCircle, Search} from "lucide-react";
 import Dropdown from "@/components/chats/DropDown";
-import {ChatRoom} from "@/models/chat/chatRoom";
+import {ChatRoom} from "@/models/chat/ChatRoom";
 import {useAuth} from "@/context/AuthProvider";
 import {defaultPfp} from "../../../public/modules/defaultPfp";
 import {Loading} from "@/components/Loading";
@@ -56,7 +56,7 @@ export const ChatRoomsComponent: React.FC<ChatRoomsPageProps> = ({selectChat, ch
                                     <div
                                         className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
                                         <img
-                                            src={user?.avatar?.location || defaultPfp}
+                                            src={user.avatar?.location || defaultPfp}
                                             alt="Profile"
                                             className="w-15 h-12 rounded-full border-4 border-white dark:border-gray-800 object-cover bg-white"
                                         />
@@ -69,7 +69,9 @@ export const ChatRoomsComponent: React.FC<ChatRoomsPageProps> = ({selectChat, ch
                                     <p className="text-xs text-gray-500 dark:text-gray-400 truncate">Click to view
                                         conversation</p>
                                 </div>
-                                <div>{newMessagesCount.get(chatRoom.chatId)}</div>
+                                {!!newMessagesCount.get(chatRoom.chatId) &&
+                                    <div>{newMessagesCount.get(chatRoom.chatId)}</div>
+                                }
                                 <div></div>
                             </button>
                         ))}
