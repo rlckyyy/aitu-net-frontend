@@ -5,7 +5,8 @@ import type React from "react";
 import {useState} from "react";
 import {useAuth} from "@/context/AuthProvider";
 import Link from "next/link";
-import {Mail, Lock, LogIn} from "lucide-react";
+import {Lock, LogIn, Mail} from "lucide-react";
+import {api} from "@/lib";
 
 export default function LoginForm() {
     const [email, setEmail] = useState("");
@@ -13,7 +14,24 @@ export default function LoginForm() {
     const [error, setError] = useState("");
     const router = useRouter();
     const {loginUser} = useAuth();
+    const [showForgotModal, setShowForgotModal] = useState(false);
+    const [resetEmail, setResetEmail] = useState('');
+    const [resetMessage, setResetMessage] = useState('');
+    const [resetError, setResetError] = useState('');
 
+    const handleForgotPassword = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setResetMessage('');
+        setResetError('');
+        try {
+            await api.auth.forgotPassword(resetEmail);
+            setResetMessage('Password reset link has been sent to your email.');
+            setResetEmail('');
+        } catch (err: any) {
+            const problem: ProblemDetail = err;
+            setResetError(problem.detail || 'Something went wrong.');
+        }
+    };
     const handleLogin = (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
@@ -110,10 +128,13 @@ export default function LoginForm() {
                             </div>
 
                             <div className="text-sm">
-                                <a href="#"
-                                   className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowForgotModal(true)}
+                                    className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400"
+                                >
                                     Forgot your password?
-                                </a>
+                                </button>
                             </div>
                         </div>
 
@@ -131,6 +152,41 @@ export default function LoginForm() {
                     </form>
                 </div>
             </div>
+            {showForgotModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+                    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 w-full max-w-md">
+                        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Reset your password</h3>
+                        <form onSubmit={handleForgotPassword} className="space-y-4">
+                            <input
+                                type="email"
+                                placeholder="Enter your email"
+                                value={resetEmail}
+                                onChange={(e) => setResetEmail(e.target.value)}
+                                required
+                                className="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-white"
+                            />
+                            {resetError && <p className="text-sm text-red-600 dark:text-red-400">{resetError}</p>}
+                            {resetMessage &&
+                                <p className="text-sm text-green-600 dark:text-green-400">{resetMessage}</p>}
+                            <div className="flex justify-end space-x-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowForgotModal(false)}
+                                    className="text-gray-700 dark:text-gray-300 hover:underline"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 text-sm"
+                                >
+                                    Send Reset Link
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
