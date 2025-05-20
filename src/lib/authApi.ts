@@ -19,7 +19,7 @@ export const authApi = {
         await request('/auth/forgot', {method: 'GET', params: {email}})
     },
 
-    recoverPassword: async (email: string , token: string, password: string) => {
-        await request('/auth/recover', {method: 'PATCH', params: {email, token, password}})
+    recoverPassword: async (token: string, password: string) => {
+        await request('/auth/recover', {method: 'PATCH', params: {token, password}})
     }
 };

@@ -7,7 +7,6 @@ import {api} from "@/lib";
 export default function RecoverPasswordComp() {
     const params = useSearchParams();
     const token = params.get('token');
-    const email = params.get('email');
 
     const [password, setPassword] = useState('');
     const [password2, setPassword2] = useState('');
@@ -19,7 +18,7 @@ export default function RecoverPasswordComp() {
         setError('');
         setMessage('');
 
-        if (!token || !email) {
+        if (!token) {
             setError("Invalid recovery link.");
             return;
         }
@@ -31,7 +30,7 @@ export default function RecoverPasswordComp() {
 
         try {
             setLoading(true);
-            await api.auth.recoverPassword(email, token, password);
+            await api.auth.recoverPassword(token, password);
             setMessage("Your password has been successfully updated.");
             setPassword('');
             setPassword2('');
