@@ -7,11 +7,13 @@ import {useRouter} from "next/navigation";
 import {api} from "@/lib";
 import {ArrowLeft, FileText, Save, User} from "lucide-react";
 import Link from "next/link";
+import {AccessType} from "@/models/group/accessType";
 
 export default function () {
     const {user} = useAuth();
     const [username, setUsername] = useState<string | null>(null);
     const [description, setDescription] = useState<string | null>(null);
+    const [accessType, setAccessType] = useState<AccessType | null>(null);
     const router = useRouter();
 
     const handleSubmit = (e: FormEvent) => {
@@ -19,8 +21,9 @@ export default function () {
         const req: ProfileUpdate = {
             username: username ?? user?.username,
             description: description ?? user?.description,
+            accessType: accessType ?? user?.accessType,
         };
-        api.user.updateUser(req)
+        api.user.updateUser(req);
         router.push(`/users/profile`);
     };
 
@@ -36,6 +39,7 @@ export default function () {
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
+                {/* Username */}
                 <div className="space-y-1">
                     <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Username
@@ -54,6 +58,7 @@ export default function () {
                     </div>
                 </div>
 
+                {/* Description */}
                 <div className="space-y-1">
                     <label htmlFor="description" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Bio
@@ -74,6 +79,38 @@ export default function () {
                         yourself.</p>
                 </div>
 
+                {/* AccessType Selector */}
+                <div className="space-y-1">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                        Access Type
+                    </label>
+                    <div className="flex space-x-4 mt-2">
+                        <button
+                            type="button"
+                            onClick={() => setAccessType(AccessType.PUBLIC)}
+                            className={`px-4 py-2 rounded-md border ${
+                                (accessType ?? user?.accessType) === AccessType.PUBLIC
+                                    ? "bg-indigo-600 text-white border-indigo-600"
+                                    : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600"
+                            } focus:outline-none`}
+                        >
+                            Public
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setAccessType(AccessType.PRIVATE)}
+                            className={`px-4 py-2 rounded-md border ${
+                                (accessType ?? user?.accessType) === AccessType.PRIVATE
+                                    ? "bg-indigo-600 text-white border-indigo-600"
+                                    : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600"
+                            } focus:outline-none`}
+                        >
+                            Private
+                        </button>
+                    </div>
+                </div>
+
+                {/* Submit button */}
                 <div className="pt-4">
                     <button
                         type="submit"

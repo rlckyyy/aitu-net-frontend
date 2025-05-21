@@ -38,6 +38,7 @@ export default function UserPosts() {
             await api.post.createPost(newPost, newPostFiles);
             setNewPostDescription("");
             setNewPostFiles([]);
+            setIsCreatePostModalOpen(false);
             api.post
                 .searchPosts(undefined, user?.id, PostType.USER, undefined)
                 .then((r) => setPosts(r.data));

@@ -20,8 +20,20 @@ export default function UserProfile() {
     const userId = searchParams.get("userId") ? searchParams.get("userId")! : undefined;
     const router = useRouter();
     const {user: currUser} = useAuth();
+    // const pathname = usePathname();
+
+    // useEffect(() => {
+    //     console.log("Curr user:", currUser);
+    //     console.log("User ID:", userId);
+    //     if (currUser?.id === userId && pathname !== "/users/profile") {
+    //         console.log("Redirecting to profile page");
+    //         router.push(`/users/profile`);
+    //     }
+    // }, [userId]);
 
     useEffect(() => {
+        console.log("Curr user:", currUser);
+        console.log("User ID:", userId);
         if (userId) {
             setLoading(true);
             console.log("Fetching user data for ID:", userId);

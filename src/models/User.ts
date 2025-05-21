@@ -1,3 +1,5 @@
+import {AccessType} from "@/models/group/accessType";
+
 export interface User {
     id: string;
     email: string;
@@ -10,6 +12,7 @@ export interface User {
     showConnectionDetails: boolean;
     leftOn: Date;
     connectedOn: Date;
+    accessType: AccessType;
 }
 
 export interface Avatar {

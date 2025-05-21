@@ -1,4 +1,4 @@
-import {Post} from "@/models/post/post";
+import {Post, PostType} from "@/models/post/post";
 import {useEffect, useState} from "react";
 import {Reaction, ReactionType} from "@/models/reaction/reaction";
 import {api} from "@/lib";
@@ -10,6 +10,7 @@ import {MediaFiles} from "@/components/MediaFiles";
 import {useAuth} from "@/context/AuthProvider";
 import {User} from "@/models/User";
 import {ThumbsDown, ThumbsUp} from "lucide-react";
+import {Group} from "@/models/group/group";
 
 interface PostUnitProps {
     post: Post;
@@ -21,6 +22,7 @@ export default function PostUnit({post}: PostUnitProps) {
     const [newComment, setNewComment] = useState('');
     const {user} = useAuth();
     const [userMap, setUserMap] = useState<Record<string, User>>();
+    const [resourceOwner, setResourceOwner] = useState<User | Group | null>(null);
     const userReaction = reactions.find(r => r.userId === user?.id);
 
 
@@ -31,6 +33,14 @@ export default function PostUnit({post}: PostUnitProps) {
         api.comment.getComments(params).then(r => setComments(r.data));
         api.post.getReactions(post.id).then(r => setReactions(r.data));
     }, []);
+    useEffect(() => {
+        console.log(post);
+        if (post.postType === PostType.GROUP && post.groupId) {
+            api.group.getById(post.groupId).then(r => setResourceOwner(r.data));
+        } else if (post.postType === PostType.USER && post.ownerId) {
+            api.user.getUserById(post.ownerId).then(r => setResourceOwner(r.data));
+        }
+    }, [post.postType, post.ownerId, post.groupId]);
 
     useEffect(() => {
         const uniqueUserIds = Array.from(new Set(comments.map(c => c.userId).filter(Boolean))) as string[];
@@ -100,7 +110,7 @@ export default function PostUnit({post}: PostUnitProps) {
                 {/* Header */}
                 <div className="flex items-center space-x-4 mb-4">
                     <img
-                        src={user?.avatar?.location || defaultPfp}
+                        src={resourceOwner?.avatar?.location || defaultPfp}
                         alt="avatar"
                         className="w-10 h-10 rounded-full object-cover"
                     />
