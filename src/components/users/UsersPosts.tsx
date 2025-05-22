@@ -25,6 +25,9 @@ export default function UserPosts() {
             setNewPostFiles(Array.from(e.target.files));
         }
     };
+    const handleDeletePost = (postId: string) => {
+        setPosts((prevPosts) => prevPosts.filter(post => post.id !== postId));
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -106,7 +109,7 @@ export default function UserPosts() {
 
             {/* Список постов */}
             <div className="space-y-4">
-                <PostFeed posts={posts}/>
+                <PostFeed posts={posts} onDelete={handleDeletePost}/>
             </div>
         </div>
     );
