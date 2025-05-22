@@ -47,6 +47,9 @@ export default function GroupProfile() {
             console.error("Error creating post:", error);
         }
     };
+    const handleDeletePost = (postId: string) => {
+        setPosts((prevPosts) => prevPosts.filter(post => post.id !== postId));
+    };
 
     return (
         <div className="max-w-4xl mx-auto mt-6 p-6 bg-white dark:bg-gray-900 shadow-lg rounded-2xl">
@@ -85,7 +88,7 @@ export default function GroupProfile() {
 
             {/* Лента постов */}
             <div className="space-y-4">
-                <PostFeed posts={posts}/>
+                <PostFeed posts={posts} onDelete={handleDeletePost}/>
             </div>
 
             {/* Модалка */}

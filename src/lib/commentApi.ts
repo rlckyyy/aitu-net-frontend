@@ -18,5 +18,9 @@ export const commentApi = {
     deleteComment: async (commentId: string) => {
         return await request(`/comments/${commentId}`,
             {method: 'DELETE'});
+    },
+    updateComment: async (commentId: string, update: { content: string }) => {
+        return await request(`/comments/${commentId}`,
+            {method: 'PATCH', data: update});
     }
 }

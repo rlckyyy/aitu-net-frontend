@@ -4,9 +4,10 @@ import PostUnit from "@/components/posts/Post";
 
 export interface PostFeedProps {
     posts: Post[];
+    onDelete: (postId: string) => void;
 }
 
-export const PostFeed: React.FC<PostFeedProps> = ({posts}) => {
+export const PostFeed: React.FC<PostFeedProps> = ({posts, onDelete}) => {
 
     if (!posts) {
         return <Loading/>
@@ -19,7 +20,7 @@ export const PostFeed: React.FC<PostFeedProps> = ({posts}) => {
     return (
         <div className="space-y-6 mt-6">
             {posts.map(post => (
-                <PostUnit post={post} key={post.id}/>
+                <PostUnit post={post} key={post.id} onDelete={onDelete}/>
             ))}
         </div>
     );

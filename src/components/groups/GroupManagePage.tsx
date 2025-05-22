@@ -32,6 +32,9 @@ export default function GroupManagePage() {
             setAvatar(e.target.files[0]);
         }
     };
+    const handleDeletePost = (postId: string) => {
+        setPosts((prevPosts) => prevPosts.filter(post => post.id !== postId));
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -126,7 +129,7 @@ export default function GroupManagePage() {
 
                 {/* Список постов */}
                 <div className="mt-6 space-y-4">
-                    <PostFeed posts={posts}/>
+                    <PostFeed posts={posts} onDelete={handleDeletePost}/>
                 </div>
             </div>
 

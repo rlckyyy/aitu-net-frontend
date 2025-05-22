@@ -44,9 +44,7 @@ export default function ClientLayout({children}: { children: React.ReactNode }) 
                                     <img
                                         src={user?.avatar?.location || defaultPfp}
                                         alt="User Avatar"
-                                        width={40}
-                                        height={40}
-                                        className="rounded-full cursor-pointer border border-gray-200 dark:border-gray-600 hover:ring-2 hover:ring-indigo-400 transition-all"
+                                        className="w-10 h-10 object-cover rounded-full border border-gray-200 dark:border-gray-600 hover:ring-2 hover:ring-indigo-400 transition-all"
                                     />
                                 </button>
                                 {menuOpen && (

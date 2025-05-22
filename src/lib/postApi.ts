@@ -63,5 +63,8 @@ export const postApi = {
 
     getReactions: async (postId: string) => {
         return await request<Reaction[]>(`/post/public/${postId}/reactions`);
+    },
+    deletePost: async (id: string) => {
+        return await request(`/post/${id}`, {method: 'DELETE'});
     }
 };

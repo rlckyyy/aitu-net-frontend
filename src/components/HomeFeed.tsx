@@ -4,8 +4,6 @@ import React, {useEffect, useState} from "react";
 import {Post, PostDTO, PostType} from "@/models/post/post";
 import {api} from "@/lib";
 import {useAuth} from "@/context/AuthProvider";
-import clsx from "clsx";
-import {MediaFiles} from "@/components/MediaFiles";
 import {PostFeed} from "@/components/posts/PostFeed";
 
 export default function HomeFeed() {
@@ -14,6 +12,8 @@ export default function HomeFeed() {
     const [newPostFiles, setNewPostFiles] = useState<File[]>([]);
     const [posts, setPosts] = useState<Post[]>([]);
     const {user} = useAuth();
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
 
 
     useEffect(() => {
@@ -21,6 +21,10 @@ export default function HomeFeed() {
             .searchPosts(undefined, undefined, undefined, undefined)
             .then((r) => setPosts(r.data));
     }, []);
+
+    const handleDeletePost = (postId: string) => {
+        setPosts((prevPosts) => prevPosts.filter(post => post.id !== postId));
+    };
 
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -31,7 +35,8 @@ export default function HomeFeed() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
+        if (isSubmitting) return;
+        setIsSubmitting(true);
         const newPost: PostDTO = {
             ownerId: user?.id,
             postType: PostType.USER,
@@ -48,6 +53,8 @@ export default function HomeFeed() {
             setPosts(response.data);
         } catch (error) {
             console.error("Error creating post:", error);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -93,7 +100,8 @@ export default function HomeFeed() {
                             <div className="flex justify-end">
                                 <button
                                     type="submit"
-                                    className="px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-md transition-colors duration-200"
+                                    disabled={isSubmitting}
+                                    className={`px-5 py-2 rounded-xl shadow-md transition-colors duration-200 ${isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700 text-white"}`}
                                 >
                                     Add Post
                                 </button>
@@ -105,7 +113,7 @@ export default function HomeFeed() {
 
             {/* Лента постов */}
             <div className="space-y-4 mt-6">
-                <PostFeed posts={posts}/>
+                <PostFeed posts={posts} onDelete={handleDeletePost}/>
             </div>
         </div>
     );

@@ -10,6 +10,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.4",
+    "@heroicons/react": "^2.2.0",
     "@stomp/stompjs": "^7.0.0",
     "axios": "^1.7.9",
     "clsx": "^2.1.1",

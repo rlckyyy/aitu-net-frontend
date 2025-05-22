@@ -31,6 +31,11 @@ export default function UserProfile() {
     //     }
     // }, [userId]);
 
+    const handleDeletePost = (postId: string) => {
+        setPosts((prevPosts) => prevPosts.filter(post => post.id !== postId));
+    };
+
+
     useEffect(() => {
         console.log("Curr user:", currUser);
         console.log("User ID:", userId);
@@ -165,7 +170,7 @@ export default function UserProfile() {
                 </div>
             </div>
             <div className="m-6">
-                <PostFeed posts={posts}/>
+                <PostFeed posts={posts} onDelete={handleDeletePost}/>
             </div>
         </div>
     );
