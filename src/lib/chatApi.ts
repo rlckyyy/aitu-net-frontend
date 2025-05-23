@@ -10,8 +10,6 @@ export const chatApi = {
     fetchChatRooms: (idOrEmail?: string): Promise<AxiosResponse<ChatRoom[]>> =>
         (request<ChatRoom[]>(`/chats/rooms/${idOrEmail ?? ''}`)),
 
-    searchUsers: (query: string): Promise<AxiosResponse<User[]>> =>
-        (request<User[]>(`/chats/users/search?query=${query}`)),
 
     /**
      * Current user will be added at api if absent.

@@ -22,7 +22,7 @@ export default function SearchComponent() {
             setLoading(false);
             return;
         }
-        api.chat
+        api.user
             .searchUsers(query)
             .then(response => setUsers(response.data))
             .finally(() => setLoading(false));

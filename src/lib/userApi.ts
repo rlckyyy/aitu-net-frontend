@@ -9,6 +9,9 @@ export const userApi = {
 
     deleteProfilePhoto: () => request('/users/profile/photo', { method: 'DELETE' }),
 
+    searchUsers: (query: string): Promise<AxiosResponse<User[]>> =>
+        (request<User[]>(`/users/public/search?query=${query}`)),
+
     uploadProfilePhoto: (file: File) => {
         const formData = new FormData();
         formData.append('file', file);
