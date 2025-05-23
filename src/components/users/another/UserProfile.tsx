@@ -11,6 +11,7 @@ import {PostFeed} from "@/components/posts/PostFeed";
 import {Loading} from "@/components/Loading";
 import FriendsSideBar from "@/components/users/user/FriendsSideBar";
 import {defaultPfp} from "../../../../public/modules/defaultPfp";
+import {AccessType} from "@/models/group/accessType";
 
 export default function UserProfile() {
     const [user, setUser] = useState<User | null>(null);
@@ -20,16 +21,24 @@ export default function UserProfile() {
     const userId = searchParams.get("userId") ? searchParams.get("userId")! : undefined;
     const router = useRouter();
     const {user: currUser} = useAuth();
-    // const pathname = usePathname();
+    const [isOpen, setIsOpen] = useState<boolean>();
 
-    // useEffect(() => {
-    //     console.log("Curr user:", currUser);
-    //     console.log("User ID:", userId);
-    //     if (currUser?.id === userId && pathname !== "/users/profile") {
-    //         console.log("Redirecting to profile page");
-    //         router.push(`/users/profile`);
-    //     }
-    // }, [userId]);
+    useEffect(() => {
+        if (currUser?.id === userId) {
+            console.log("Redirecting to profile page");
+            router.push(`/users/profile`);
+        }
+    }, [userId]);
+
+    useEffect(() => {
+        if (!user) return;
+
+        const isPublic = user.accessType === AccessType.PUBLIC;
+        const isFriend = currUser?.friendList.includes(user.id) ?? false;
+
+        const canOpen = isPublic || isFriend;
+        setIsOpen(canOpen);
+    }, [user, currUser]);
 
     const handleDeletePost = (postId: string) => {
         setPosts((prevPosts) => prevPosts.filter(post => post.id !== postId));
@@ -58,7 +67,7 @@ export default function UserProfile() {
         api.post.searchPosts(undefined, userId, PostType.USER, undefined)
             .then(response => setPosts(response.data))
             .catch(e => console.error("Error while fetching posts", e));
-    }, [posts]);
+    }, [userId]);
 
     const handleSendMessage = () => {
         if (user?.email) {
@@ -111,67 +120,85 @@ export default function UserProfile() {
 
                 {currUser && (
                     <div className="absolute bottom-4 right-4 flex space-x-2">
-                        <button
-                            onClick={handleSendMessage}
-                            className="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 rounded-lg shadow hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700"
-                        >
-                            <MessageCircle size={16} className="mr-2"/>
-                            Message
-                        </button>
+                        {isOpen && (
+                            <button
+                                onClick={handleSendMessage}
+                                className="inline-flex items-center px-4 py-2 bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 rounded-lg shadow hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border border-gray-200 dark:border-gray-700"
+                            >
+                                <MessageCircle size={16} className="mr-2" />
+                                Message
+                            </button>
+                        )}
 
-                        {!currUser.friendList.includes(user.email) && (
+                        {!currUser.friendList.includes(user.id) && (
                             <button
                                 onClick={handleSendFriendRequest}
                                 className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700 transition-colors"
                             >
-                                <UserPlus size={16} className="mr-2"/>
+                                <UserPlus size={16} className="mr-2" />
                                 Add Friend
                             </button>
                         )}
-
                     </div>
                 )}
+
             </div>
 
             <div className="pt-20 px-8 pb-8">
                 <div className="flex flex-col md:flex-row gap-8">
-                    {/* Left column - User info */}
+                    {/* Left column - Always visible basic info */}
                     <div className="flex-1">
                         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{user.username}</h1>
-                        {user?.description &&
-                            <p className="mt-2 text-gray-600 dark:text-gray-300">{user.description}</p>}
 
-                        <div className="mt-6 space-y-4">
-                            <div className="flex items-center">
-                                <Mail className="w-5 h-5 text-gray-500 dark:text-gray-400 mr-2"/>
-                                <span className="text-gray-700 dark:text-gray-300">{user.email}</span>
-                            </div>
+                        {!isOpen ? (
+                            <p className="mt-4 text-gray-500 dark:text-gray-400 italic">
+                                This profile is private. Only friends can view more details.
+                            </p>
+                        ) : (
+                            <>
+                                {user?.description && (
+                                    <p className="mt-2 text-gray-600 dark:text-gray-300">{user.description}</p>
+                                )}
 
-                            <div className="flex items-center">
-                                <Shield className="w-5 h-5 text-gray-500 dark:text-gray-400 mr-2"/>
-                                <span
-                                    className="text-gray-700 dark:text-gray-300">{user?.roles?.join(", ") || "Member"}</span>
-                            </div>
-
-                            {user?.description && (
-                                <div className="flex items-start">
-                                    <FileText className="w-5 h-5 text-gray-500 dark:text-gray-400 mr-2 mt-1"/>
-                                    <div>
-                                        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Bio</h3>
-                                        <p className="text-gray-600 dark:text-gray-400">{user.description}</p>
+                                <div className="mt-6 space-y-4">
+                                    <div className="flex items-center">
+                                        <Mail className="w-5 h-5 text-gray-500 dark:text-gray-400 mr-2"/>
+                                        <span className="text-gray-700 dark:text-gray-300">{user.email}</span>
                                     </div>
+
+                                    <div className="flex items-center">
+                                        <Shield className="w-5 h-5 text-gray-500 dark:text-gray-400 mr-2"/>
+                                        <span className="text-gray-700 dark:text-gray-300">
+                                        {user?.roles?.join(", ") || "Member"}
+                                    </span>
+                                    </div>
+
+                                    {user?.description && (
+                                        <div className="flex items-start">
+                                            <FileText className="w-5 h-5 text-gray-500 dark:text-gray-400 mr-2 mt-1"/>
+                                            <div>
+                                                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Bio</h3>
+                                                <p className="text-gray-600 dark:text-gray-400">{user.description}</p>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-                        </div>
+                            </>
+                        )}
                     </div>
 
-                    {/* Right column - Friends */}
-                    <FriendsSideBar userId={user.id}/>
+                    {/* Right column - Friends only if isOpen */}
+                    {isOpen && <FriendsSideBar userId={user.id}/>}
                 </div>
             </div>
-            <div className="m-6">
-                <PostFeed posts={posts} onDelete={handleDeletePost}/>
-            </div>
+
+            {/* Posts only if isOpen */}
+            {isOpen && (
+                <div className="m-6">
+                    <PostFeed posts={posts} onDelete={handleDeletePost}/>
+                </div>
+            )}
         </div>
     );
+
 }
