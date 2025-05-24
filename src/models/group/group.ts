@@ -17,4 +17,6 @@ export interface Group {
     postIds: string[];
     adminIds: string[];
     ownerId: string;
+    createdAt: Date;
+    updatedAt: Date;
 }

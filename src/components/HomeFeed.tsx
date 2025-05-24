@@ -19,8 +19,16 @@ export default function HomeFeed() {
     useEffect(() => {
         api.post
             .searchPosts(undefined, undefined, undefined, undefined)
-            .then((r) => setPosts(r.data));
+            .then((r) => {
+                const sortedPosts = [...r.data].sort((a, b) => {
+                    const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+                    const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+                    return dateB - dateA;
+                });
+                setPosts(sortedPosts);
+            });
     }, []);
+
 
     const handleDeletePost = (postId: string) => {
         setPosts((prevPosts) => prevPosts.filter(post => post.id !== postId));

@@ -36,6 +36,7 @@ export default function GroupProfile() {
     const [loadingPosts, setLoadingPosts] = useState(false);
     const {user} = useAuth();
     const isAdmin = user?.id ? group?.adminIds.includes(user.id) : false;
+    const createdAtDate = group?.createdAt ? new Date(group.createdAt) : null;
 
 
     useEffect(() => {
@@ -223,7 +224,15 @@ export default function GroupProfile() {
                                 </div>
                                 <div className="flex items-center">
                                     <Calendar size={20} className="mr-2"/>
-                                    <span>Created {new Date().getFullYear()}</span>
+                                    {createdAtDate ? (
+                                        <span>
+    Created {createdAtDate.getDate()}{" "}
+                                            {createdAtDate.toLocaleString("default", {month: "long"})}{" "}
+                                            {createdAtDate.getFullYear()}
+  </span>
+                                    ) : (
+                                        <span>This year</span>
+                                    )}
                                 </div>
                                 <div className="flex items-center">
                                     <FileText size={20} className="mr-2"/>
