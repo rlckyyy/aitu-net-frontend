@@ -5,6 +5,7 @@ import {ReactElement, useState} from "react";
 import ListFriends from "@/components/friends/list/ListFriends";
 import ReceivedRequests from "@/components/friends/respond-requests/ReceivedRequests";
 import SendRequests from "@/components/friends/send-requests/SendRequests";
+import {useAuth} from "@/context/AuthProvider";
 
 const defaultIconClassName = "text-indigo-500";
 const defaultIconSize = 20;
@@ -30,14 +31,14 @@ const tabs = [
 ]
 
 export default function FriendLayout() {
-
+    const {user} = useAuth();
     const [selectedTab, setSelectedTab] = useState<tabTypes>("list");
     const baseClasses = "px-4 py-2 text-sm font-medium text-gray-900bg-white border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:hover:text-white dark:hover:bg-gray-700 dark:focus:ring-blue-500 dark:focus:text-white"
 
     function displayWindow(): ReactElement {
         switch (selectedTab) {
             case "list":
-                return <ListFriends/>
+                return <ListFriends userIdProp={user?.id}/>
             case "received":
                 return <ReceivedRequests/>
             case "sent":

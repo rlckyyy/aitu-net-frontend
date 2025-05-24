@@ -8,18 +8,31 @@ import {useRouter, useSearchParams} from "next/navigation";
 import {defaultPfp} from "../../../../public/modules/defaultPfp";
 import {api} from "@/lib";
 
+interface FriendsProps {
+    userIdProp?: string;
+}
 
-export default function ListFriends() {
+export default function ListFriends({userIdProp}: FriendsProps) {
     const [friends, setFriends] = useState<User[]>([]);
     const router = useRouter();
     const searchParams = useSearchParams();
     const userId = searchParams.get("userId");
 
     useEffect(() => {
-        if (userId){
-            api.friends.getUserFriendList(userId).then(response => setFriends(response.data));
+        const fetchFriends = async (id: string) => {
+            try {
+                const response = await api.friends.getUserFriendList(id);
+                setFriends(response.data);
+            } catch (error) {
+                console.error("Failed to fetch friends:", error);
+            }
+        };
+
+        const idToFetch = userIdProp || userId;
+        if (idToFetch) {
+            fetchFriends(idToFetch);
         }
-    }, [userId]);
+    }, [userIdProp, userId]);
 
     return (
         <div
