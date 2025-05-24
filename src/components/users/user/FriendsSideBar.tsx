@@ -2,7 +2,7 @@
 
 import {User as UserIcon, Users} from "lucide-react";
 import Link from "next/link";
-import React, {useEffect, useState} from "react";
+import React, {use, useEffect, useState} from "react";
 import {User} from "@/models/User";
 import {api} from "@/lib";
 
@@ -21,8 +21,10 @@ export default function FriendsSideBar({userId}: { userId: string }) {
                         <Users className="w-5 h-5 mr-2"/>
                         Friends
                     </h2>
-                    <Link href="/friends/list"
-                          className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">
+                    <Link
+                        href={`/friends/list?userId=${userId}`}
+                        className="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
+                    >
                         View all
                     </Link>
                 </div>

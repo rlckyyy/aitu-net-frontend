@@ -19,7 +19,6 @@ export default function Profile() {
     const menuRef = useRef<HTMLDivElement | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-    // Handle file upload
     const handleUpload = useCallback(async () => {
         if (!selectedFile || !user) return;
 
@@ -38,17 +37,14 @@ export default function Profile() {
         }
     }, [selectedFile, user, loadUser]);
 
-    // Handle file selection
     const handleFileChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
-            // Validate file size (max 5MB)
-            if (file.size > 5 * 1024 * 1024) {
-                setUploadError("File size must be less than 5MB");
+            if (file.size > 10 * 1024 * 1024) {
+                setUploadError("File size must be less than 10MB");
                 return;
             }
 
-            // Validate file type
             if (!file.type.startsWith('image/')) {
                 setUploadError("Please select an image file");
                 return;
@@ -58,13 +54,11 @@ export default function Profile() {
             setSelectedFile(file);
         }
 
-        // Reset file input
         if (event.target) {
             event.target.value = '';
         }
     }, []);
 
-    // Handle photo deletion
     const handleDelete = useCallback(async () => {
         if (!user?.avatar) return;
 
@@ -80,13 +74,11 @@ export default function Profile() {
         }
     }, [user?.avatar, loadUser]);
 
-    // Toggle menu
     const toggleMenu = useCallback(() => {
         setMenuOpen(prev => !prev);
         setUploadError("");
     }, []);
 
-    // Handle click outside menu
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -104,7 +96,6 @@ export default function Profile() {
         };
     }, [menuOpen]);
 
-    // Auto-upload when file is selected
     useEffect(() => {
         if (selectedFile) {
             handleUpload();

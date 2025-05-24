@@ -31,6 +31,7 @@ export default function UserProfile() {
     useEffect(() => {
         loadUser()
     }, []);
+
     useEffect(() => {
         if (currUser?.id === userId) {
             console.log("Redirecting to profile page");
