@@ -35,8 +35,9 @@ export default function GroupProfile() {
     const [loading, setLoading] = useState(true);
     const [loadingPosts, setLoadingPosts] = useState(false);
     const {user} = useAuth();
+    const isAdmin = user?.id ? group?.adminIds.includes(user.id) : false;
 
-    // Fetch group data and posts
+
     useEffect(() => {
         if (!groupId) return;
 
@@ -61,7 +62,6 @@ export default function GroupProfile() {
         fetchGroupData();
     }, [groupId]);
 
-    // Handle post submission
     const handleSubmit = useCallback(async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -83,7 +83,6 @@ export default function GroupProfile() {
         try {
             await api.post.createPost(post, postFiles);
 
-            // Reset form
             setPostDescription("");
             setPostFiles([]);
             setIsModalOpen(false);
@@ -101,16 +100,13 @@ export default function GroupProfile() {
         }
     }, [postDescription, postFiles, groupId, user?.id]);
 
-    // Handle post deletion
     const handleDeletePost = useCallback((postId: string) => {
         setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
     }, []);
 
-    // Handle file selection
     const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
 
-        // Validate files
         const validFiles = files.filter(file => {
             if (file.size > 10 * 1024 * 1024) { // 10MB limit
                 setError(`File ${file.name} is too large. Maximum size is 10MB.`);
@@ -125,7 +121,6 @@ export default function GroupProfile() {
         }
     }, []);
 
-    // Close modal handler
     const closeModal = useCallback(() => {
         setIsModalOpen(false);
         setPostDescription("");
@@ -194,15 +189,17 @@ export default function GroupProfile() {
                         </div>
 
                         {/* Create Post Button */}
-                        <div className="absolute bottom-6 right-6">
-                            <button
-                                onClick={() => setIsModalOpen(true)}
-                                className="inline-flex items-center px-6 py-3 bg-white/90 backdrop-blur-sm hover:bg-white text-gray-900 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-white/20 font-medium"
-                            >
-                                <PlusCircle size={18} className="mr-2"/>
-                                Create Post
-                            </button>
-                        </div>
+                        {isAdmin && (
+                            <div className="absolute bottom-6 right-6">
+                                <button
+                                    onClick={() => setIsModalOpen(true)}
+                                    className="inline-flex items-center px-6 py-3 bg-white/90 backdrop-blur-sm hover:bg-white text-gray-900 rounded-xl shadow-lg hover:shadow-xl transition-all duration-200 border border-white/20 font-medium"
+                                >
+                                    <PlusCircle size={18} className="mr-2"/>
+                                    Create Post
+                                </button>
+                            </div>
+                        )}
                     </div>
 
                     {/* Group Information */}
