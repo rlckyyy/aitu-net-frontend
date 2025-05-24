@@ -14,8 +14,6 @@ export default function HomeFeed() {
     const {user} = useAuth();
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-
-
     useEffect(() => {
         api.post
             .searchPosts(undefined, undefined, undefined, undefined)

@@ -18,10 +18,12 @@ export default function SearchComponent() {
     const {user} = useAuth();
 
     useEffect(() => {
+        console.log("Query: ", query);
         if (!query || query === "") {
             setLoading(false);
             return;
         }
+        console.log("Query 2: ", query);
         api.user
             .searchUsers(query)
             .then(response => setUsers(response.data))
