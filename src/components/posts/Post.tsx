@@ -1,202 +1,432 @@
-import {Post, PostType} from "@/models/post/post";
-import {useEffect, useState} from "react";
-import {Reaction, ReactionType} from "@/models/reaction/reaction";
-import {api} from "@/lib";
-import {Comment, CommentCriteria} from "@/models/comment/comment";
-import {defaultPfp} from "../../../public/modules/defaultPfp";
-import {formatDistanceToNow} from "date-fns";
+import { Post, PostType } from "@/models/post/post";
+import { useEffect, useState, useCallback, useMemo } from "react";
+import { Reaction, ReactionType } from "@/models/reaction/reaction";
+import { api } from "@/lib";
+import { Comment, CommentCriteria } from "@/models/comment/comment";
+import { defaultPfp } from "../../../public/modules/defaultPfp";
+import { formatDistanceToNow } from "date-fns";
 import clsx from "clsx";
-import {MediaFiles} from "@/components/MediaFiles";
-import {useAuth} from "@/context/AuthProvider";
-import {User} from "@/models/User";
-import {MoreVertical, ThumbsDown, ThumbsUp} from "lucide-react";
-import {Group} from "@/models/group/group";
-import {Menu} from "@headlessui/react";
-import {CommentList} from "@/components/comments/Comment";
+import { MediaFiles } from "@/components/MediaFiles";
+import { useAuth } from "@/context/AuthProvider";
+import { User } from "@/models/User";
+import {
+    MoreVertical,
+    ThumbsDown,
+    ThumbsUp,
+    Edit3,
+    Trash2,
+    X,
+    Check,
+    Heart,
+    MessageCircle,
+    Share2
+} from "lucide-react";
+import { Group } from "@/models/group/group";
+import { Menu, Transition } from "@headlessui/react";
+import { CommentList } from "@/components/comments/Comment";
+import { Fragment } from "react";
 
 interface PostUnitProps {
     post: Post;
     onDelete?: (postId: string) => void;
+    onEdit?: (postId: string, description: string) => void;
 }
 
-export default function PostUnit({post, onDelete}: PostUnitProps) {
+export default function PostUnit({ post, onDelete, onEdit }: PostUnitProps) {
     const [comments, setComments] = useState<Comment[]>([]);
     const [reactions, setReactions] = useState<Reaction[]>([]);
-    const {user} = useAuth();
     const [resourceOwner, setResourceOwner] = useState<User | Group | null>(null);
-    const userReaction = reactions.find(r => r.userId === user?.id);
-    useEffect(() => {
-        const params: CommentCriteria = {
-            postId: post.id,
-        };
-        api.comment.getComments(params).then(r => setComments(r.data));
-        api.post.getReactions(post.id).then(r => setReactions(r.data));
-    }, []);
+    const [isEditing, setIsEditing] = useState(false);
+    const [editedDescription, setEditedDescription] = useState(post.description || "");
+    const [isLoading, setIsLoading] = useState(false);
+    const [showComments, setShowComments] = useState(false);
 
+    const { user } = useAuth();
+
+    // Мемоизированные значения для оптимизации
+    const userReaction = useMemo(() =>
+            reactions.find(r => r.userId === user?.id),
+        [reactions, user?.id]
+    );
+
+    const likesCount = useMemo(() =>
+            reactions.filter(r => r.reactionType === ReactionType.LIKE).length,
+        [reactions]
+    );
+
+    const dislikesCount = useMemo(() =>
+            reactions.filter(r => r.reactionType === ReactionType.DISLIKE).length,
+        [reactions]
+    );
+
+    const isOwner = useMemo(() =>
+            user?.id === post.ownerId,
+        [user?.id, post.ownerId]
+    );
+
+    // Загрузка данных
     useEffect(() => {
-        if (post.postType === PostType.GROUP && post.groupId) {
-            api.group.getById(post.groupId).then(r => setResourceOwner(r.data));
-        } else if (post.postType === PostType.USER && post.ownerId) {
-            api.user.getUserById(post.ownerId).then(r => setResourceOwner(r.data));
-        }
+        const loadData = async () => {
+            try {
+                setIsLoading(true);
+                const [commentsRes, reactionsRes] = await Promise.all([
+                    api.comment.getComments({ postId: post.id } as CommentCriteria),
+                    api.post.getReactions(post.id)
+                ]);
+
+                setComments(commentsRes.data);
+                setReactions(reactionsRes.data);
+            } catch (error) {
+                console.error('Failed to load post data:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        loadData();
+    }, [post.id]);
+
+    // Загрузка владельца поста
+    useEffect(() => {
+        const loadOwner = async () => {
+            try {
+                if (post.postType === PostType.GROUP && post.groupId) {
+                    const res = await api.group.getById(post.groupId);
+                    setResourceOwner(res.data);
+                } else if (post.postType === PostType.USER && post.ownerId) {
+                    const res = await api.user.getUserById(post.ownerId);
+                    setResourceOwner(res.data);
+                }
+            } catch (error) {
+                console.error('Failed to load post owner:', error);
+            }
+        };
+
+        loadOwner();
     }, [post.postType, post.ownerId, post.groupId]);
 
-    const handleReaction = async (reactionType: ReactionType) => {
+    // Обработка реакций
+    const handleReaction = useCallback(async (reactionType: ReactionType) => {
         if (!user) return;
-        const existingReaction = reactions.find((r) => r.userId === user?.id);
 
-        if (existingReaction) {
-            if (existingReaction.reactionType === reactionType) {
-                await api.post.deletePostReaction(post.id, user?.id);
-                setReactions(reactions.filter((r) => r.userId !== user?.id));
+        const existingReaction = reactions.find(r => r.userId === user.id);
+
+        try {
+            if (existingReaction) {
+                if (existingReaction.reactionType === reactionType) {
+                    // Удаляем реакцию
+                    await api.post.deletePostReaction(post.id, user.id);
+                    setReactions(prev => prev.filter(r => r.userId !== user.id));
+                } else {
+                    // Изменяем реакцию
+                    const updatedReaction = { ...existingReaction, reactionType };
+                    await api.post.updatePostReaction(updatedReaction);
+                    setReactions(prev => prev.map(r =>
+                        r.userId === user.id ? updatedReaction : r
+                    ));
+                }
             } else {
-                existingReaction.reactionType = reactionType;
-                await api.post.updatePostReaction(existingReaction);
-                setReactions([...reactions.filter((r) => r.userId !== user?.id), existingReaction]);
+                // Добавляем новую реакцию
+                const newReaction: Reaction = {
+                    userId: user.id,
+                    postId: post.id,
+                    reactionType
+                };
+                await api.post.updatePostReaction(newReaction);
+                setReactions(prev => [...prev, newReaction]);
             }
-        } else {
-            const newReaction: Reaction = {
-                userId: user.id,
-                postId: post.id,
-                reactionType: reactionType
-            };
-            await api.post.updatePostReaction(newReaction);
-            setReactions([...reactions, newReaction]);
+        } catch (error) {
+            console.error('Failed to update reaction:', error);
         }
-    };
+    }, [user, reactions, post.id]);
 
+    // Обработка удаления поста
+    const handleDeletePost = useCallback(async () => {
+        if (!window.confirm('Are you sure you want to delete this post?')) return;
 
-    const handleDeletePost = async () => {
-        await api.post.deletePost(post.id);
-        if (onDelete) onDelete(post.id);
-    };
+        try {
+            await api.post.deletePost(post.id);
+            onDelete?.(post.id);
+        } catch (error) {
+            console.error('Failed to delete post:', error);
+        }
+    }, [post.id, onDelete]);
+
+    // Обработка редактирования поста
+    const handleEditPost = useCallback(async () => {
+        if (editedDescription.trim() === post.description?.trim()) {
+            setIsEditing(false);
+            return;
+        }
+
+        try {
+            await api.post.updatePost(post.id, { description: editedDescription });
+            setIsEditing(false);
+            post.description = editedDescription;
+            onEdit?.(post.id, editedDescription);
+        } catch (error) {
+            console.error('Failed to update post:', error);
+        }
+    }, [editedDescription, post, onEdit]);
+
+    const cancelEdit = useCallback(() => {
+        setIsEditing(false);
+        setEditedDescription(post.description || "");
+    }, [post.description]);
+
+    if (isLoading) {
+        return (
+            <div className="bg-white dark:bg-gray-900 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 animate-pulse">
+                <div className="flex items-center space-x-4 mb-4">
+                    <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                    <div className="flex-1">
+                        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2"></div>
+                        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
+                    </div>
+                </div>
+                <div className="h-20 bg-gray-200 dark:bg-gray-700 rounded mb-4"></div>
+            </div>
+        );
+    }
 
     return (
-        <div className="space-y-6 mt-6">
-            <div
-                key={post.id}
-                className="bg-white dark:bg-gray-900 p-5 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700"
-            >
-                <div className="flex items-center justify-between mb-4">
+        <article className="bg-white dark:bg-gray-900 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-gray-100 dark:hover:shadow-gray-900/50">
+            {/* Заголовок поста */}
+            <div className="p-6 pb-4">
+                <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                        <img
-                            src={resourceOwner?.avatar?.location || defaultPfp}
-                            alt="avatar"
-                            className="w-10 h-10 rounded-full object-cover"
-                        />
+                        <div className="relative">
+                            <img
+                                src={resourceOwner?.avatar?.location || defaultPfp}
+                                alt={`${post.resource || "Unknown"} avatar`}
+                                className="w-12 h-12 rounded-full object-cover ring-2 ring-gray-100 dark:ring-gray-800"
+                            />
+                            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full ring-2 ring-white dark:ring-gray-900"></div>
+                        </div>
                         <div className="flex flex-col">
-              <span className="font-semibold text-gray-900 dark:text-white">
-                {post.resource || "Unknown"}
-              </span>
-                            <span className="text-xs text-gray-500 dark:text-gray-400">
-                {post.createdAt
-                    ? formatDistanceToNow(new Date(post.createdAt), {addSuffix: true})
-                    : "Just now"}
-              </span>
+                            <h3 className="font-semibold text-gray-900 dark:text-white text-lg">
+                                {post.resource || "Unknown"}
+                            </h3>
+                            <time className="text-sm text-gray-500 dark:text-gray-400">
+                                {post.createdAt
+                                    ? formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })
+                                    : "Just now"}
+                            </time>
                         </div>
                     </div>
 
-                    {/* Dropdown Menu */}
-                    <Menu as="div" className="relative inline-block text-left">
-                        <Menu.Button className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800">
-                            <MoreVertical className="w-5 h-5 text-gray-500 dark:text-gray-400"/>
-                        </Menu.Button>
+                    {/* Меню действий */}
+                    {isOwner && (
+                        <Menu as="div" className="relative">
+                            <Menu.Button className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200">
+                                <MoreVertical className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+                            </Menu.Button>
 
-                        <Menu.Items
-                            className="absolute right-0 z-10 mt-2 w-36 origin-top-right rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                            <div className="py-1">
-                                <Menu.Item>
-                                    {({active}) => (
-                                        <button
-                                            onClick={handleDeletePost}
-                                            className={`${
-                                                active
-                                                    ? "bg-red-100 text-red-700 dark:bg-red-900 dark:text-white"
-                                                    : "text-red-600 dark:text-red-400"
-                                            } block w-full text-left px-4 py-2 text-sm`}
-                                        >
-                                            Delete Post
-                                        </button>
-                                    )}
-                                </Menu.Item>
-                            </div>
-                        </Menu.Items>
-                    </Menu>
-                </div>
-
-                {/* Description */}
-                <p
-                    className={clsx(
-                        "text-sm mb-4",
-                        post.description
-                            ? "text-gray-800 dark:text-gray-200"
-                            : "italic text-gray-500 dark:text-gray-400"
+                            <Transition
+                                as={Fragment}
+                                enter="transition ease-out duration-100"
+                                enterFrom="transform opacity-0 scale-95"
+                                enterTo="transform opacity-100 scale-100"
+                                leave="transition ease-in duration-75"
+                                leaveFrom="transform opacity-100 scale-100"
+                                leaveTo="transform opacity-0 scale-95"
+                            >
+                                <Menu.Items className="absolute right-0 z-20 mt-2 w-48 origin-top-right rounded-2xl bg-white dark:bg-gray-800 shadow-xl ring-1 ring-black ring-opacity-5 focus:outline-none border border-gray-100 dark:border-gray-700">
+                                    <div className="p-2">
+                                        <Menu.Item>
+                                            {({ active }) => (
+                                                <button
+                                                    onClick={() => setIsEditing(true)}
+                                                    className={clsx(
+                                                        "flex items-center space-x-3 w-full text-left px-4 py-3 text-sm rounded-xl transition-colors duration-200",
+                                                        active
+                                                            ? "bg-blue-50 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300"
+                                                            : "text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+                                                    )}
+                                                >
+                                                    <Edit3 className="w-4 h-4" />
+                                                    <span>Edit</span>
+                                                </button>
+                                            )}
+                                        </Menu.Item>
+                                        <Menu.Item>
+                                            {({ active }) => (
+                                                <button
+                                                    onClick={handleDeletePost}
+                                                    className={clsx(
+                                                        "flex items-center space-x-3 w-full text-left px-4 py-3 text-sm rounded-xl transition-colors duration-200",
+                                                        active
+                                                            ? "bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-300"
+                                                            : "text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                                    )}
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                    <span>Delete</span>
+                                                </button>
+                                            )}
+                                        </Menu.Item>
+                                    </div>
+                                </Menu.Items>
+                            </Transition>
+                        </Menu>
                     )}
-                >
-                    {post.description || "No description"}
-                </p>
+                </div>
+            </div>
 
-                {/* Media */}
-                {post.mediaFileIds && post.mediaFileIds.length > 0 && (
-                    <div className="mb-4">
-                        <MediaFiles mediaFileIds={post.mediaFileIds}/>
+            {/* Контент поста */}
+            <div className="px-6">
+                {isEditing ? (
+                    <div className="mb-6">
+                        <div className="relative">
+              <textarea
+                  value={editedDescription}
+                  onChange={(e) => setEditedDescription(e.target.value)}
+                  placeholder="What's on your mind?"
+                  className="w-full min-h-[120px] p-4 border border-gray-200 dark:border-gray-700 rounded-2xl bg-gray-50 dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  rows={4}
+              />
+                        </div>
+                        <div className="flex justify-end space-x-3 mt-4">
+                            <button
+                                onClick={cancelEdit}
+                                className="flex items-center space-x-2 px-4 py-2 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200"
+                            >
+                                <X className="w-4 h-4" />
+                                <span>Cancel</span>
+                            </button>
+                            <button
+                                onClick={handleEditPost}
+                                className="flex items-center space-x-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl transition-colors duration-200 font-medium"
+                            >
+                                <Check className="w-4 h-4" />
+                                <span>Save</span>
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="mb-6">
+                        <p className={clsx(
+                            "text-gray-800 dark:text-gray-200 leading-relaxed",
+                            !post.description && "italic text-gray-500 dark:text-gray-400"
+                        )}>
+                            {post.description || "No description"}
+                        </p>
                     </div>
                 )}
 
-                {/* Reactions */}
-                <div className="flex flex-col items-start space-y-2 pt-3">
-                    <div className="flex items-end space-x-6">
-                        {/* Like */}
+                {/* Медиафайлы */}
+                {post.mediaFileIds && post.mediaFileIds.length > 0 && (
+                    <div className="mb-6">
+                        <MediaFiles mediaFileIds={post.mediaFileIds} />
+                    </div>
+                )}
+            </div>
+
+            {/* Статистика и действия */}
+            <div className="px-6 pb-4">
+                {/* Статистика реакций */}
+                {(likesCount > 0 || dislikesCount > 0) && (
+                    <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-100 dark:border-gray-800">
+                        <div className="flex items-center space-x-6">
+                            {likesCount > 0 && (
+                                <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+                                    <div className="flex items-center space-x-1">
+                                        <div className="w-6 h-6 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                                            <ThumbsUp className="w-3 h-3 text-blue-600 dark:text-blue-400" />
+                                        </div>
+                                        <span>{likesCount}</span>
+                                    </div>
+                                </div>
+                            )}
+                            {dislikesCount > 0 && (
+                                <div className="flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-400">
+                                    <div className="flex items-center space-x-1">
+                                        <div className="w-6 h-6 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+                                            <ThumbsDown className="w-3 h-3 text-red-600 dark:text-red-400" />
+                                        </div>
+                                        <span>{dislikesCount}</span>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                        <button
+                            onClick={() => setShowComments(!showComments)}
+                            className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-colors duration-200"
+                        >
+                            {comments.length} comments
+                        </button>
+                    </div>
+                )}
+
+                {/* Кнопки действий */}
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-1">
+                        {/* Лайк */}
                         <button
                             onClick={() => handleReaction(ReactionType.LIKE)}
-                            className="group transition-all duration-200 transform hover:scale-110 active:scale-95"
                             disabled={!user}
+                            className={clsx(
+                                "flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 group",
+                                userReaction?.reactionType === ReactionType.LIKE
+                                    ? "bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400"
+                                    : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-blue-600 dark:hover:text-blue-400",
+                                !user && "opacity-50 cursor-not-allowed"
+                            )}
                         >
                             <ThumbsUp
-                                size={28}
-                                className={`transition-colors duration-300 ${
-                                    userReaction?.reactionType === ReactionType.LIKE
-                                        ? 'text-blue-600 dark:text-blue-400'
-                                        : 'text-gray-400 dark:text-gray-500 group-hover:text-blue-500'
-                                }`}
-                                fill={
-                                    userReaction?.reactionType === ReactionType.LIKE ? '#2563eb' : 'none'
-                                }
+                                className={clsx(
+                                    "w-5 h-5 transition-all duration-300",
+                                    userReaction?.reactionType === ReactionType.LIKE && "scale-110"
+                                )}
                             />
+                            <span className="font-medium">Like</span>
                         </button>
 
-                        {/* Dislike */}
+                        {/* Дизлайк */}
                         <button
                             onClick={() => handleReaction(ReactionType.DISLIKE)}
-                            className="group transition-all duration-200 transform hover:scale-110 active:scale-95"
                             disabled={!user}
+                            className={clsx(
+                                "flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-300 group",
+                                userReaction?.reactionType === ReactionType.DISLIKE
+                                    ? "bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400"
+                                    : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-red-600 dark:hover:text-red-400",
+                                !user && "opacity-50 cursor-not-allowed"
+                            )}
                         >
                             <ThumbsDown
-                                size={28}
-                                className={`transition-colors duration-300 ${
-                                    userReaction?.reactionType === ReactionType.DISLIKE
-                                        ? 'text-red-600 dark:text-red-400'
-                                        : 'text-gray-400 dark:text-gray-500 group-hover:text-red-500'
-                                }`}
-                                fill={
-                                    userReaction?.reactionType === ReactionType.DISLIKE ? '#dc2626' : 'none'
-                                }
+                                className={clsx(
+                                    "w-5 h-5 transition-all duration-300",
+                                    userReaction?.reactionType === ReactionType.DISLIKE && "scale-110"
+                                )}
                             />
+                            <span className="font-medium">Dislike</span>
                         </button>
                     </div>
-                    <div
-                        className="ml-1 mt-1 px-3 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300 shadow-sm w-fit">
-                        {reactions.filter(r => r.reactionType === ReactionType.LIKE).length} Likes
+
+                    {/* Comments Button */}
+                    <button
+                        onClick={() => setShowComments(!showComments)}
+                        className="flex items-center space-x-2 px-4 py-2 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-800 dark:hover:text-gray-200 rounded-xl transition-all duration-200"
+                    >
+                        <MessageCircle className="w-5 h-5" />
+                        <span className="font-medium">Comment</span>
+                    </button>
+                </div>
+            </div>
+
+            {/* Comments Section */}
+            {showComments && (
+                <div className="mt-4 mx-6 mb-6">
+                    <div className="border-t border-gray-100 dark:border-gray-800 pt-4">
+                        <CommentList
+                            postId={post.id}
+                            initialComments={comments}
+                            currentUserId={user?.id}
+                        />
                     </div>
                 </div>
-
-                <CommentList
-                    postId={post.id}
-                    initialComments={comments}
-                    currentUserId={user?.id}
-                />
-
-            </div>
-        </div>
+            )}
+        </article>
     );
 }

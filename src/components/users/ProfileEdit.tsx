@@ -1,7 +1,7 @@
 "use client";
 
 import {useAuth} from "@/context/AuthProvider";
-import {type FormEvent, useState} from "react";
+import {type FormEvent, useEffect, useState} from "react";
 import type {ProfileUpdate} from "@/models/ProfileUpdate";
 import {useRouter} from "next/navigation";
 import {api} from "@/lib";
@@ -13,8 +13,9 @@ export default function () {
     const {user} = useAuth();
     const [username, setUsername] = useState<string | null>(null);
     const [description, setDescription] = useState<string | null>(null);
-    const [accessType, setAccessType] = useState<AccessType | null>(null);
+    const [accessType, setAccessType] = useState<AccessType>(user?.accessType ?? AccessType.PUBLIC);
     const router = useRouter();
+
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
@@ -82,31 +83,36 @@ export default function () {
                 {/* AccessType Selector */}
                 <div className="space-y-1">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Access Type
+                        Profile Visibility
                     </label>
-                    <div className="flex space-x-4 mt-2">
-                        <button
-                            type="button"
-                            onClick={() => setAccessType(AccessType.PUBLIC)}
-                            className={`px-4 py-2 rounded-md border ${
-                                (accessType ?? user?.accessType) === AccessType.PUBLIC
-                                    ? "bg-indigo-600 text-white border-indigo-600"
-                                    : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600"
-                            } focus:outline-none`}
-                        >
-                            Public
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setAccessType(AccessType.PRIVATE)}
-                            className={`px-4 py-2 rounded-md border ${
-                                (accessType ?? user?.accessType) === AccessType.PRIVATE
-                                    ? "bg-indigo-600 text-white border-indigo-600"
-                                    : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600"
-                            } focus:outline-none`}
-                        >
-                            Private
-                        </button>
+                    <div className="mt-1">
+                        <div className="inline-flex rounded-md shadow-sm border border-gray-300 dark:border-gray-600">
+                            <button
+                                type="button"
+                                onClick={() => setAccessType(AccessType.PUBLIC)}
+                                className={`px-4 py-2 text-sm font-medium rounded-l-md focus:z-10 focus:outline-none 
+                    ${accessType === AccessType.PUBLIC
+                                    ? "bg-indigo-600 text-white"
+                                    : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"}`}
+                            >
+                                🌐 Public
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setAccessType(AccessType.PRIVATE)}
+                                className={`px-4 py-2 text-sm font-medium rounded-r-md focus:z-10 focus:outline-none 
+                    ${accessType === AccessType.PRIVATE
+                                    ? "bg-indigo-600 text-white"
+                                    : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"}`}
+                            >
+                                🔒 Private
+                            </button>
+                        </div>
+                        <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                            {accessType === AccessType.PUBLIC
+                                ? "Your profile will be visible to everyone."
+                                : "Your profile will be visible only to you and your friends."}
+                        </p>
                     </div>
                 </div>
 
