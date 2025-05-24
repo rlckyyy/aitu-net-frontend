@@ -25,10 +25,12 @@ export default function UserProfile() {
     const searchParams = useSearchParams();
     const userId = searchParams.get("userId") || undefined;
     const router = useRouter();
-    const {user: currUser} = useAuth();
+    const {user: currUser, loadUser} = useAuth();
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
-    // Redirect if viewing own profile
+    useEffect(() => {
+        loadUser()
+    }, []);
     useEffect(() => {
         if (currUser?.id === userId) {
             console.log("Redirecting to profile page");
@@ -36,7 +38,6 @@ export default function UserProfile() {
         }
     }, [userId, currUser?.id, router]);
 
-    // Calculate profile access
     useEffect(() => {
         if (!user || !currUser) return;
 
@@ -47,7 +48,6 @@ export default function UserProfile() {
         setIsOpen(isPublic || isFriend || isOwner);
     }, [user, currUser]);
 
-    // Fetch user data
     useEffect(() => {
         if (!userId) return;
 
