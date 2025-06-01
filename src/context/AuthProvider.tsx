@@ -28,12 +28,10 @@ export function AuthProvider({children}: AuthProviderProps) {
         loadUser()
     }, []);
 
-    // Функция для создания ключа шифрования из пароля
     const deriveKeyFromPassword = async (password: string, salt: Uint8Array): Promise<CryptoKey> => {
         const encoder = new TextEncoder();
         const passwordBuffer = encoder.encode(password);
 
-        // Импортируем пароль как ключ для PBKDF2
         const baseKey = await window.crypto.subtle.importKey(
             "raw",
             passwordBuffer,
@@ -42,7 +40,6 @@ export function AuthProvider({children}: AuthProviderProps) {
             ["deriveKey"]
         );
 
-        // Выводим ключ шифрования с помощью PBKDF2
         return window.crypto.subtle.deriveKey(
             {
                 name: "PBKDF2",
