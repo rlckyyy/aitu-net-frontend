@@ -17,7 +17,8 @@ export class CompanionChatStrategy implements ChatStrategy {
         const companionId = this.searchParams.get("companionId")!
         const maybeChatRoom = [...this.chatRooms.values()]
             .find(chatRoom => {
-                chatRoom.participants.values().filter(u => u.id === companionId)
+                return chatRoom.chatRoomType === ChatRoomType.ONE_TO_ONE &&
+                    chatRoom.participants.some(u => u.id === companionId)
             })
 
         if (!maybeChatRoom) {

@@ -32,5 +32,7 @@ export const chatApi = {
         (request<ChatRoomWithMessages[]>(`/chats/${userId ?? ''}`)),
 
     countNewMessages: (chatId: string): Promise<AxiosResponse<{ count: number }>> =>
-        (request<{ count: number }>(`/chats/rooms/${chatId}/messages/count`))
+        (request<{ count: number }>(`/chats/rooms/${chatId}/messages/count`)),
+    getChatParticipantKeys: (chatId: string): Promise<AxiosResponse<Record<string, string>>> =>
+        (request<Record<string, string>>(`/chats/rooms/${chatId}/keys`)),
 };

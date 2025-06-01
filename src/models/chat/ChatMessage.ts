@@ -15,10 +15,21 @@ export type ChatMessage = {
     id?: string;
     chatId: string;
     senderId: string;
-    content: string;
+    encryptedContent: Record<string, string>
+    encryptedKeys: Record<string, string>
     length: number;
-    status: ChatMessageStatus;
+    status?: ChatMessageStatus;
     type: MessageType;
     createdAt?: Date;
     updatedAt?: Date;
 };
+
+export type DecryptedMessage = {
+    id: string
+    chatId: string
+    senderId: string
+    content: string
+    createdAt: Date | string;
+    status: ChatMessageStatus
+    type: MessageType
+}
