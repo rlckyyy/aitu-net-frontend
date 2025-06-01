@@ -13,6 +13,7 @@ export interface User {
     leftOn: Date;
     connectedOn: Date;
     accessType: AccessType;
+    encryptedPrivateKey: string;
 }
 
 export interface Avatar {

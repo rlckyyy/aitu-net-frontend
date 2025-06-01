@@ -21,5 +21,14 @@ export const authApi = {
 
     recoverPassword: async (token: string, password: string) => {
         await request('/auth/recover', {method: 'PATCH', params: {token, password}})
-    }
+    },
+    getEncryptedPrivateKey: async (): Promise<AxiosResponse<{
+        encryptedKey: string;
+        salt: string;
+        iv: string; }>> =>
+        await request<{
+            encryptedKey: string;
+            salt: string;
+            iv: string;
+        }>('/auth/encrypted-private-key', {method: 'GET'}),
 };
