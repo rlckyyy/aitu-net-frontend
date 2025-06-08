@@ -16,15 +16,12 @@ export function useChat() {
     const searchParams = useSearchParams()
     const stompClientRef = useRef<Client | null>(null)
 
-    // State для чатов и сообщений
     const [chatRooms, setChatRooms] = useState<Map<string, ChatRoom>>(new Map())
     const [chatRoomMessages, setChatRoomMessages] = useState<Map<string, DecryptedMessage[]>>(new Map())
     const [currentChatId, setCurrentChatId] = useState<string>("")
 
-    // Кэш публичных ключей участников для каждого чата
     const [participantKeys, setParticipantKeys] = useState<Map<string, Record<string, string>>>(new Map())
 
-    // Управление состоянием чтения сообщений
     const timeoutRef = useRef<NodeJS.Timeout>(null)
     const readMessagesRef = useRef<Map<string, DecryptedMessage>>(new Map())
     const [newMessagesCount, setNewMessagesCount] = useState<Map<string, number>>(new Map())
@@ -32,11 +29,9 @@ export function useChat() {
     const SOCKET_URL: string = process.env.NEXT_PUBLIC_WEBSOCKET_URL || "defaultWebSocketUrl"
     const encryptionService = E2EEncryptionService.getInstance()
 
-    // ===== ИНИЦИАЛИЗАЦИЯ =====
     useEffect(() => {
         if (!user) return
 
-        // Инициализируем сервис шифрования
         encryptionService.initialize()
 
         const stompClient = new Client({
@@ -56,7 +51,6 @@ export function useChat() {
         }
     }, [user])
 
-    // Подсчет новых сообщений при изменении списка чатов
     useEffect(() => {
         if (chatRooms.size === 0) return
 
@@ -80,7 +74,6 @@ export function useChat() {
         loadMessageCounts()
     }, [chatRooms])
 
-    // ===== WEBSOCKET СОЕДИНЕНИЕ =====
     const onConnected = () => {
         if (!user) return
         console.log("🔌 Connected to WebSocket")
@@ -133,13 +126,11 @@ export function useChat() {
             const chatRoom: ChatRoom = messageObject.message
             console.log("📁 New chat room created:", chatRoom.chatId)
 
-            // Добавляем новый чат и загружаем ключи
             pushToChatRooms(chatRoom)
             await loadChatParticipantKeys(chatRoom.chatId)
         }
     }
 
-    // ===== ОТПРАВКА СООБЩЕНИЙ =====
     const sendMessage = async (
         chatId: string,
         messageText: string,
@@ -148,16 +139,12 @@ export function useChat() {
         if (!user) {
             throw new Error('User not authenticated')
         }
-
         if (!messageText.trim()) {
             console.warn('Empty message text, skipping send')
             return
         }
-
         console.log('📤 Sending message to chat:', chatId)
-
         try {
-            // 1. Получаем ключи участников
             let keys = participantKeys.get(chatId)
             if (!keys) {
                 console.log('🔑 Loading participant keys...')
@@ -167,12 +154,8 @@ export function useChat() {
                     throw new Error('Failed to load participant keys')
                 }
             }
-
-            // 2. Шифруем сообщение
             console.log('🔒 Encrypting message...')
             const { encryptedContent, encryptedKeys } = await encryptionService.encryptMessage(messageText, keys)
-
-            // 3. Создаем объект сообщения
             const chatMessage: ChatMessage = {
                 chatId,
                 senderId: user.id,
@@ -181,27 +164,22 @@ export function useChat() {
                 type,
                 length: messageText.length
             }
-
-            // 4. Отправляем через WebSocket
             stompClientRef.current?.publish({
                 destination: '/app/chat',
                 body: JSON.stringify(chatMessage)
             })
-
             console.log('✅ Encrypted message sent')
         } catch (error) {
             console.error('❌ Failed to send encrypted message:', error)
-            throw error // Пробрасываем ошибку для обработки в UI
+            throw error
         }
     }
 
-    // ===== РАСШИФРОВКА СООБЩЕНИЙ =====
     const decryptReceivedMessage = async (encryptedMessage: ChatMessage): Promise<DecryptedMessage> => {
         if (!user) {
             throw new Error('User not authenticated')
         }
 
-        // Расшифровываем содержимое
         const decryptedContent = await encryptionService.decryptMessage(encryptedMessage, user.id)
 
         return {
@@ -215,7 +193,6 @@ export function useChat() {
         }
     }
 
-    // ===== ЗАГРУЗКА ДАННЫХ =====
     const fetchAndSetChatRooms = async (userId?: string) => {
         try {
             const response = await api.chat.fetchChatRooms(userId)
@@ -323,11 +300,9 @@ export function useChat() {
         })
     }
 
-    // ===== ОТМЕТКИ О ПРОЧТЕНИИ =====
     const markMessageAsRead = async (message: DecryptedMessage): Promise<void> => {
         readMessagesRef.current.set(message.id, message)
 
-        // Дебаунс - отправляем статус через 3 секунды
         if (timeoutRef.current) {
             clearTimeout(timeoutRef.current)
         }
@@ -343,7 +318,6 @@ export function useChat() {
             readMessagesRef.current.clear()
         }, 3000)
 
-        // Уменьшаем счетчик новых сообщений
         setNewMessagesCount(prev => {
             const newState = new Map(prev)
             const currentCount = newState.get(message.chatId)
@@ -371,18 +345,15 @@ export function useChat() {
     }
 
     return {
-        // Данные
-        chatRooms,                    // Map<chatId, ChatRoom>
-        chatRoomMessages,             // Map<chatId, DecryptedMessage[]> ← Уже расшифрованные!
-        currentChatId,                // Текущий выбранный чат
-        newMessagesCount,             // Map<chatId, number>
+        chatRooms,
+        chatRoomMessages,
+        currentChatId,
+        newMessagesCount,
 
-        // Функции
-        selectChat,                   // (chatId: string) => Promise<void>
-        sendMessage,                  // (chatId, text, type?) => Promise<void> ← Автоматически шифрует
-        markMessageAsRead,            // (message: DecryptedMessage) => Promise<void>
+        selectChat,
+        sendMessage,
+        markMessageAsRead,
 
-        // Служебное
-        stompClientRef               // Ref на WebSocket клиент
+        stompClientRef
     }
 }

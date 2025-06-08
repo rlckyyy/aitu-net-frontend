@@ -25,6 +25,7 @@ import { Group } from "@/models/group/group";
 import { Menu, Transition } from "@headlessui/react";
 import { CommentList } from "@/components/comments/Comment";
 import { Fragment } from "react";
+import Link from "next/link";
 
 interface PostUnitProps {
     post: Post;
@@ -43,7 +44,6 @@ export default function PostUnit({ post, onDelete, onEdit }: PostUnitProps) {
 
     const { user } = useAuth();
 
-    // Мемоизированные значения для оптимизации
     const userReaction = useMemo(() =>
             reactions.find(r => r.userId === user?.id),
         [reactions, user?.id]
@@ -63,6 +63,22 @@ export default function PostUnit({ post, onDelete, onEdit }: PostUnitProps) {
             user?.id === post.ownerId,
         [user?.id, post.ownerId]
     );
+
+    // Определяем ссылку на профиль в зависимости от типа поста
+    const profileLink = useMemo(() => {
+        if (post.postType === PostType.GROUP && post.groupId) {
+            return {
+                pathname: "/group/profile",
+                query: { groupId: post.groupId }
+            };
+        } else if (post.postType === PostType.USER && post.ownerId) {
+            return {
+                pathname: "/users/profile/another",
+                query: { userId: post.ownerId }
+            };
+        }
+        return null;
+    }, [post.postType, post.groupId, post.ownerId]);
 
     // Загрузка данных
     useEffect(() => {
@@ -189,31 +205,57 @@ export default function PostUnit({ post, onDelete, onEdit }: PostUnitProps) {
         );
     }
 
+    // Компонент для отображения профиля/аватара
+    const ProfileSection = () => {
+        const profileContent = (
+            <>
+                <div className="relative">
+                    <img
+                        src={resourceOwner?.avatar?.location || defaultPfp}
+                        alt={`${post.resource || "Unknown"} avatar`}
+                        className="w-12 h-12 rounded-full object-cover ring-2 ring-gray-100 dark:ring-gray-800"
+                    />
+                    <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full ring-2 ring-white dark:ring-gray-900"></div>
+                </div>
+                <div className="flex flex-col">
+                    <h3 className="font-semibold text-gray-900 dark:text-white text-lg hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200">
+                        {post.postType === PostType.GROUP
+                            ? (resourceOwner as Group)?.name || post.resource || "Unknown Group"
+                            : (resourceOwner as User)?.username || (resourceOwner as User)?.email || post.resource || "Unknown User"
+                        }
+                    </h3>
+                    <time className="text-sm text-gray-500 dark:text-gray-400">
+                        {post.createdAt
+                            ? formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })
+                            : "Just now"}
+                    </time>
+                </div>
+            </>
+        );
+
+        // Если есть ссылка на профиль, оборачиваем в Link
+        if (profileLink) {
+            return (
+                <Link href={profileLink} className="flex items-center space-x-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 rounded-xl p-2 -m-2 transition-colors duration-200">
+                    {profileContent}
+                </Link>
+            );
+        }
+
+        // Если нет ссылки, просто отображаем без Link
+        return (
+            <div className="flex items-center space-x-4">
+                {profileContent}
+            </div>
+        );
+    };
+
     return (
         <article className="bg-white dark:bg-gray-900 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-gray-100 dark:hover:shadow-gray-900/50">
             {/* Заголовок поста */}
             <div className="p-6 pb-4">
                 <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                        <div className="relative">
-                            <img
-                                src={resourceOwner?.avatar?.location || defaultPfp}
-                                alt={`${post.resource || "Unknown"} avatar`}
-                                className="w-12 h-12 rounded-full object-cover ring-2 ring-gray-100 dark:ring-gray-800"
-                            />
-                            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full ring-2 ring-white dark:ring-gray-900"></div>
-                        </div>
-                        <div className="flex flex-col">
-                            <h3 className="font-semibold text-gray-900 dark:text-white text-lg">
-                                {post.resource || "Unknown"}
-                            </h3>
-                            <time className="text-sm text-gray-500 dark:text-gray-400">
-                                {post.createdAt
-                                    ? formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })
-                                    : "Just now"}
-                            </time>
-                        </div>
-                    </div>
+                    <ProfileSection />
 
                     {/* Меню действий */}
                     {isOwner && (

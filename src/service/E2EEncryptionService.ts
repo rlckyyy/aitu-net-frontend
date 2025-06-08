@@ -35,31 +35,25 @@ export class E2EEncryptionService {
             true,
             ["encrypt", "decrypt"]
         )
-
         const encoder = new TextEncoder()
         const data = encoder.encode(plainText)
         const iv = window.crypto.getRandomValues(new Uint8Array(12))
-
         const encryptedData = await window.crypto.subtle.encrypt(
             { name: "AES-GCM", iv: iv },
             aesKey,
             data
         )
-
         const encryptedMessageData = {
             encryptedData: this.arrayBufferToBase64(encryptedData),
             iv: this.arrayBufferToBase64(iv.buffer)
         }
-
         const encryptedContent: Record<string, string> = {}
         const encryptedKeys: Record<string, string> = {}
-
         for (const [userId, publicKeyBase64] of Object.entries(publicKeys)) {
             encryptedKeys[userId] = await this.encryptAESKeyWithRSA(aesKey, publicKeyBase64)
 
             encryptedContent[userId] = JSON.stringify(encryptedMessageData)
         }
-
         return { encryptedContent, encryptedKeys }
     }
 
